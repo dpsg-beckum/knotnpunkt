@@ -1,0 +1,90 @@
+
+body{
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#loginDiv{
+    text-align: center;
+    width: 30vw;
+    margin-top: 30vh;
+    margin-bottom: 35vh;
+    padding: 1em;
+    background-color: wheat;
+}
+
+.loginButton{
+    color: white;
+    background-color: darkred;
+    width: 30%;
+    border-radius: 5px;
+    border-color: white;
+    border-style: solid;
+}
+
+.errorMsg{
+    font-size: 0.7em;
+    color: red;
+}
+
+#titleBar{
+    background-color: darkblue;
+    color: white    ;
+    float: left;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+#titleBar a:hover{
+    text-decoration: underline;
+}
+#titleBar p{
+    float: left;
+}
+
+#headerLogo{
+    font-weight: bold;
+    margin-left: 2%;
+    /* vertical-align: middle; */
+}
+#headerLogo img{
+    vertical-align: text-bottom;
+    height: 1.5em;
+    margin-right: 1em;
+}
+
+
+
+#headerProfil{
+    float: right;
+    margin-top: 1em;
+    font-size: 1em;
+}
+#headerProfil a{
+    color: white;
+    text-decoration: none;
+}
+
+#headerProfil img{
+    vertical-align: text-top;
+    margin-right: 0.5em;
+    /* float: right; */
+}
+#headerLogout{
+    float: right !important;
+    margin-left: 3%;
+    margin-top: calc(1em - 5px);
+    color: white;
+    padding: 5px;
+    margin-right: 5px;
+    text-decoration: none;
+    background-color: grey;
+    vertical-align: middle;
+}
+
+#contentBlock{
+    margin-top: 5%;
+}

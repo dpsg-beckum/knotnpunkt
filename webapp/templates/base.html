@@ -1,0 +1,29 @@
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>DPSG Lagersystem</title>
+    <link rel="stylesheet" type='text/css' href="{{url_for('static', filename='styles.css')}}">
+</head>
+<body>
+        <div id="titleBar">
+            <div id="linkeSeite">
+                
+                <p id="headerLogo"><a href="/home"><img src="{{url_for('static', filename="home.svg")}}" ></a>DPSG Lagersystem</p>
+            </div>
+            <div id="rechteSeite">
+                <a id="headerLogout" href="/logout">Abmelden</a>
+                <div id="headerProfil">
+                    <img id="profilLogo" src="{{url_for("static", filename="profile.svg")}}">
+                    <a id="profilLink" href="/profil/{{current_user.benutzername}}">{{current_user.name}}</a><br>    
+                    </div>
+            </div>
+
+        </div>
+    <div id="contentBlock">
+    {%block content%}{%endblock%}
+    </div>
+    <div id="footerBlock">
+    {%block footer%}{%endblock%}
+    </div>
+</body>
+</html>

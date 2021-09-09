@@ -1,0 +1,24 @@
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Lagersystem</title>
+    <link rel="stylesheet" type='text/css' href="{{url_for('static', filename='styles.css')}}">
+</head>
+<body>
+    <center>
+        <div id="loginDiv">
+        <h1>Anmelden</h1>
+        <form action="login" method="post">
+        <p><input type="text" name="benutzername" id="email_login" placeholder="Benutzername" value="{{request.form.benutzername}}"></p>
+        <p><input type="password" name="passwort" id="passwort" placeholder="Passwort" value="{{request.form.passwort}}"></p>
+        {% if error %}
+                <p class="errorMsg" id="credentialError">{{ error }}
+        {% endif %}
+        <p><input type="submit" value="Login" class="LoginButton"></p>
+        </form>
+        </div>
+    </center>
+
+</body>
+</html>
+

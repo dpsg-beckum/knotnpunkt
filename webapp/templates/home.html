@@ -1,0 +1,16 @@
+{%extends "base.html"%}
+
+{% block content%}
+
+    <center><h1>Startseite</h1>
+    {%for a in apps%}
+    <div><a href="{{a.lower()}}">{{a}}</a></div>
+    {%endfor%}
+    </center>
+{% endblock%}
+
+
+{% block footer%}
+
+
+{% endblock%}
