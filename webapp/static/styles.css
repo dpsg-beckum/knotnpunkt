@@ -1,32 +1,46 @@
+    :root{
+        --dpsg-dunkelblau: #003056;
+        --dpsg-dunkelrot: #810a1a;
+        --dpsg-woelflinge-orange: #ff6400;
+        --dpsg-juffis-blau: #2f53a7;
+        --dpsg-pfadis-grün: #00823c;
+        --dpsg-rover-rot: #cc1f2f;
+        --dpsg-leiter-grau: #b1b9ad;
+        --dpsg-beige: #ecdfcb;
+        --dpsg-braun: #815848 ;
+        --dpsg-hellgrün: #93aa0d
+    
+    }
 
 body{
     background-color: white;
     font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--dpsg-beige);
 }
 
-#loginDiv{
-    text-align: center;
-    width: 30vw;
-    margin-top: 30vh;
-    margin-bottom: 35vh;
-    padding: 1em;
-    background-color: wheat;
+#loginLogoMain{
+    font-family: Arvo, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 6em;
+    color: var(--dpsg-dunkelblau);
 }
 
-.loginButton{
-    color: white;
-    background-color: darkred;
-    width: 30%;
-    border-radius: 5px;
-    border-color: white;
-    border-style: solid;
+#loginLogoSubline{
+    font-family: Arvo, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 1.1em;
+    position: absolute;
+    left: 55%;
+    margin-top: 0;
+    color: var(--dpsg-dunkelrot);
 }
 
-.errorMsg{
-    font-size: 0.7em;
-    color: red;
+#loginUsername{
+    font-size: 3em;
 }
-
+#loginPassword{
+    font-size: 3em;
+}
 #titleBar{
     background-color: darkblue;
     color: white    ;

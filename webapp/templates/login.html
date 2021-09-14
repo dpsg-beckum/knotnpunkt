@@ -1,10 +1,45 @@
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <title>Lagersystem</title>
     <link rel="stylesheet" type='text/css' href="{{url_for('static', filename='styles.css')}}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
+    <center>
+        <div id="loginLogo">
+            <div id="loginLogoMain">
+                knotnpunkt
+            </div>
+            <div id="loginLogoSubline">DPSG St. Stephanus Beckum</div>
+        </div>
+
+        <img src="{{url_for('static', filename='logo_dpsg_beckum.svg')}}"
+            style="padding-top: 10em; padding-bottom: 6em;">
+
+        <form action="login" method="post">
+            <p><input type="text" name="benutzername" id="loginUsername" placeholder="Benutzername"
+                    value="{{request.form.benutzername}}"></p>
+                    <br>
+            <p><input type="password" name="passwort" id="loginPassword" placeholder="Passwort"
+                    value="{{request.form.passwort}}"></p>
+            {% if error %}
+            <p class="errorMsg" id="credentialError">{{ error }}
+                {% endif %}
+            <p><input type="submit" value="Login" class="LoginButton"></p>
+        </form>
+
+    </center>
+
+
+
+
+    <!--     
     <center>
         <div id="loginDiv">
         <h1>Anmelden</h1>
@@ -17,8 +52,8 @@
         <p><input type="submit" value="Login" class="LoginButton"></p>
         </form>
         </div>
-    </center>
+    </center> -->
 
 </body>
-</html>
 
+</html>
