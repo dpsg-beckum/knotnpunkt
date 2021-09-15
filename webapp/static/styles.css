@@ -13,33 +13,116 @@
     }
 
 body{
-    background-color: white;
-    font-family: Arial, Helvetica, sans-serif;
     background-color: var(--dpsg-beige);
 }
 
+/*    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--dpsg-beige);
+    display: grid;
+    grid-template-columns: repeat(, 1fr);
+     overflow: hidden; 
+} */
+
+main{
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 2vw;
+}
 #loginLogoMain{
     font-family: Arvo, Helvetica, sans-serif;
     font-weight: bold;
-    font-size: 6em;
+    font-size: max(4vw, 1.5em);
     color: var(--dpsg-dunkelblau);
+    text-align: center;
 }
-
+#loginLogoMain h1{
+    margin-bottom: 0;
+}
 #loginLogoSubline{
     font-family: Arvo, Helvetica, sans-serif;
     font-weight: bold;
-    font-size: 1.1em;
-    position: absolute;
-    left: 55%;
-    margin-top: 0;
+    font-size: max(2vw, 0.7em);
+    position: relative;
+    /* left: 30%; */
+    /* margin-top: 0; */
     color: var(--dpsg-dunkelrot);
+    text-align: center;
+}
+
+#loginLogoImg{
+    width: 20vw;
+    margin-top: 10vh;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+#loginForm{
+    text-align: center;
 }
 
 #loginUsername{
-    font-size: 3em;
+    font-size: max(2vw, 1em);
+    margin-top: 10vh;
+    border-radius: 0vh;
+    border-color: var(--dpsg-dunkelblau);
+    border-width: 3px;
+    background-color: white
 }
 #loginPassword{
-    font-size: 3em;
+    font-size: max(2vw, 1em);
+    border-color: var(--dpsg-dunkelblau);
+    border-width: 3px;
+    background-color: white
+}
+
+#loginButton{
+    font-size: max(2vw, 1.3em);
+    margin-top: 3vh;
+    border-color: white;
+    border-radius: 1vw;
+    background-color: var(--dpsg-pfadis-grün);
+    color: white;
+    width: 60%;
+    border-style: solid;
+}
+
+/* #loginFooter{
+    font-size: 0.7em;
+    text-align: center;
+    color: rgb(119, 119, 119) !important;
+    font-family: 'Courier New', Courier, monospace
+}
+
+#loginFooter a{
+    color: rgb(119, 119, 119);
+    text-decoration: none;
+} */
+footer{
+    position: fixed;
+    bottom: 1rem;
+    text-align: center;
+    width: 100%;
+    color: rgb(105, 105, 105);
+    font-size: 0.8em;
+}
+footer a{
+    color: rgb(105, 105, 105);
+    text-decoration: none;
+}
+
+@media (min-width: 30em) {
+
+        main{
+          grid-template-columns: repeat(2, 1fr);
+}
+#loginForm{
+    margin-top: 30vh;
+}
+#loginLogoMain{
+    margin-top: 20vh;
+}
 }
 #titleBar{
     background-color: darkblue;
