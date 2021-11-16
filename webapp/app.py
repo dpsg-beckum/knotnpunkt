@@ -16,7 +16,8 @@ logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(me
 app = Flask(__name__)
 app.secret_key = b'c\xb4A+K\xf7\xe9\xab\xb4,\x0c\xc8\xec\x82\xf0\xde'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../test.db'
-db = SQLAlchemy(app)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app, )
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -41,10 +42,10 @@ def login():
                 login_user(user, remember=True)
                 return redirect(url_for('home'))
             else: 
-                debug(f"Falsches Passwort für {request.form['email']}")
+                debug(f"Falsches Passwort für {request.form['benutzername']}")
                 error = 'Benutzername oder Passwort falsch.'
         else:
-            debug(f"Benutzername {request.form['email']} ist nicht in der Datenbank vorhanden")
+            debug(f"Benutzername {request.form['benutzername']} ist nicht in der Datenbank vorhanden")
             error = 'Benutzername oder Passwort falsch.'
     return render_template('login.html', error = error)
 
