@@ -32,7 +32,7 @@
               </a>
           </li>
           {%endfor%}
-          <!-- dropdown -->
+          <!-- Dropdown Prototyp -->
           <!-- <li class="dropdown">
               <a href="#" class="nav-link dropdown-toggle  text-truncate" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">Bootstrap</span>
@@ -64,42 +64,6 @@
         </div>
   </div>
 </div>
-<!-- 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#" style="font-family: Arvo, serif; font-weight:bold;">knotnpunkt</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/home">Start</a>
-                </li>
-                {%for a in apps%}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{a.lower()}}">{{a}}</a>
-                </li>
-                {%endfor%}
-            </ul>
-            <ul class="navbar-nav mb-2 mb-lg-0">
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  {{current_user.name}}
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href="#">Profil</a></li>
-                  <li><a class="dropdown-item" href="#">Einstellungen</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="/logout">Abmelden</a></li>
-                </ul>
-              </li>
-              
-            </ul>
-          </div>
-        </div>
-      </nav> -->
-    
     <div id="footerBlock">
     {%block footer%}{%endblock%}
     </div>
