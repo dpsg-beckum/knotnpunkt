@@ -8,7 +8,7 @@ Hier entsteht die Zelte- und Materialverwaltung der [DPSG St. Stephanus Beckum](
 ```
 git clone https://github.com/dpsg-beckum/knotnpunkt.git
 
-cd /knotnpunkt/webapp
+cd knotnpunkt/webapp
 
 python app.py
 ```
@@ -17,7 +17,7 @@ python app.py
 ```
 git clone https://github.com/dpsg-beckum/knotnpunkt.git
 
-cd /knotnpunkt/webapp
+cd knotnpunkt/webapp
 
 docker build -t knotnpunkt:latest .
 
