@@ -23,6 +23,13 @@ docker build -t knotnpunkt:latest .
 
 docker run -p 5000:5000 -n knotnpunkt -d knotnpunkt:latest
 ```
+Standardbenutzername und Passwort:
+```
+Benutzername: admin
+Passwort: admin
+```
+
+
 ---
   <a href="https://www.instagram.com/dpsg_beckum">
     <img src="https://img.shields.io/badge/%40dpsg__beckum-Instagram-003056" alt="DPSG Beckum auf Instagram">
