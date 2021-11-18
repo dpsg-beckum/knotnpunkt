@@ -1,8 +1,6 @@
 # knotnpunkt
 Hier entsteht die Zelte- und Materialverwaltung der [DPSG St. Stephanus Beckum](https://www.dpsg-beckum.de)
-<center>
-[![Instagram](https://img.shields.io/badge/%40dpsg__beckum-Instagram-003056)](https://www.instagram.com/dpsg_beckum)
-</center>
+
 
 ## Herunterladen und Testen
 
@@ -25,3 +23,8 @@ docker build -t knotnpunkt:latest .
 
 docker run -p 5000:5000 -n knotnpunkt -d knotnpunkt:latest
 ```
+---
+  <a href="https://www.instagram.com/dpsg_beckum">
+    <img src="https://img.shields.io/badge/%40dpsg__beckum-Instagram-003056" alt="DPSG Beckum auf Instagram">
+  </a>
+
