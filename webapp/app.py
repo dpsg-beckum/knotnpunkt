@@ -244,7 +244,7 @@ class Rolle(db.Model):
 
     def __str__(self):
         return f"<Rolle {self.name}>"
-
+    
 class Eigenschaft(db.Model):
     __tablename__ = 'Eigenschaft'
 
