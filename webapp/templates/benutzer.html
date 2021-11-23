@@ -1,0 +1,27 @@
+{%extends "base.html"%}
+
+{% block content%}
+<ul class="list-group">
+{% for user in benutzer_liste %}
+        
+        <li class="list-group-item bg-light">
+            <div class="row">
+                <div class="col">
+                    <h5>{{user.name}}</h5>
+                    <div>{{user.benutzername}}</div>
+                </div>
+                <div class="col">
+                    <div>{{user.Rolle.name}}</div>
+                    <div>Rolle</div>
+                </div>
+                <div class="col">
+                    <h5>einer Woche</h5>
+                    <h6>Mitglied seit</h6>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+
+</ul>
+
+{% endblock%}

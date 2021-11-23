@@ -63,29 +63,29 @@ def logout():
 @app.route('/home')
 @login_required
 def home():
-    user = current_user
-    views = user.views()
-    return render_template('home.html', apps=views)
+    return render_template('home.html', apps=current_user.views())
 
 @app.route("/benutzer")
 @login_required
 def benutzer():
-    return "Benutzerseiten"
+    liste = Benutzer.query.order_by(Benutzer.name).all()
+    debug(liste)
+    return render_template('benutzer.html', apps=current_user.views(), benutzer_liste=liste)
 
 @app.route("/material")
 @login_required
 def material():
-    return "Material"
+    return render_template('material.html', apps=current_user.views())
 
 @app.route("/kalender")
 @login_required
 def kalender():
-    return "Kalender"
+    return render_template('kalender.html', apps=current_user.views())
 
 @app.route("/einstellungen")
 @login_required
 def einstellungen():
-    return "Einstellungen"
+    return render_template('server_einstellungen.html', apps=current_user.views())
 
 @login_manager.user_loader
 def user_loader(user_id):

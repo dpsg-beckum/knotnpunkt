@@ -26,6 +26,12 @@
   </div>
   <div class="offcanvas-body px-0">
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+        <li class="nav-item">
+            <a href="/home" class="nav-link text-truncate">
+                <i class="fs-5 bi-house">Startseite</i>
+                <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+            </a>
+        </li>
         {%for a in apps%}
         <li class="nav-item">
               <a href="/{{a.lower()}}" class="nav-link text-truncate">
@@ -56,15 +62,22 @@
   <div class="row">
       <div class="col min-vh-100 py-3">
           <!-- toggler -->
-          <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+          <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button" style="padding: 0.3em">
               <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
               <img src="{{url_for('static', filename='menu.svg')}}">
-          </button>
-          <div id="contentBlock">
-            {%block content%}{%endblock%}
+            </button>
+            
+            <a class="btn float-start" href="/home" role="button" style="padding:0.3">
+              <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
+              <img src="{{url_for('static', filename='house.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+            </a>
+            <div id="contentBlock">
+                {%block content%}{%endblock%}
             </div>
         </div>
   </div>
+
+  
 </div>
     <div id="footerBlock">
     {%block footer%}{%endblock%}
