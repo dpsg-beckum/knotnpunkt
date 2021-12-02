@@ -72,6 +72,19 @@ def benutzer():
     debug(liste)
     return render_template('benutzer.html', apps=current_user.views(), benutzer_liste=liste)
 
+@app.route('/profil/<benutzername>', methods=['GET', 'POST'])
+def profil(benutzername):
+    if request.method== 'POST':
+        return redirect("/benutzer")
+    else:
+        user = Benutzer.query.get(benutzername)
+        rollen = Rolle.query.all()
+        if current_user.Rolle.schreibenBenutzer:
+            readonly = True
+        else:
+            readonly = False
+        return render_template('profil.html', apps=current_user.views(), user=user, roles = rollen, readonly=readonly)
+
 @app.route("/material")
 @login_required
 def material():

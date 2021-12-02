@@ -3,7 +3,7 @@
 {% block content%}
 <ul class="list-group">
 {% for user in benutzer_liste %}
-        
+        <a href="/profil/{{user.benutzername}}" class="text-decoration-none">
         <li class="list-group-item bg-light">
             <div class="row">
                 <div class="col">
@@ -20,6 +20,7 @@
                 </div>
             </div>
         </li>
+    </a>
         {% endfor %}
 
 </ul>
