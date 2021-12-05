@@ -1,4 +1,5 @@
-from flask import Flask, request
+from os import name
+from flask import Flask, request, Response
 from flask.helpers import url_for
 from flask.templating import render_template
 from flask_login import LoginManager, current_user
@@ -10,6 +11,10 @@ from werkzeug.utils import redirect
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import debug
+
+
+
+#TODO: Rolle und passwort auf Hinzufügen-DIalog übernehmen
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
 
@@ -65,25 +70,70 @@ def logout():
 def home():
     return render_template('home.html', apps=current_user.views())
 
-@app.route("/benutzer")
+
+@app.route("/benutzer", methods=['GET', 'POST'])
 @login_required
 def benutzer():
-    liste = Benutzer.query.order_by(Benutzer.name).all()
-    debug(liste)
-    return render_template('benutzer.html', apps=current_user.views(), benutzer_liste=liste)
-
-@app.route('/profil/<benutzername>', methods=['GET', 'POST'])
-def profil(benutzername):
-    if request.method== 'POST':
+    if request.method =='POST':
+        debug(request.form)
+        debug(Rolle.query.filter_by(name="admin").first().idRolle)
+        neuerBenutzer = Benutzer(request.form.get('benutzername'), request.form.get('name'), request.form.get('email'), f"{request.form.get('benutzername')}", Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle)
+        db.session.add(neuerBenutzer)
+        db.session.commit()
         return redirect("/benutzer")
     else:
-        user = Benutzer.query.get(benutzername)
-        rollen = Rolle.query.all()
         if current_user.Rolle.schreibenBenutzer:
-            readonly = True
+            erlaubeBearbeiten = True
         else:
-            readonly = False
-        return render_template('profil.html', apps=current_user.views(), user=user, roles = rollen, readonly=readonly)
+            erlaubeBearbeiten = False
+        liste = Benutzer.query.order_by(Benutzer.name).all()
+        rollen = Rolle.query.all()
+        
+        return render_template('benutzer.html', apps=current_user.views(), benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
+
+
+
+
+@app.route('/profil/<benutzername>', methods=['GET', 'POST'])
+@login_required
+def profil(benutzername):
+    fehlermeldung = ""
+    if current_user.Rolle.lesenBenutzer or current_user.benutzername == benutzername:
+        if request.method== 'POST':
+            debug(request.form)
+            user = Benutzer.query.get(benutzername)
+            if request.form.get("delete", "off") == 'on':
+                db.session.delete(user)
+                db.session.commit()
+                debug("user gelöscht")
+                return redirect('/benutzer')
+            else:
+                user.benutzername =  request.form['benutzername']
+                user.name = request.form['name']
+                user.email = request.form['email']
+                if request.form.get('rolle'):
+                    user.rolleRef = Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle
+                if request.form.get('passwort', None):
+                    if request.form.get('passwort') == request.form.get('passwortBestaetigung'):
+                        user.passwort = request.form.get('passwort')
+                        debug("Passwort wurde geaendert!")
+                        db.session.add(user)
+                        db.session.commit()
+                    else:
+                        fehlermeldung = "Bitte bestätige dein neues Passwort"
+                db.session.add(user)
+                db.session.commit()        
+                return redirect('/benutzer')
+        else:
+            user = Benutzer.query.get(benutzername)
+            rollen = Rolle.query.all()
+            if current_user.Rolle.schreibenBenutzer and user.Rolle.name != 'admin' or current_user.Rolle.name == 'admin':
+                erlaubeBearbeiten = True
+            else:
+                erlaubeBearbeiten = False
+            return render_template('profil.html', apps=current_user.views(), user=user, roles = rollen, edit=erlaubeBearbeiten, error=fehlermeldung)
+    else:
+        return Response(f'Du hast leider keinen Zugriff auf das Profil von {benutzername}.', 401)
 
 @app.route("/material")
 @login_required
@@ -148,6 +198,17 @@ class Benutzer(db.Model):
     eingeloggt = db.Column(db.Boolean, nullable=False, default=False)
     Adresse = relationship('Adresse')
     Rolle= relationship('Rolle')
+
+    def __init__(self, benutzername, name, emailAdresse, passwort, idRolle) -> None:
+        super().__init__()
+        self.benutzername = benutzername
+        self.name = name
+        self.emailAdresse = emailAdresse
+        self.passwort = passwort
+        self.adresseRef = 1
+        self.rolleRef = idRolle
+        self.eingeloggt = False
+
 
     def is_active(self):
         return True
