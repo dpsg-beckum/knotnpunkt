@@ -1,6 +1,26 @@
 {%extends "base.html"%}
 
 {% block content%}
-
-
+<ul class="row list-group">
+{% for m in materialListe %}
+            <a href="/material/{{m.idMaterial}}" class="text-decoration-none">
+                <li class="list-group-item bg-light">
+                    <div class="row">
+                        <div class="col">
+                            <h5>{{m.name}}</h5>
+                            <div>{{m.Kategorie.name}}</div>
+                        </div>
+                        <div class="col">
+                            <div>Test</div>
+                            <div>Rolle</div>
+                        </div>
+                        <div class="col">
+                            <h5>einer Woche</h5>
+                            <h6>Mitglied seit</h6>
+                        </div>
+                    </div>
+                </li>
+            </a>
+            {% endfor %}
+        </ul>
 {% endblock%}

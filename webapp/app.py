@@ -13,9 +13,6 @@ import logging
 from logging import debug
 
 
-
-#TODO: Rolle und passwort auf Hinzufügen-DIalog übernehmen
-
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
 
 app = Flask(__name__)
@@ -138,7 +135,12 @@ def profil(benutzername):
 @app.route("/material")
 @login_required
 def material():
-    return render_template('material.html', apps=current_user.views())
+    materialien = Material.query.all()
+    return render_template('material.html', apps=current_user.views(), materialListe=materialien)
+
+@app.route('/material/<idMaterial>')
+def materialDetails(idMaterial):
+    return render_template('MaterialDetails.html')
 
 @app.route("/kalender")
 @login_required
@@ -150,10 +152,13 @@ def kalender():
 def einstellungen():
     return render_template('server_einstellungen.html', apps=current_user.views())
 
+@app.route('/scanner')
+def scanner():
+    return render_template('scanner.html')
+
 @login_manager.user_loader
 def user_loader(user_id):
     return Benutzer.query.get(user_id)
-
 
 
 # Datenbank-Klassen
@@ -169,7 +174,6 @@ class Adresse(db.Model):
     def __str__(self):
         return f"<Adresse {id}>"
 
-
 class Kategorie(db.Model):
     __tablename__ = 'Kategorie'
 
@@ -177,14 +181,12 @@ class Kategorie(db.Model):
     name = db.Column(db.String(45), nullable=False)
     istZaehlbar = db.Column(db.String(45), nullable=False)
 
-
 class Label(db.Model):
     __tablename__ = 'Label'
 
     idLabel = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
     datentyp = db.Column(db.String(45), nullable=False)
-
 
 class Benutzer(db.Model):
     __tablename__ = 'Benutzer'
@@ -208,7 +210,6 @@ class Benutzer(db.Model):
         self.adresseRef = 1
         self.rolleRef = idRolle
         self.eingeloggt = False
-
 
     def is_active(self):
         return True
@@ -251,8 +252,6 @@ class Benutzer(db.Model):
     def __repr__(self):
         return f"<User {self.benutzername} {self.Rolle.schreibenEinstellungen}>"
 
-
-
 class Standarteigenschaft(db.Model):
     __tablename__ = 'Standarteigenschaft'
 
@@ -264,7 +263,6 @@ class Standarteigenschaft(db.Model):
 
     Kategorie = relationship('Kategorie')
     Label = relationship('Label')
-
 
 class Aktion(db.Model):
     __tablename__ = 'Aktion'
@@ -279,7 +277,6 @@ class Aktion(db.Model):
     Adresse = relationship('Adresse')
     Benutzer = relationship('Benutzer')
 
-
 class Lager(db.Model):
     __tablename__ = 'Lager'
 
@@ -290,17 +287,12 @@ class Lager(db.Model):
     Adresse = relationship('Adresse')
     Benutzer = relationship('Benutzer')
 
-
 class Material(db.Model):
     __tablename__ = 'Material'
-
     idMaterial = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
     Kategorie_idKategorie = db.Column(db.ForeignKey('Kategorie.idKategorie'), nullable=False, index=True)
-    Lager_idLager = db.Column(db.ForeignKey('Lager.idLager'), nullable=False, index=True)
-
     Kategorie = relationship('Kategorie')
-    Lager = relationship('Lager')
 
 class Rolle(db.Model):
     __tablename__ = 'Rolle'
@@ -333,4 +325,4 @@ class Eigenschaft(db.Model):
 
 
 if __name__ == '__main__':
-    app.run(debug = True, host="0.0.0.0")
+    app.run(debug = True, host="0.0.0.0", ssl_context='adhoc')

@@ -39,3 +39,5 @@ Passwort: admin
     <img src="https://img.shields.io/badge/%40dpsg__beckum-Instagram-003056" alt="DPSG Beckum auf Instagram">
   </a>
 
+Verwendete Bibliotheken:
++ [mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
