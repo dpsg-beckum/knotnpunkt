@@ -21,7 +21,7 @@ python app.py
 ```
 git clone https://github.com/dpsg-beckum/knotnpunkt.git
 
-cd knotnpunkt/webapp
+cd knotnpunkt
 
 docker build -t knotnpunkt:latest .
 
