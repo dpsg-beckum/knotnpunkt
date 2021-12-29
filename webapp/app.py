@@ -1,4 +1,5 @@
 from os import name
+from datetime import datetime as dt
 from flask import Flask, request, Response
 from flask.helpers import url_for
 from flask.templating import render_template
@@ -11,14 +12,20 @@ from werkzeug.utils import redirect
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import debug
+import json
+import humanize as hu
 
+def util(datetime):
+   _t = hu.i18n.activate("de_DE")
+   return hu.naturaltime(dt.now()-dt.strptime(json.loads(datetime).get('zuletztGescannt'), '%Y-%m-%d %H:%M'))
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
-
+print(hu.naturaltime(dt.now()-dt.strptime("2021-11-01 10:23", '%Y-%m-%d %H:%M')))
 app = Flask(__name__)
 app.secret_key = b'c\xb4A+K\xf7\xe9\xab\xb4,\x0c\xc8\xec\x82\xf0\xde'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.jinja_env.globals.update(naturaltime=util)
 db = SQLAlchemy(app, )
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -136,7 +143,7 @@ def profil(benutzername):
 @login_required
 def material():
     materialien = Material.query.all()
-    return render_template('material.html', apps=current_user.views(), materialListe=materialien)
+    return render_template('material.html', apps=current_user.views(), materialListe=materialien, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route('/material/<idMaterial>')
 def materialDetails(idMaterial):
@@ -291,6 +298,7 @@ class Material(db.Model):
     __tablename__ = 'Material'
     idMaterial = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
+    Eigenschaften = db.Column(db.Text, nullable=True)
     Kategorie_idKategorie = db.Column(db.ForeignKey('Kategorie.idKategorie'), nullable=False, index=True)
     Kategorie = relationship('Kategorie')
 

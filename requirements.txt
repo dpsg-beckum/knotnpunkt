@@ -14,3 +14,5 @@ MarkupSafe==2.0.1
 SQLAlchemy==1.4.23
 Werkzeug==2.0.1
 zipp==3.5.0
+cryptography==36.0.0
+humanize==3.13.1
