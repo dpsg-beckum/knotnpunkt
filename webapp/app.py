@@ -169,6 +169,17 @@ def user_loader(user_id):
 
 
 # Datenbank-Klassen
+class Ausleihe():
+    __tablename__ = 'Ausleihe'
+    idAusleihe = db.Column('idAusleihe', db.Integer, primary_key=True),
+    ersteller_benutzername = db.Column('Benutzer_benutzername',db.String(45),db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True),
+    empfaenger = db.Column('empfaenger', db.String(45), nullable=True),
+    ts_erstellt = db.Column('ts_erstellt', db.DateTime, nullable=False),
+    ts_beginn = db.Column('ts_von', db.DateTime, nullable=False),
+    ts_ende = db.Column('ts_bis', db.DateTime, nullable=False),
+    beschreibung = db.Column('beschreibung',db.String(), nullable=False),
+    materialien = db.Column('materialien',db.String(), nullable=False),
+    Ersteller = relationship('Benutzer')
 class Adresse(db.Model):
     __tablename__ = 'Adresse'
 
