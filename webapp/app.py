@@ -1,4 +1,6 @@
-from flask import Flask, request
+from os import name
+from datetime import datetime as dt
+from flask import Flask, request, Response
 from flask.helpers import url_for
 from flask.templating import render_template
 from flask_login import LoginManager, current_user
@@ -10,13 +12,20 @@ from werkzeug.utils import redirect
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import debug
+import json
+import humanize as hu
+
+def util(datetime):
+   _t = hu.i18n.activate("de_DE")
+   return hu.naturaltime(dt.now()-dt.strptime(json.loads(datetime).get('zuletztGescannt'), '%Y-%m-%d %H:%M'))
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
-
+print(hu.naturaltime(dt.now()-dt.strptime("2021-11-01 10:23", '%Y-%m-%d %H:%M')))
 app = Flask(__name__)
 app.secret_key = b'c\xb4A+K\xf7\xe9\xab\xb4,\x0c\xc8\xec\x82\xf0\xde'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.jinja_env.globals.update(naturaltime=util)
 db = SQLAlchemy(app, )
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -63,37 +72,114 @@ def logout():
 @app.route('/home')
 @login_required
 def home():
-    user = current_user
-    views = user.views()
-    return render_template('home.html', apps=views)
+    return render_template('home.html', apps=current_user.views())
 
-@app.route("/benutzer")
+
+@app.route("/benutzer", methods=['GET', 'POST'])
 @login_required
 def benutzer():
-    return "Benutzerseiten"
+    if request.method =='POST':
+        debug(request.form)
+        debug(Rolle.query.filter_by(name="admin").first().idRolle)
+        neuerBenutzer = Benutzer(request.form.get('benutzername'), request.form.get('name'), request.form.get('email'), f"{request.form.get('benutzername')}", Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle)
+        db.session.add(neuerBenutzer)
+        db.session.commit()
+        return redirect("/benutzer")
+    else:
+        if current_user.Rolle.schreibenBenutzer:
+            erlaubeBearbeiten = True
+        else:
+            erlaubeBearbeiten = False
+        liste = Benutzer.query.order_by(Benutzer.name).all()
+        rollen = Rolle.query.all()
+        
+        return render_template('benutzer.html', apps=current_user.views(), benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
+
+
+
+
+@app.route('/profil/<benutzername>', methods=['GET', 'POST'])
+@login_required
+def profil(benutzername):
+    fehlermeldung = ""
+    if current_user.Rolle.lesenBenutzer or current_user.benutzername == benutzername:
+        if request.method== 'POST':
+            debug(request.form)
+            user = Benutzer.query.get(benutzername)
+            if request.form.get("delete", "off") == 'on':
+                db.session.delete(user)
+                db.session.commit()
+                debug("user gelöscht")
+                return redirect('/benutzer')
+            else:
+                user.benutzername =  request.form['benutzername']
+                user.name = request.form['name']
+                user.email = request.form['email']
+                if request.form.get('rolle'):
+                    user.rolleRef = Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle
+                if request.form.get('passwort', None):
+                    if request.form.get('passwort') == request.form.get('passwortBestaetigung'):
+                        user.passwort = request.form.get('passwort')
+                        debug("Passwort wurde geaendert!")
+                        db.session.add(user)
+                        db.session.commit()
+                    else:
+                        fehlermeldung = "Bitte bestätige dein neues Passwort"
+                db.session.add(user)
+                db.session.commit()        
+                return redirect('/benutzer')
+        else:
+            user = Benutzer.query.get(benutzername)
+            rollen = Rolle.query.all()
+            if current_user.Rolle.schreibenBenutzer and user.Rolle.name != 'admin' or current_user.Rolle.name == 'admin':
+                erlaubeBearbeiten = True
+            else:
+                erlaubeBearbeiten = False
+            return render_template('profil.html', apps=current_user.views(), user=user, roles = rollen, edit=erlaubeBearbeiten, error=fehlermeldung)
+    else:
+        return Response(f'Du hast leider keinen Zugriff auf das Profil von {benutzername}.', 401)
 
 @app.route("/material")
 @login_required
 def material():
-    return "Material"
+    materialien = Material.query.all()
+    return render_template('material.html', apps=current_user.views(), materialListe=materialien, jsonRef=json, huRef=hu, dtRef=dt)
+
+@app.route('/material/<idMaterial>')
+def materialDetails(idMaterial):
+    return render_template('MaterialDetails.html')
 
 @app.route("/kalender")
 @login_required
 def kalender():
-    return "Kalender"
+    return render_template('kalender.html', apps=current_user.views())
 
 @app.route("/einstellungen")
 @login_required
 def einstellungen():
-    return "Einstellungen"
+    return render_template('server_einstellungen.html', apps=current_user.views())
+
+@app.route('/scanner')
+def scanner():
+    return render_template('scanner.html')
 
 @login_manager.user_loader
 def user_loader(user_id):
     return Benutzer.query.get(user_id)
 
 
-
 # Datenbank-Klassen
+class Ausleihe():
+    __tablename__ = 'Ausleihe'
+    idAusleihe = db.Column('idAusleihe', db.Integer, primary_key=True),
+    ersteller_benutzername = db.Column('Benutzer_benutzername',db.String(45),db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True),
+    empfaenger = db.Column('empfaenger', db.String(45), nullable=True),
+    ts_erstellt = db.Column('ts_erstellt', db.DateTime, nullable=False),
+    ts_beginn = db.Column('ts_von', db.DateTime, nullable=False),
+    ts_ende = db.Column('ts_bis', db.DateTime, nullable=False),
+    beschreibung = db.Column('beschreibung',db.String(), nullable=False),
+    materialien = db.Column('materialien',db.String(), nullable=False),
+    Ersteller = relationship('Benutzer')
 class Adresse(db.Model):
     __tablename__ = 'Adresse'
 
@@ -106,7 +192,6 @@ class Adresse(db.Model):
     def __str__(self):
         return f"<Adresse {id}>"
 
-
 class Kategorie(db.Model):
     __tablename__ = 'Kategorie'
 
@@ -114,14 +199,12 @@ class Kategorie(db.Model):
     name = db.Column(db.String(45), nullable=False)
     istZaehlbar = db.Column(db.String(45), nullable=False)
 
-
 class Label(db.Model):
     __tablename__ = 'Label'
 
     idLabel = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
     datentyp = db.Column(db.String(45), nullable=False)
-
 
 class Benutzer(db.Model):
     __tablename__ = 'Benutzer'
@@ -135,6 +218,16 @@ class Benutzer(db.Model):
     eingeloggt = db.Column(db.Boolean, nullable=False, default=False)
     Adresse = relationship('Adresse')
     Rolle= relationship('Rolle')
+
+    def __init__(self, benutzername, name, emailAdresse, passwort, idRolle) -> None:
+        super().__init__()
+        self.benutzername = benutzername
+        self.name = name
+        self.emailAdresse = emailAdresse
+        self.passwort = passwort
+        self.adresseRef = 1
+        self.rolleRef = idRolle
+        self.eingeloggt = False
 
     def is_active(self):
         return True
@@ -177,8 +270,6 @@ class Benutzer(db.Model):
     def __repr__(self):
         return f"<User {self.benutzername} {self.Rolle.schreibenEinstellungen}>"
 
-
-
 class Standarteigenschaft(db.Model):
     __tablename__ = 'Standarteigenschaft'
 
@@ -190,7 +281,6 @@ class Standarteigenschaft(db.Model):
 
     Kategorie = relationship('Kategorie')
     Label = relationship('Label')
-
 
 class Aktion(db.Model):
     __tablename__ = 'Aktion'
@@ -205,7 +295,6 @@ class Aktion(db.Model):
     Adresse = relationship('Adresse')
     Benutzer = relationship('Benutzer')
 
-
 class Lager(db.Model):
     __tablename__ = 'Lager'
 
@@ -216,17 +305,13 @@ class Lager(db.Model):
     Adresse = relationship('Adresse')
     Benutzer = relationship('Benutzer')
 
-
 class Material(db.Model):
     __tablename__ = 'Material'
-
     idMaterial = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
+    Eigenschaften = db.Column(db.Text, nullable=True)
     Kategorie_idKategorie = db.Column(db.ForeignKey('Kategorie.idKategorie'), nullable=False, index=True)
-    Lager_idLager = db.Column(db.ForeignKey('Lager.idLager'), nullable=False, index=True)
-
     Kategorie = relationship('Kategorie')
-    Lager = relationship('Lager')
 
 class Rolle(db.Model):
     __tablename__ = 'Rolle'
@@ -259,4 +344,4 @@ class Eigenschaft(db.Model):
 
 
 if __name__ == '__main__':
-    app.run(debug = True, host="0.0.0.0")
+    app.run(debug = True, host="0.0.0.0", ssl_context='adhoc')

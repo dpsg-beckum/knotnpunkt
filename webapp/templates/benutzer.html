@@ -1,0 +1,100 @@
+{%extends "base.html"%}
+
+{% block content%}
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+        role="tab" aria-controls="home" aria-selected="false">Übersicht</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
+            role="tab" aria-controls="profile" aria-selected="true">Hinzufügen...</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <ul class="row list-group">
+            {% for u in benutzer_liste %}
+            <a href="/profil/{{u.benutzername}}" class="text-decoration-none">
+                <li class="list-group-item bg-light">
+                    <div class="row">
+                        <div class="col">
+                            <h5>{{u.name}}</h5>
+                            <div>{{u.benutzername}}</div>
+                        </div>
+                        <div class="col">
+                            <div>{{u.Rolle.name}}</div>
+                            <div>Rolle</div>
+                        </div>
+                        <div class="col">
+                            <h5>einer Woche</h5>
+                            <h6>Mitglied seit</h6>
+                        </div>
+                    </div>
+                </li>
+            </a>
+            {% endfor %}
+        </ul>
+    </div>
+
+
+
+
+    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="add-tab">
+        <form action="benutzer" method="post">
+        <div class="row mt-2">
+
+            <div class="row">
+                <div class="col-sm-3">
+                    <h6 class="mb-0">Benutzername</h6>
+                </div>
+                <div class="col-sm-9 text-secondary">
+                    <input class="form-control" type="text" name="benutzername" id="inputBenutzername">
+                </div>
+            </div>
+    
+            <div class="row">
+                <div class="col-sm-3">
+                    <h6 class="mb-0">Name</h6>
+                </div>
+                <div class="col-sm-9 text-secondary">
+                    <input class="form-control" type="text" name="name" id="inputBenutzername">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3">
+                    <h6 class="mb-0">Email-Adresse</h6>
+                </div>
+                <div class="col-sm-9 text-secondary">
+                    <input class="form-control" type="text" name="email" id="inputBenutzername">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <h6 class="mb-0">Rolle</h6>
+                </div>
+                <div class="col-sm-9 text-secondary">
+                    <select class="form-control" id="inputRolle" name="rolle">
+                        {%for r in roles%}
+                        {%if r.name not in ['admin', 'api'] or current_user.Rolle.name == 'admin'%}<option value="{{r.name}}">{{r.name}}
+                        </option>{%endif%}
+                        {%endfor%}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-4">
+            <input class="btn btn-primary" type="submit" value="Erstellen">
+        </div>       
+        </div>
+    </form>
+    </div>
+</div>
+
+
+
+
+{% endblock%}
