@@ -139,11 +139,18 @@ def profil(benutzername):
     else:
         return Response(f'Du hast leider keinen Zugriff auf das Profil von {benutzername}.', 401)
 
-@app.route("/material")
+@app.route("/material", methods=['GET', 'POST'])
 @login_required
 def material():
-    materialien = Material.query.all()
-    return render_template('material.html', apps=current_user.views(), materialListe=materialien, jsonRef=json, huRef=hu, dtRef=dt)
+    if request.method == 'POST':
+        neuesMaterial = Material(request.form.get('name'), request.form.get('kategorie'), '{"verfuegbar": 3, "anzahl": 12, "zaehlbar": true, "zuletztGescannt": "2021-11-13 10:10"}')
+        db.session.add(neuesMaterial)
+        db.session.commit()
+        return redirect('/material')
+    else:
+        materialien = Material.query.all()
+        kategorien = Kategorie.query.all()
+        return render_template('material.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route('/material/<idMaterial>')
 def materialDetails(idMaterial):
@@ -312,6 +319,12 @@ class Material(db.Model):
     Eigenschaften = db.Column(db.Text, nullable=True)
     Kategorie_idKategorie = db.Column(db.ForeignKey('Kategorie.idKategorie'), nullable=False, index=True)
     Kategorie = relationship('Kategorie')
+
+    def __init__(self, name, kategorie, eigenschaften) -> None:
+        super().__init__()
+        self.name = name if name != '' else 'Unbennantes Material'
+        self.Kategorie_idKategorie = kategorie
+        self.Eigenschaften = eigenschaften
 
 class Rolle(db.Model):
     __tablename__ = 'Rolle'

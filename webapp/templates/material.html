@@ -1,53 +1,110 @@
 {%extends "base.html"%}
 
 {% block content%}
-<ul class="row list-group">
-    {% for m in materialListe %}
-    <li class="list-group-item bg-light">
-        <a href="/material/{{m.idMaterial}}" class="text-decoration-none text-dark">
-            <div class="row">
-                <div class="col-auto">
-                    <img style="height: 4em;"
-                        src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}" alt="">
-                </div>
-                <div class="col">
-                    <h5>{{m.name}}</h5>
-                    <div>{{m.Kategorie.name}}</div>
-                </div>
-                <div class="col">
-                    {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
-                    {% if jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)>0 %}
-                    <div class="text-success">{{jsonRef.loads(m.Eigenschaften).get('verfuegbar')}} /
-                        {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
-                    {% else %}
-                    <div class="text-danger">Nicht verfügbar</div>
-                    {% endif %}
 
-                    {% else %}
-                    {% if jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)==True %}
-                    <div class="text-success">Verfügbar</div>
-                    {% elif jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)==False%}
-                    <div class="text-danger">Nicht verfügbar</div>
-                    {% endif %}
-                    {% endif %}
-                </div>
-                <div class="col d-none d-sm-block">
-                    <div>{{naturaltime(m.Eigenschaften)}}</div>
-                    <div>{#naturaltime(dtRef.now()-dtRef.strptime(jsonRef.loads(m.Eigenschaften).get('zuletztGescannt'),
-                        '%Y-%m-%d %H:%M'))#}</div>
-                    <div style="font-size: 0.8em;">Zuletzt Geändert</div>
-                </div>
-            </div>
-            <div class="row">
-                <!-- {% if jsonRef.loads(m.Eigenschaften).get('farbe',False) %}
-                    <div style="border-radius: 0.5em" class="bg-primary w-auto">
-                        {{jsonRef.loads(m.Eigenschaften).get('farbe',False)}}
+<div class="bd-example">
+    <nav>
+      <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-liste-tab" data-bs-toggle="tab" data-bs-target="#liste-tab" type="button" role="tab">Übersicht</button>
+        <button class="nav-link" id="nav-hinzufuegen-tab" data-bs-toggle="tab" data-bs-target="#hinzufuegen-tab" type="button" role="tab">Hinzufügen...</button>
+      </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade active show" id="liste-tab" role="tabpanel" aria-labelledby="nav-home-tab">
+          
+          <ul class="row list-group">
+              {% for m in materialListe %}
+              <li class="list-group-item bg-light">
+                  <a href="/material/{{m.idMaterial}}" class="text-decoration-none text-dark">
+                      <div class="row">
+                          <div class="col-auto">
+                              <img style="height: 4em;"
+                              src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}" alt="">
+                            </div>
+                            <div class="col">
+                                <h5>{{m.name}}</h5>
+                                <div>{{m.Kategorie.name}}</div>
+                            </div>
+                            <div class="col">
+                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
+                                {% if jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)>0 %}
+                                <div class="text-success">{{jsonRef.loads(m.Eigenschaften).get('verfuegbar')}} /
+                                    {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
+                                    {% else %}
+                                    <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
+                                    
+                                    {% else %}
+                                    {% if jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)==True %}
+                                    <div class="text-success">Verfügbar</div>
+                                    {% elif jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)==False%}
+                                    <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="col d-none d-sm-block">
+                                    <div>{{naturaltime(m.Eigenschaften)}}</div>
+                                    <div>{#naturaltime(dtRef.now()-dtRef.strptime(jsonRef.loads(m.Eigenschaften).get('zuletztGescannt'),
+                                        '%Y-%m-%d %H:%M'))#}</div>
+                                        <div style="font-size: 0.8em;">Zuletzt Geändert</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!-- {% if jsonRef.loads(m.Eigenschaften).get('farbe',False) %}
+                                        <div style="border-radius: 0.5em" class="bg-primary w-auto">
+                                            {{jsonRef.loads(m.Eigenschaften).get('farbe',False)}}
+                                        </div>
+                                        {% endif %} -->
+                                        
+                                    </div>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                {% endif %} -->
+                        
+                        
+                        <div class="tab-pane fade" id="hinzufuegen-tab" role="tabpanel" aria-labelledby="nav-profile-tab">
+                            
+                            <form action="material" method="post">
+                                <div class="mb-3 row">
+                                    <div class="col-1 mt-1 text-xl-end">Name</div>
+                                    <div class="col-xl-3">
+                                  <input type="text" class="form-control" id="floatingInput" placeholder="Jurte II" name="name">   
+                                </div>
+                            </div>
 
-            </div>
-        </a>
-    </li>
-    {% endfor %}
-</ul>
-{% endblock%}
+                                <div class="mb-3 row">
+                                    <div class="col-1 mt-1 text-xl-end">Kategorie</div>
+                                    <div class="col-xl-3">
+                                    <select class="form-select" aria-label=".form-select-lg example" name="kategorie">
+                                      <!-- <option selected="{{kategorienListe}}"</option> -->
+                                        {%for k in kategorienListe%}
+                                      <option value="{{k.idKategorie}}"">{{k.name}}</option>
+                                        {%endfor%}
+                                    </select>
+                                </div>
+                                  </div>
+                                  
+                                  <div class="mb-3 row">
+                                      <div class="col-1 mt-1 text-xl-end">Bild (optional)</div>
+                                      <div class="col-xl-5">
+                                      <input type="file" class="form-control" disabled>
+                                    </div>
+                                    </div> 
+
+                                    <!-- Hier neues Felder einfügen -->
+
+                                    <div class="row">
+                                    <div class="col-1"></div>
+                                    <div class="col-2">
+                                        <button class="btn btn-primary" type="submit">Hinzufügen</button>
+                                      </div> 
+                                    </div>
+                                </form>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endblock%}
