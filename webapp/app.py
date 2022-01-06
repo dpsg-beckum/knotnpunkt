@@ -146,8 +146,10 @@ def material():
     return render_template('material.html', apps=current_user.views(), materialListe=materialien, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route('/material/<idMaterial>')
+@login_required
 def materialDetails(idMaterial):
-    return render_template('MaterialDetails.html')
+    material_details = Material.query.filter_by(idMaterial = idMaterial).all()
+    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route("/kalender")
 @login_required
