@@ -28,7 +28,7 @@
                                 <div>{{m.Kategorie.name}}</div>
                             </div>
                             <div class="col">
-                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
+                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',1)>1 %}
                                 {% if jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)>0 %}
                                 <div class="text-success">{{jsonRef.loads(m.Eigenschaften).get('verfuegbar')}} /
                                     {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
@@ -69,7 +69,7 @@
 
         <div class="tab-pane" id="hinzufuegen-tab" role="tabpanel" aria-labelledby="nav-profile-tab">
 
-            <form action="material" method="post">
+            <form action="material" method="post" id="formMaterialHinzufuegen">
                 <div class="row mb-3">
                     <div class="col-2">
                         <button class="btn btn-success" type="submit">Hinzufügen</button>
@@ -79,7 +79,7 @@
                 <div class="row">
                     <div class="col-xl-4 border mx-xl-2 py-2">
                         <div class="mb-3 row">
-                            <div class="col-2 mt-1 text-xl-end">Name</div>
+                            <div class="col-3 mt-1 text-xl-end">* Name</div>
                             <div class="col-xl">
                                 <input type="text" class="form-control" id="floatingInput" placeholder="Jurte II"
                                     name="name" required>
@@ -87,7 +87,7 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <div class="col-2 mt-1 text-xl-end">Kategorie</div>
+                            <div class="col-3 mt-1 text-xl-end">Kategorie</div>
                             <div class="col-xl">
                                 <select class="form-select" aria-label=".form-select-lg example" name="kategorie">
                                     <!-- <option selected="{{kategorienListe}}"</option> -->
@@ -99,7 +99,7 @@
                         </div>
 
                         <div class=" mb-3 row">
-                            <div class="col-2 mt-1 text-xl-end">Anzahl</div>
+                            <div class="col-3 mt-1 text-xl-end">Anzahl</div>
                             <div class="col-xl">
                                 <input type="number" class="form-control" id="floatingInput" value="1" min="1"
                                     name="anzahl">
@@ -111,15 +111,15 @@
 
                     </div>
 
-                    <div class="col-xl-4 border mt-2 mt-xl-0 mx-xl-2 py-2">
-                        
-                       <!-- TODO: Hier Einfüge-Infos einfügen -->
-                       
+                    <div class="col-xl-4 mt-2 mt-xl-0 mx-xl-2 py-2">
+
+                        <div class="text-danger">* Pflichtfeld</div>
+
                     </div>
                 </div>
 
                 <div>
-                    
+
                     <div class="nav nav-tabs mb-3 mt-1" id="nav-tab-details" role="tablist">
 
                         <button class="nav-link active" id="nav-aussehen-tab" data-bs-toggle="tab"
@@ -131,41 +131,43 @@
                         <button class="nav-link" id="nav-verpackung-tab" data-bs-toggle="tab"
                             data-bs-target="#verpackung-tab" type="button" role="tab">Verpackung & Transport</button>
 
-                        <button class="nav-link" id="nav-verleih-tab" data-bs-toggle="tab"
-                            data-bs-target="#verleih-tab" type="button" role="tab">Verleih</button>
+                        <button class="nav-link" id="nav-verleih-tab" data-bs-toggle="tab" data-bs-target="#verleih-tab"
+                            type="button" role="tab">Verleih</button>
 
-                        </div>
-                        <div class="tab-content" id="nav-tabContent">
-                            <div class="tab-pane active show" id="groesse-tab" role="tabpanel">
-                                <div class="mb-3 row">
-                                    <div class="col-2 mt-1 text-xl-end">Bild (optional)</div>
-                                    <div class="col-xl-3">
-                                        <input type="file" class="form-control" disabled>
-                                    </div>
-                                </div>
-                                <div class="mb-3 row">
-                                    <div class="col-2 mt-1 text-xl-end">Farbe</div>
-                                    <div class="col-xl-3">
-                                        <input type="color" class="form-control" id="floatingInput" name="farbe">
-                                    </div>
+                    </div>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane active show" id="groesse-tab" role="tabpanel">
+                            <div class="mb-3 row">
+                                <div class="col-2 mt-1 text-xl-end">Bild</div>
+                                <div class="col-xl-3">
+                                    <input type="file" class="form-control" disabled>
                                 </div>
                             </div>
-                            <div class="tab-pane " id="anschaffung-tab" role="tabpanel">
-                                <div class="mb-3 row">
-                                    <div class="col-2 mt-1 text-xl-end">Rüsthaus-Artikelnummer</div>
-                                    <div class="col-xl-3">
-                                        <input type="text" class="form-control" id="floatingInput" placeholder=""
-                                            name="ruesthausArtNummer">
-                                    </div>
+                            <div class="mb-3 row">
+                                <div class="col-2 text-xl-end"><input type="checkbox" name="farbeCheckbox"
+                                        id="farbeCheckbox" onclick="farbeCheckboxOnClick(this.checked)" checked> Farbe</div>
+                                <div class="col-xl-3">
+                                    <input type="color" class="form-control" id="farbauswahl" name="farbe"
+                                        disabled="true">
                                 </div>
-                            </div>
-                            <div class="tab-pane" id="verpackung-tab" role="tabpanel">
-                                Verpackung
-                            </div>
-                            <div class="tab-pane" id="verleih-tab" role="tabpanel">
-                                Verleih
                             </div>
                         </div>
+                        <div class="tab-pane " id="anschaffung-tab" role="tabpanel">
+                            <div class="mb-3 row">
+                                <div class="col-2 mt-1 text-xl-end">Rüsthaus-Artikelnummer</div>
+                                <div class="col-xl-3">
+                                    <input type="text" class="form-control" id="floatingInput" placeholder=""
+                                        name="rhArtNummer">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="verpackung-tab" role="tabpanel">
+                            Verpackung
+                        </div>
+                        <div class="tab-pane" id="verleih-tab" role="tabpanel">
+                            Verleih
+                        </div>
+                    </div>
                 </div>
 
             </form>
@@ -174,4 +176,10 @@
     </div>
 </div>
 </div>
+<script>
+    function farbeCheckboxOnClick(status) {
+        status = !status;
+        document.getElementById("farbauswahl").disabled = status;
+    }
+</script>
 {% endblock%}

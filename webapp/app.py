@@ -6,7 +6,7 @@ from flask.templating import render_template
 from flask_login import LoginManager, current_user
 from flask_login.utils import login_required, login_user, logout_user
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.sqltypes import Boolean
+from sqlalchemy.sql.sqltypes import Boolean, Integer
 from sqlalchemy.dialects.mysql import DATETIME
 from werkzeug.utils import redirect
 from flask_sqlalchemy import SQLAlchemy
@@ -143,7 +143,17 @@ def profil(benutzername):
 @login_required
 def material():
     if request.method == 'POST':
-        neuesMaterial = Material(request.form.get('name'), request.form.get('kategorie'), '{"verfuegbar": 3, "anzahl": 12, "zaehlbar": true, "zuletztGescannt": "2021-11-13 10:10"}')
+        debug(request.form.get('rhArtNummer'))
+        eigenschaften = {"anzahl": request.form.get('anzahl')}
+        if request.form.get('farbeCheckbox'):
+            eigenschaften['farbe'] = request.form.get('farbe')
+        if request.form.get('rhArtNummer'):
+            eigenschaften['rhArtNummer'] = request.form.get('rhArtNummer')
+        debug(eigenschaften)
+        if int(eigenschaften['anzahl']) >1:
+            eigenschaften['verfuegbar'] = 1
+        eigenschaften['zuletztGescannt'] = dt.strftime(dt.now(), "%Y-%m-%d %H:%M")
+        neuesMaterial = Material(request.form.get('name'), request.form.get('kategorie'), json.dumps(eigenschaften))
         db.session.add(neuesMaterial)
         db.session.commit()
         return redirect('/material')
