@@ -37,22 +37,19 @@
             </div>
             <div class="row">
                 <h4>Als nächstes ausgeliehen von:</h4>
+                
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
+                    {% for a in ausleihListeZukunft %}
+                        <li class="list-group-item">- <strong>{{a.empfaenger}}</strong> Zeitraum: {{a.ts_beginn}} bis {{a.ts_ende}}</li>
+                    {% endfor %}
                 </ul>
             </div>
             <div class="row" style="padding-top: 30px;">
                 <h4>Zuletzt ausgeliehen von:</h4>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">An item</li>
-                    <li class="list-group-item">A second item</li>
-                    <li class="list-group-item">A third item</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
+                    {% for a in ausleihListeAlt %}
+                        <li class="list-group-item">- <strong>{{a.empfaenger}}</strong> Zeitraum: {{a.ts_beginn}} bis {{a.ts_ende}}</li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>

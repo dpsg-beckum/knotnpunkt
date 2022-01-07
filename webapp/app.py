@@ -149,7 +149,16 @@ def material():
 @login_required
 def materialDetails(idMaterial):
     material_details = Material.query.filter_by(idMaterial = idMaterial).all()
-    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, jsonRef=json, huRef=hu, dtRef=dt)
+    ausleihen = Ausleihe.query.all()
+    ausleihen_filtered_future = []
+    ausleihen_filtered_past = []
+    for a in ausleihen:
+        if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
+            if a.ts_beginn > dt.now():
+                ausleihen_filtered_future.append(a)
+            else:
+                ausleihen_filtered_past.append(a)
+    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route("/kalender")
 @login_required
@@ -171,17 +180,19 @@ def user_loader(user_id):
 
 
 # Datenbank-Klassen
-class Ausleihe():
+class Ausleihe(db.Model):
     __tablename__ = 'Ausleihe'
-    idAusleihe = db.Column('idAusleihe', db.Integer, primary_key=True),
-    ersteller_benutzername = db.Column('Benutzer_benutzername',db.String(45),db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True),
-    empfaenger = db.Column('empfaenger', db.String(45), nullable=True),
-    ts_erstellt = db.Column('ts_erstellt', db.DateTime, nullable=False),
-    ts_beginn = db.Column('ts_von', db.DateTime, nullable=False),
-    ts_ende = db.Column('ts_bis', db.DateTime, nullable=False),
-    beschreibung = db.Column('beschreibung',db.String(), nullable=False),
-    materialien = db.Column('materialien',db.String(), nullable=False),
+
+    idAusleihe = db.Column(db.Integer, primary_key=True)
+    ersteller_benutzername = db.Column('Benutzer_benutzername',db.String(45),db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True)
+    empfaenger = db.Column('empfaenger', db.String(45), nullable=True)
+    ts_erstellt = db.Column('ts_erstellt', db.DateTime, nullable=False)
+    ts_beginn = db.Column('ts_von', db.DateTime, nullable=False)
+    ts_ende = db.Column('ts_bis', db.DateTime, nullable=False)
+    beschreibung = db.Column('beschreibung',db.String(), nullable=False)
+    materialien = db.Column('materialien',db.String(), nullable=False)
     Ersteller = relationship('Benutzer')
+
 class Adresse(db.Model):
     __tablename__ = 'Adresse'
 
