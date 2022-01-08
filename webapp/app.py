@@ -6,6 +6,7 @@ from flask.templating import render_template
 from flask_login import LoginManager, current_user
 from flask_login.utils import login_required, login_user, logout_user
 from sqlalchemy.orm import relationship
+from sqlalchemy import desc
 from sqlalchemy.sql.sqltypes import Boolean
 from sqlalchemy.dialects.mysql import DATETIME
 from werkzeug.utils import redirect
@@ -149,16 +150,20 @@ def material():
 @login_required
 def materialDetails(idMaterial):
     material_details = Material.query.filter_by(idMaterial = idMaterial).all()
-    ausleihen = Ausleihe.query.all()
+    ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
     ausleihen_filtered_future = []
     ausleihen_filtered_past = []
+    verfuegbar = True #Hier noch für zaehlbare Teile Funktion bauen
     for a in ausleihen:
         if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
             if a.ts_beginn > dt.now():
                 ausleihen_filtered_future.append(a)
             else:
                 ausleihen_filtered_past.append(a)
-    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, jsonRef=json, huRef=hu, dtRef=dt)
+                if a.ts_beginn <= dt.now() <= a.ts_ende:
+                    verfuegbar = False
+    zuletzt_ausgeliehen_Tage = (dt.now() - ausleihen_filtered_past[0].ts_beginn).days
+    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbar = verfuegbar,zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route("/kalender")
 @login_required
