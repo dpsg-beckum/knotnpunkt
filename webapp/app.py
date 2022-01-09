@@ -20,6 +20,23 @@ def util(datetime):
    _t = hu.i18n.activate("de_DE")
    return hu.naturaltime(dt.now()-dt.strptime(json.loads(datetime).get('zuletztGescannt'), '%Y-%m-%d %H:%M'))
 
+def checkverfuegbarkeit(materialien):
+    dict_verfuegbar = {}
+    ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all()
+    for m in materialien:
+        verfuegbar = True
+        if json.loads(m.Eigenschaften).get('zaehlbar',False):
+            dict_verfuegbar[m.idMaterial] =json.loads(m.Eigenschaften).get('anzahl',1)
+        for a in ausleihen:
+            if int(m.idMaterial) in [int(x) for x in a.materialien.split(",")]:
+                if a.ts_beginn <= dt.now() <= a.ts_ende:
+                    if json.loads(m.Eigenschaften).get('zaehlbar',False) == False:
+                        dict_verfuegbar[m.idMaterial] = False
+                    else:
+                        dict_verfuegbar[m.idMaterial] = dict_verfuegbar[m.idMaterial] -1
+    return dict_verfuegbar
+
+
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
 print(hu.naturaltime(dt.now()-dt.strptime("2021-11-01 10:23", '%Y-%m-%d %H:%M')))
 app = Flask(__name__)
@@ -144,7 +161,8 @@ def profil(benutzername):
 @login_required
 def material():
     materialien = Material.query.all()
-    return render_template('material.html', apps=current_user.views(), materialListe=materialien, jsonRef=json, huRef=hu, dtRef=dt)
+    verfuegbarkeit = checkverfuegbarkeit(materialien)
+    return render_template('material.html', apps=current_user.views(), materialListe=materialien,verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route('/material/<idMaterial>')
 @login_required
@@ -153,17 +171,15 @@ def materialDetails(idMaterial):
     ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
     ausleihen_filtered_future = []
     ausleihen_filtered_past = []
-    verfuegbar = True #Hier noch für zaehlbare Teile Funktion bauen
+    verfuegbarkeit = checkverfuegbarkeit(material_details)
     for a in ausleihen:
         if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
             if a.ts_beginn > dt.now():
                 ausleihen_filtered_future.append(a)
             else:
                 ausleihen_filtered_past.append(a)
-                if a.ts_beginn <= dt.now() <= a.ts_ende:
-                    verfuegbar = False
     zuletzt_ausgeliehen_Tage = (dt.now() - ausleihen_filtered_past[0].ts_beginn).days
-    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbar = verfuegbar,zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
+    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route("/kalender")
 @login_required

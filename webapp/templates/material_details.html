@@ -13,10 +13,20 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{m.name}}</h5>
                                 <p class="card-text">{{ jsonRef.loads(m.Eigenschaften).get('beschreibung',"-") }}</p>
-                                {% if verfuegbar %}
-                                    <div class="text-success">Verfügbar</div>
+                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
+                                    {% if verfuegbarkeit[m.idMaterial]>0 %}
+                                        <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
+                                        {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
+                                    {% else %}
+                                        <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
+        
                                 {% else %}
-                                    <div class="text-danger">Nicht verfügbar</div>
+                                    {% if verfuegbarkeit[m.idMaterial]==True %}
+                                        <div class="text-success">Verfügbar</div>
+                                    {% elif verfuegbarkeit[m.idMaterial]==False%}
+                                        <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
                                 {% endif %}
                                 <p class="card-text"><small class="text-muted">Zuletzt ausgeliehen: Vor {{zuletzt_ausgeliehen_Tage}} {% if zuletzt_ausgeliehen_Tage == 1 %}Tag{% else %}Tagen{% endif %}</small></p>
                                 <a href="" class="btn btn-primary">Ausleihen</a>
