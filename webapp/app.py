@@ -1,5 +1,7 @@
+from email.policy import default
 from os import name
 from datetime import datetime as dt
+from statistics import median_grouped
 from flask import Flask, request, Response
 from flask.helpers import url_for
 from flask.templating import render_template
@@ -196,7 +198,10 @@ def materialDetails(idMaterial):
                 ausleihen_filtered_future.append(a)
             else:
                 ausleihen_filtered_past.append(a)
-    zuletzt_ausgeliehen_Tage = (dt.now() - ausleihen_filtered_past[0].ts_beginn).days
+    if len(ausleihen_filtered_past):
+        zuletzt_ausgeliehen_Tage = (dt.now() - ausleihen_filtered_past[0].ts_beginn).days
+    else: 
+        zuletzt_ausgeliehen_Tage = None
     return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route("/kalender")
@@ -219,6 +224,20 @@ def user_loader(user_id):
 
 
 # Datenbank-Klassen
+
+class Aktivitaet(db.Model):
+    __tablename__ = 'Aktivitaet'
+    idAktivitaet = db.Column(db.Integer, primary_key=True)
+    MaterialId = db.Column(db.ForeignKey('Material.idMaterial'), nullable=False)
+    ausgecheckt = db.Column('ausgecheckt', db.DateTime, nullable=False)
+    eingecheckt = db.Column('eingecheckt', db.DateTime, nullable=True)
+    menge = db.Column('menge', db.Integer, nullable=False, default=1)
+    ersteller_benutzername = db.Column('ersteller_benutzername',db.String(45),db.ForeignKey('Benutzer.benutzername'), nullable=False)
+    bemerkung = db.Column('bemerkung',db.String(), nullable=True)
+    Material = relationship('Material')
+    Ersteller = relationship('Benutzer')
+
+
 class Ausleihe(db.Model):
     __tablename__ = 'Ausleihe'
 
@@ -226,8 +245,8 @@ class Ausleihe(db.Model):
     ersteller_benutzername = db.Column('Benutzer_benutzername',db.String(45),db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True)
     empfaenger = db.Column('empfaenger', db.String(45), nullable=True)
     ts_erstellt = db.Column('ts_erstellt', db.DateTime, nullable=False)
-    ts_beginn = db.Column('ts_von', db.DateTime, nullable=False)
-    ts_ende = db.Column('ts_bis', db.DateTime, nullable=False)
+    ts_beginn = db.Column('ts_von', db.Date, nullable=False)
+    ts_ende = db.Column('ts_bis', db.Date, nullable=False)
     beschreibung = db.Column('beschreibung',db.String(), nullable=False)
     materialien = db.Column('materialien',db.String(), nullable=False)
     Ersteller = relationship('Benutzer')
