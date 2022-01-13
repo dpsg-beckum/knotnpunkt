@@ -1,7 +1,6 @@
 {%extends "base.html"%}
 
 {% block content%}
-
 <div class="bd-example">
     <nav>
         <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
@@ -28,20 +27,20 @@
                                 <div>{{m.Kategorie.name}}</div>
                             </div>
                             <div class="col">
-                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',1)>1 %}
-                                {% if jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)>0 %}
-                                <div class="text-success">{{jsonRef.loads(m.Eigenschaften).get('verfuegbar')}} /
-                                    {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
+                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
+                                    {% if verfuegbarkeit[m.idMaterial]>0 %}
+                                        <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
+                                        {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
+                                    {% else %}
+                                        <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
+            
                                 {% else %}
-                                <div class="text-danger">Nicht verfügbar</div>
-                                {% endif %}
-
-                                {% else %}
-                                {% if jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)==True %}
-                                <div class="text-success">Verfügbar</div>
-                                {% elif jsonRef.loads(m.Eigenschaften).get('verfuegbar',None)==False%}
-                                <div class="text-danger">Nicht verfügbar</div>
-                                {% endif %}
+                                    {% if verfuegbarkeit[m.idMaterial]==True %}
+                                        <div class="text-success">Verfügbar</div>
+                                    {% elif verfuegbarkeit[m.idMaterial]==False%}
+                                        <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                             <div class="col d-none d-sm-block">
@@ -74,6 +73,7 @@
                     <div class="col-2">
                         <button class="btn btn-success" type="submit">Hinzufügen</button>
                     </div>
+
                 </div>
 
                 <div class="row">

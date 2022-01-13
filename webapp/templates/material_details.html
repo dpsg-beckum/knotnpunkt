@@ -1,0 +1,58 @@
+{%extends "base.html"%}
+
+{% block content%}
+    {% for m in material_details %}
+        <div class="container mx-auto" style="max-width: 800px;">
+            <div class="row">
+                <div class="card mb-5">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}"  class="img-fluid rounded-start" alt="">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{m.name}}</h5>
+                                <p class="card-text">{{ jsonRef.loads(m.Eigenschaften).get('beschreibung',"-") }}</p>
+                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
+                                    {% if verfuegbarkeit[m.idMaterial]>0 %}
+                                        <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
+                                        {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
+                                    {% else %}
+                                        <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
+        
+                                {% else %}
+                                    {% if verfuegbarkeit[m.idMaterial]==True %}
+                                        <div class="text-success">Verfügbar</div>
+                                    {% elif verfuegbarkeit[m.idMaterial]==False%}
+                                        <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
+                                {% endif %}
+                                <p class="card-text"><small class="text-muted">Zuletzt ausgeliehen: Vor {{zuletzt_ausgeliehen_Tage}} {% if zuletzt_ausgeliehen_Tage == 1 %}Tag{% else %}Tagen{% endif %}</small></p>
+                                <a href="" class="btn btn-primary">Ausleihen</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <h4>Als nächstes ausgeliehen von:</h4>
+                
+                <ul class="list-group list-group-flush">
+                    {% for a in ausleihListeZukunft %}
+                        <li class="list-group-item">- <strong>{{a.empfaenger}} →</strong> {{a.ts_beginn.strftime("%d.%m.%Y")}} bis {{a.ts_ende.strftime("%d.%m.%Y")}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="row" style="padding-top: 30px;">
+                <h4>Zuletzt ausgeliehen von:</h4>
+                <ul class="list-group list-group-flush">
+                    {% for a in ausleihListeAlt %}
+                        <li class="list-group-item">- <strong>{{a.empfaenger}} →</strong> {{a.ts_beginn.strftime("%d.%m.%Y")}} bis {{a.ts_ende.strftime("%d.%m.%Y")}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+            
+    {% endfor %}
+{% endblock%}
