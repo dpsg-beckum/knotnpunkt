@@ -1,53 +1,185 @@
 {%extends "base.html"%}
 
 {% block content%}
-<ul class="row list-group">
-    {% for m in materialListe %}
-    <li class="list-group-item bg-light">
-        <a href="/material/{{m.idMaterial}}" class="text-decoration-none text-dark">
-            <div class="row">
-                <div class="col-auto">
-                    <img style="height: 4em;"
-                        src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}" alt="">
-                </div>
-                <div class="col">
-                    <h5>{{m.name}}</h5>
-                    <div>{{m.Kategorie.name}}</div>
-                </div>
-                <div class="col">
-                    {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
-                        {% if verfuegbarkeit[m.idMaterial]>0 %}
-                            <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
-                            {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
-                        {% else %}
-                            <div class="text-danger">Nicht verfügbar</div>
-                        {% endif %}
+<div class="bd-example">
+    <nav>
+        <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+            <button class="nav-link active" id="nav-liste-tab" data-bs-toggle="tab" data-bs-target="#liste-tab"
+                type="button" role="tab">Übersicht</button>
+            <button class="nav-link" id="nav-hinzufuegen-tab" data-bs-toggle="tab" data-bs-target="#hinzufuegen-tab"
+                type="button" role="tab">Hinzufügen...</button>
+        </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane active show" id="liste-tab" role="tabpanel" aria-labelledby="nav-home-tab">
 
-                    {% else %}
-                        {% if verfuegbarkeit[m.idMaterial]==True %}
-                            <div class="text-success">Verfügbar</div>
-                        {% elif verfuegbarkeit[m.idMaterial]==False%}
-                            <div class="text-danger">Nicht verfügbar</div>
-                        {% endif %}
-                    {% endif %}
-                </div>
-                <div class="col d-none d-sm-block">
-                    <div>{{naturaltime(m.Eigenschaften)}}</div>
-                    <div>{#naturaltime(dtRef.now()-dtRef.strptime(jsonRef.loads(m.Eigenschaften).get('zuletztGescannt'),
-                        '%Y-%m-%d %H:%M'))#}</div>
-                    <div style="font-size: 0.8em;">Zuletzt Geändert</div>
-                </div>
-            </div>
-            <div class="row">
-                <!-- {% if jsonRef.loads(m.Eigenschaften).get('farbe',False) %}
-                    <div style="border-radius: 0.5em" class="bg-primary w-auto">
-                        {{jsonRef.loads(m.Eigenschaften).get('farbe',False)}}
+            <ul class="row list-group">
+                {% for m in materialListe %}
+                <li class="list-group-item bg-light">
+                    <a href="/material/{{m.idMaterial}}" class="text-decoration-none text-dark">
+                        <div class="row">
+                            <div class="col-auto">
+                                <img style="height: 4em;"
+                                    src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}" alt="">
+                            </div>
+                            <div class="col">
+                                <h5>{{m.name}}</h5>
+                                <div>{{m.Kategorie.name}}</div>
+                            </div>
+                            <div class="col">
+                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
+                                    {% if verfuegbarkeit[m.idMaterial]>0 %}
+                                        <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
+                                        {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
+                                    {% else %}
+                                        <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
+            
+                                {% else %}
+                                    {% if verfuegbarkeit[m.idMaterial]==True %}
+                                        <div class="text-success">Verfügbar</div>
+                                    {% elif verfuegbarkeit[m.idMaterial]==False%}
+                                        <div class="text-danger">Nicht verfügbar</div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="col d-none d-sm-block">
+                                <div>{{naturaltime(m.Eigenschaften)}}</div>
+                                <div>
+                                    {#naturaltime(dtRef.now()-dtRef.strptime(jsonRef.loads(m.Eigenschaften).get('zuletztGescannt'),
+                                    '%Y-%m-%d %H:%M'))#}</div>
+                                <div style="font-size: 0.8em;">Zuletzt Geändert</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- {% if jsonRef.loads(m.Eigenschaften).get('farbe',False) %}
+                                        <div style="border-radius: 0.5em" class="bg-primary w-auto">
+                                            {{jsonRef.loads(m.Eigenschaften).get('farbe',False)}}
+                                        </div>
+                                        {% endif %} -->
+
+                        </div>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+        <div class="tab-pane" id="hinzufuegen-tab" role="tabpanel" aria-labelledby="nav-profile-tab">
+
+            <form action="material" method="post" id="formMaterialHinzufuegen">
+                <div class="row mb-3">
+                    <div class="col-2">
+                        <button class="btn btn-success" type="submit">Hinzufügen</button>
                     </div>
-                {% endif %} -->
 
-            </div>
-        </a>
-    </li>
-    {% endfor %}
-</ul>
+                </div>
+
+                <div class="row">
+                    <div class="col-xl-4 border mx-xl-2 py-2">
+                        <div class="mb-3 row">
+                            <div class="col-3 mt-1 text-xl-end">* Name</div>
+                            <div class="col-xl">
+                                <input type="text" class="form-control" id="floatingInput" placeholder="Jurte II"
+                                    name="name" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-3 mt-1 text-xl-end">Kategorie</div>
+                            <div class="col-xl">
+                                <select class="form-select" aria-label=".form-select-lg example" name="kategorie">
+                                    <!-- <option selected="{{kategorienListe}}"</option> -->
+                                    {%for k in kategorienListe%}
+                                    <option value="{{k.idKategorie}}">{{k.name}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class=" mb-3 row">
+                            <div class="col-3 mt-1 text-xl-end">Anzahl</div>
+                            <div class="col-xl">
+                                <input type="number" class="form-control" id="floatingInput" value="1" min="1"
+                                    name="anzahl">
+                            </div>
+                        </div>
+
+
+                        <!-- Hier neues Felder einfügen -->
+
+                    </div>
+
+                    <div class="col-xl-4 mt-2 mt-xl-0 mx-xl-2 py-2">
+
+                        <div class="text-danger">* Pflichtfeld</div>
+
+                    </div>
+                </div>
+
+                <div>
+
+                    <div class="nav nav-tabs mb-3 mt-1" id="nav-tab-details" role="tablist">
+
+                        <button class="nav-link active" id="nav-aussehen-tab" data-bs-toggle="tab"
+                            data-bs-target="#groesse-tab" type="button" role="tab">Größe & Aussehen</button>
+
+                        <button class="nav-link" id="nav-anschaffung-tab" data-bs-toggle="tab"
+                            data-bs-target="#anschaffung-tab" type="button" role="tab">Anschaffung</button>
+
+                        <button class="nav-link" id="nav-verpackung-tab" data-bs-toggle="tab"
+                            data-bs-target="#verpackung-tab" type="button" role="tab">Verpackung & Transport</button>
+
+                        <button class="nav-link" id="nav-verleih-tab" data-bs-toggle="tab" data-bs-target="#verleih-tab"
+                            type="button" role="tab">Verleih</button>
+
+                    </div>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane active show" id="groesse-tab" role="tabpanel">
+                            <div class="mb-3 row">
+                                <div class="col-2 mt-1 text-xl-end">Bild</div>
+                                <div class="col-xl-3">
+                                    <input type="file" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-2 text-xl-end"><input type="checkbox" name="farbeCheckbox"
+                                        id="farbeCheckbox" onclick="farbeCheckboxOnClick(this.checked)" checked> Farbe</div>
+                                <div class="col-xl-3">
+                                    <input type="color" class="form-control" id="farbauswahl" name="farbe"
+                                        disabled="true">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane " id="anschaffung-tab" role="tabpanel">
+                            <div class="mb-3 row">
+                                <div class="col-2 mt-1 text-xl-end">Rüsthaus-Artikelnummer</div>
+                                <div class="col-xl-3">
+                                    <input type="text" class="form-control" id="floatingInput" placeholder=""
+                                        name="rhArtNummer">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="verpackung-tab" role="tabpanel">
+                            Verpackung
+                        </div>
+                        <div class="tab-pane" id="verleih-tab" role="tabpanel">
+                            Verleih
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    function farbeCheckboxOnClick(status) {
+        status = !status;
+        document.getElementById("farbauswahl").disabled = status;
+    }
+</script>
 {% endblock%}

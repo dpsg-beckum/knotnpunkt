@@ -6,8 +6,8 @@ from flask.templating import render_template
 from flask_login import LoginManager, current_user
 from flask_login.utils import login_required, login_user, logout_user
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.sqltypes import Boolean, Integer
 from sqlalchemy import desc
-from sqlalchemy.sql.sqltypes import Boolean
 from sqlalchemy.dialects.mysql import DATETIME
 from werkzeug.utils import redirect
 from flask_sqlalchemy import SQLAlchemy
@@ -157,12 +157,30 @@ def profil(benutzername):
     else:
         return Response(f'Du hast leider keinen Zugriff auf das Profil von {benutzername}.', 401)
 
-@app.route("/material")
+@app.route("/material", methods=['GET', 'POST'])
 @login_required
 def material():
-    materialien = Material.query.all()
-    verfuegbarkeit = checkverfuegbarkeit(materialien)
-    return render_template('material.html', apps=current_user.views(), materialListe=materialien,verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
+    if request.method == 'POST':
+        debug(request.form.get('rhArtNummer'))
+        eigenschaften = {"anzahl": request.form.get('anzahl')}
+        if request.form.get('farbeCheckbox'):
+            eigenschaften['farbe'] = request.form.get('farbe')
+        if request.form.get('rhArtNummer'):
+            eigenschaften['rhArtNummer'] = request.form.get('rhArtNummer')
+        debug(eigenschaften)
+        if int(eigenschaften['anzahl']) >1:
+            eigenschaften['verfuegbar'] = 1
+        eigenschaften['zuletztGescannt'] = dt.strftime(dt.now(), "%Y-%m-%d %H:%M")
+        neuesMaterial = Material(request.form.get('name'), request.form.get('kategorie'), json.dumps(eigenschaften))
+        db.session.add(neuesMaterial)
+        db.session.commit()
+        return redirect('/material')
+    else:
+        materialien = Material.query.all()
+        verfuegbarkeit = checkverfuegbarkeit(materialien)
+        kategorien = Kategorie.query.all()
+        return render_template('material.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
+
 
 @app.route('/material/<idMaterial>')
 @login_required
@@ -346,6 +364,12 @@ class Material(db.Model):
     Eigenschaften = db.Column(db.Text, nullable=True)
     Kategorie_idKategorie = db.Column(db.ForeignKey('Kategorie.idKategorie'), nullable=False, index=True)
     Kategorie = relationship('Kategorie')
+
+    def __init__(self, name, kategorie, eigenschaften) -> None:
+        super().__init__()
+        self.name = name if name != '' else 'Unbennantes Material'
+        self.Kategorie_idKategorie = kategorie
+        self.Eigenschaften = eigenschaften
 
 class Rolle(db.Model):
     __tablename__ = 'Rolle'
