@@ -1,6 +1,7 @@
 from email.policy import default
 from os import name
 from datetime import datetime as dt
+from datetime import date
 from statistics import median_grouped
 from flask import Flask, request, Response
 from flask.helpers import url_for
@@ -26,12 +27,13 @@ def checkverfuegbarkeit(materialien):
     dict_verfuegbar = {}
     ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all()
     for m in materialien:
-        verfuegbar = True
         if json.loads(m.Eigenschaften).get('zaehlbar',False):
             dict_verfuegbar[m.idMaterial] =json.loads(m.Eigenschaften).get('anzahl',1)
+        else:
+            dict_verfuegbar[m.idMaterial] = True
         for a in ausleihen:
             if int(m.idMaterial) in [int(x) for x in a.materialien.split(",")]:
-                if a.ts_beginn <= dt.now() <= a.ts_ende:
+                if a.ts_beginn <= date.today() <= a.ts_ende:
                     if json.loads(m.Eigenschaften).get('zaehlbar',False) == False:
                         dict_verfuegbar[m.idMaterial] = False
                     else:
@@ -194,12 +196,12 @@ def materialDetails(idMaterial):
     verfuegbarkeit = checkverfuegbarkeit(material_details)
     for a in ausleihen:
         if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
-            if a.ts_beginn > dt.now():
+            if a.ts_beginn > date.today():
                 ausleihen_filtered_future.append(a)
             else:
                 ausleihen_filtered_past.append(a)
     if len(ausleihen_filtered_past):
-        zuletzt_ausgeliehen_Tage = (dt.now() - ausleihen_filtered_past[0].ts_beginn).days
+        zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_beginn).days
     else: 
         zuletzt_ausgeliehen_Tage = None
     return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
