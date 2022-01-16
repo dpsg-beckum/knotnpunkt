@@ -166,7 +166,7 @@ def profil(benutzername):
 def material():
     if request.method == 'POST':
         debug(request.form.get('rhArtNummer'))
-        eigenschaften = {"anzahl": request.form.get('anzahl')}
+        eigenschaften = {"anzahl": int(request.form.get('anzahl'))}
         if request.form.get('farbeCheckbox'):
             eigenschaften['farbe'] = request.form.get('farbe')
         if request.form.get('rhArtNummer'):
@@ -186,25 +186,46 @@ def material():
         return render_template('material.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
 
 
-@app.route('/material/<idMaterial>')
+@app.route('/material/<idMaterial>', methods=['GET', 'POST'])
 @login_required
 def materialDetails(idMaterial):
-    material_details = Material.query.filter_by(idMaterial = idMaterial).all()
-    ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
-    ausleihen_filtered_future = []
-    ausleihen_filtered_past = []
-    verfuegbarkeit = checkverfuegbarkeit(material_details)
-    for a in ausleihen:
-        if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
-            if a.ts_beginn > date.today():
-                ausleihen_filtered_future.append(a)
+    if request.method == 'POST':
+        material_update = Material.query.filter_by(idMaterial = idMaterial).first()
+        material_update.name = request.form.get('name')
+        material_update.Kategorie_idKategorie = request.form.get('kategorie')
+        eigenschaften = json.loads(material_update.Eigenschaften)
+        debug(type(eigenschaften))
+        if request.form.get('farbeCheckbox'):
+            eigenschaften['farbe'] = request.form.get('farbe')
+        if request.form.get('rhArtNummer'):
+            eigenschaften['rhArtNummer'] = request.form.get('rhArtNummer')
+        if request.form.get('anzahl'):
+            if int(request.form.get('anzahl'))>1:
+                eigenschaften['anzahl'] = int(request.form.get('anzahl'))
+                eigenschaften['zaehlbar'] = True
             else:
-                ausleihen_filtered_past.append(a)
-    if len(ausleihen_filtered_past):
-        zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_beginn).days
-    else: 
-        zuletzt_ausgeliehen_Tage = None
-    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
+                eigenschaften['zaehlbar'] = False
+        material_update.Eigenschaften = json.dumps(eigenschaften)
+        db.session.commit()
+        return redirect('/material/'+idMaterial)
+    else:
+        material_details = Material.query.filter_by(idMaterial = idMaterial).all()
+        ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
+        ausleihen_filtered_future = []
+        ausleihen_filtered_past = []
+        verfuegbarkeit = checkverfuegbarkeit(material_details)
+        for a in ausleihen:
+            if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
+                if a.ts_beginn > date.today():
+                    ausleihen_filtered_future.append(a)
+                else:
+                    ausleihen_filtered_past.append(a)
+        if len(ausleihen_filtered_past):
+            zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_beginn).days
+        else: 
+            zuletzt_ausgeliehen_Tage = None
+        kategorien = Kategorie.query.all()
+        return render_template('material_details.html', apps=current_user.views(), material_details=material_details, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
 
 @app.route("/kalender")
 @login_required

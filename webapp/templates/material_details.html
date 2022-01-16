@@ -5,6 +5,13 @@
         <div class="container mx-auto" style="max-width: 800px;">
             <div class="row">
                 <div class="card mb-5">
+                    <div class="d-flex flex-row-reverse bd-highlight">
+                        <div class="p-2 bd-highlight">
+                            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#ModalMaterialEdit">
+                                <img src="{{url_for('static', filename='pencil.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+                            </button>
+                        </div>
+                    </div>
                     <div class="row g-0">
                         <div class="col-md-4">
                             <img src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}"  class="img-fluid rounded-start" alt="">
@@ -53,6 +60,128 @@
                 </ul>
             </div>
         </div>
+
+        
+        
+        <!-- Modal -->
+        <div class="modal fade" id="ModalMaterialEdit" tabindex="-1" aria-labelledby="ModalMaterialEditLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="ModalMaterialEditLabel">Material bearbeiten</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form action="{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten">                
+                            <div class="row">
+                                <div class="col-xl-6 border mx-xl-2 py-2">
+                                    <div class="mb-3 row">
+                                        <div class="col-3 mt-1 text-xl-end">* Name</div>
+                                        <div class="col-xl">
+                                            <input type="text" class="form-control" id="floatingInput" value="{{m.name}}"
+                                                name="name" required>
+                                        </div>
+                                    </div>
+                                    <div class=" mb-3 row">
+                                        <div class="col-3 mt-1 text-xl-end">Beschreibung</div>
+                                        <div class="col-xl">
+                                            <input type="textarea" class="form-control" id="floatingInput" value="{{jsonRef.loads(m.Eigenschaften).get('beschreibung')}}" name="beschreibung">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 row">
+                                        <div class="col-3 mt-1 text-xl-end">Kategorie</div>
+                                        <div class="col-xl">
+                                            <select class="form-select" aria-label=".form-select-lg example" name="kategorie">
+                                                <!-- <option selected="{{kategorienListe}}"</option> -->
+                                                {%for k in kategorienListe%}
+                                                <option value="{{k.idKategorie}}">{{k.name}}</option>
+                                                {%endfor%}
+                                            </select>
+                                        </div>
+                                    </div>
+                
+                                    <div class=" mb-3 row">
+                                        <div class="col-3 mt-1 text-xl-end">Anzahl</div>
+                                        <div class="col-xl">
+                                            <input type="number" class="form-control" id="floatingInput" value="{% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}{{jsonRef.loads(m.Eigenschaften).get('anzahl')}}{% else %}{{1}}{% endif %}" name="anzahl">
+                                        </div>
+                                    </div>
+                
+                
+                                    <!-- Hier neues Felder einfügen -->
+                
+                                </div>
+                
+                                <div class="col-xl-4 mt-2 mt-xl-0 mx-xl-2 py-2">
+                
+                                    <div class="text-danger">* Pflichtfeld</div>
+                
+                                </div>
+                            </div>
+                
+                            <div>
+                
+                                <div class="nav nav-tabs mb-3 mt-1" id="nav-tab-details" role="tablist">
+                
+                                    <button class="nav-link active" id="nav-aussehen-tab" data-bs-toggle="tab"
+                                        data-bs-target="#groesse-tab" type="button" role="tab">Größe & Aussehen</button>
+                
+                                    <button class="nav-link" id="nav-anschaffung-tab" data-bs-toggle="tab"
+                                        data-bs-target="#anschaffung-tab" type="button" role="tab">Anschaffung</button>
+                
+                                    <button class="nav-link" id="nav-verpackung-tab" data-bs-toggle="tab"
+                                        data-bs-target="#verpackung-tab" type="button" role="tab">Verpackung & Transport</button>
+                
+                                    <button class="nav-link" id="nav-verleih-tab" data-bs-toggle="tab" data-bs-target="#verleih-tab"
+                                        type="button" role="tab">Verleih</button>
+                
+                                </div>
+                                <div class="tab-content" id="nav-tabContent">
+                                    <div class="tab-pane active show" id="groesse-tab" role="tabpanel">
+                                        <div class="mb-3 row">
+                                            <div class="col-2 mt-1 text-xl-end">Bild</div>
+                                            <div class="col-xl-3">
+                                                <input type="file" class="form-control" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3 row">
+                                            <div class="col-2 text-xl-end"><input type="checkbox" name="farbeCheckbox"
+                                                    id="farbeCheckbox" onclick="farbeCheckboxOnClick(this.checked)" checked> Farbe</div>
+                                            <div class="col-xl-3">
+                                                <input type="color" class="form-control" id="farbauswahl" name="farbe">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane " id="anschaffung-tab" role="tabpanel">
+                                        <div class="mb-3 row">
+                                            <div class="col-2 mt-1 text-xl-end">Rüsthaus-Artikelnummer</div>
+                                            <div class="col-xl-3">
+                                                <input type="text" class="form-control" id="floatingInput" placeholder=""
+                                                    name="rhArtNummer">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="verpackung-tab" role="tabpanel">
+                                        Verpackung
+                                    </div>
+                                    <div class="tab-pane" id="verleih-tab" role="tabpanel">
+                                        Verleih
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row justify-content-end">
+                                <div class="col-sm-2">
+                                    <button class="btn btn-success" type="submit">Speichern</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
             
     {% endfor %}
 {% endblock%}
