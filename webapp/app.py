@@ -27,9 +27,10 @@ def checkverfuegbarkeit(materialien):
     dict_verfuegbar = {}
     ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all()
     for m in materialien:
-        verfuegbar = True
         if json.loads(m.Eigenschaften).get('zaehlbar',False):
             dict_verfuegbar[m.idMaterial] =json.loads(m.Eigenschaften).get('anzahl',1)
+        else:
+            dict_verfuegbar[m.idMaterial] = True
         for a in ausleihen:
             if int(m.idMaterial) in [int(x) for x in a.materialien.split(",")]:
                 if a.ts_beginn <= date.today() <= a.ts_ende:
