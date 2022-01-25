@@ -183,6 +183,7 @@ def material():
         materialien = Material.query.all()
         verfuegbarkeit = checkverfuegbarkeit(materialien)
         kategorien = Kategorie.query.all()
+        debug(current_user.benutzername)
         return render_template('material.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
 
 
@@ -210,6 +211,7 @@ def materialDetails(idMaterial):
         return redirect('/material/'+idMaterial)
     else:
         material_details = Material.query.filter_by(idMaterial = idMaterial).all()
+        materialien = Material.query.all()
         ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
         ausleihen_filtered_future = []
         ausleihen_filtered_past = []
@@ -225,7 +227,15 @@ def materialDetails(idMaterial):
         else: 
             zuletzt_ausgeliehen_Tage = None
         kategorien = Kategorie.query.all()
-        return render_template('material_details.html', apps=current_user.views(), material_details=material_details, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
+        return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
+
+@app.route('/reservieren/<idMaterial>', methods=['POST'])
+@login_required
+def materialReservieren(idMaterial):
+    neueReservierung = Ausleihe(ersteller_benutzername = current_user.benutzername,ts_erstellt = dt.now(),ts_beginn = dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"), ts_ende = dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),materialien = str(idMaterial),empfaenger = request.form.get('empfaenger'), beschreibung= request.form.get('beschreibung'))
+    db.session.add(neueReservierung)
+    db.session.commit()
+    return redirect('/material')
 
 @app.route("/kalender")
 @login_required
@@ -270,7 +280,7 @@ class Ausleihe(db.Model):
     ts_erstellt = db.Column('ts_erstellt', db.DateTime, nullable=False)
     ts_beginn = db.Column('ts_von', db.Date, nullable=False)
     ts_ende = db.Column('ts_bis', db.Date, nullable=False)
-    beschreibung = db.Column('beschreibung',db.String(), nullable=False)
+    beschreibung = db.Column('beschreibung',db.String(), nullable=True)
     materialien = db.Column('materialien',db.String(), nullable=False)
     Ersteller = relationship('Benutzer')
 

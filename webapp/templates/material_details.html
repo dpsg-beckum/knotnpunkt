@@ -36,7 +36,7 @@
                                     {% endif %}
                                 {% endif %}
                                 {%if zuletzt_ausgeliehen_Tage%}<p class="card-text"><small class="text-muted">Zuletzt ausgeliehen: Vor {{zuletzt_ausgeliehen_Tage}} {% if zuletzt_ausgeliehen_Tage == 1 %}Tag{% else %}Tagen{% endif %}</small></p>{%endif%}
-                                <a href="" class="btn btn-primary">Ausleihen</a>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalMaterialReservieren">Reservieren</button>
                             </div>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
 
         
         
-        <!-- Modal -->
+        <!-- Modal Material Bearbeiten -->
         <div class="modal fade" id="ModalMaterialEdit" tabindex="-1" aria-labelledby="ModalMaterialEditLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -181,6 +181,88 @@
             </div>
         </div>
 
+                <!-- Modal Material Reservierung -->
+                <div class="modal fade" id="ModalMaterialReservieren" tabindex="-1" aria-labelledby="ModalMaterialReservierenLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="ModalMaterialReservierenLabel">Material reservieren</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/reservieren/{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten"> 
+                                    <div class="row">
+                                        <div class="col-xl-11 border mx-xl-2 py-2">
+                                            <div class="mb-3 row">
+                                                <div class="col-3 mt-1 text-xl-end">Von:</div>
+                                                <div class="col-xl"><input type="date" class="form-control" name="reservieren_von"></div>
+                                            </div>
+                                            <div class="mb-3 row">
+                                                <div class="col-3 mt-1 text-xl-end">Bis:</div>
+                                                <div class="col-xl"><input type="date" class="form-control" name="reservieren_bis"></div>
+                                            </div>
+                                            <div class="mb-3 row">
+                                                <div class="col-3 mt-1 text-xl-end">Ausleiher (wenn selbst, leer lassen):</div>
+                                                <div class="col-xl"><input type="text" class="form-control" name="empfaenger"></div>
+                                            </div>
+                                            <div class="mb-3 row">
+                                                <div class="col-3 mt-1 text-xl-end">Anmerkungen:</div>
+                                                <div class="col-xl"><input type="text" class="form-control" name="beschreibung"></div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                    <div class="row">
+                                        <h4>Weitere Materialien reservieren:</h4>
+                                        <div class="accordion" id="accordionExample">
+                                            {% for k in kategorienListe %}
+                                                <div class="accordion-item">
+                                                    <h2 class="accordion-header" id="heading{{k.idKategorie}}">
+                                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{k.idKategorie}}" aria-expanded="true" aria-controls="collapse{{k.idKategorie}}">
+                                                            {{k.name}}
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapse{{k.idKategorie}}" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                                        <div class="accordion-body">
+                                                            <ul class="list-group list-group-flush">
+                                                                {%for m in materialListe%}
+                                                                    {% if m.Kategorie_idKategorie == k.idKategorie%}
+                                                                        <li class="list-group-item bg-light">
+                                                                            <div class="row">
+                                                                                <div class="col-auto">
+                                                                                    <img style="height: 4em;"
+                                                                                        src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}" alt="">
+                                                                                </div>
+                                                                                <div class="col">
+                                                                                    <h5>{{m.name}}</h5>
+                                                                                </div>
+                                                                                <div class="col">
+                                                                                    verfügbar
+                                                                                </div>
+                                                                                <div class="col">
+                                                                                    <button type="button" class="btn btn-primary">Hinzufügen</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </li>
+                                                                    {% endif %}
+                                                                {%endfor%}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="mb-3 row">
+                                            <button class="btn btn-success btn-sm" type="submit">Prüfen & Reservieren</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         
             
     {% endfor %}
