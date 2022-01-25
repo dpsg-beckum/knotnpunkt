@@ -1,8 +1,10 @@
 from email.policy import default
 from os import name
 from datetime import datetime as dt
+from datetime import date
 from statistics import median_grouped
-from flask import Flask, request, Response
+from time import sleep          #time.sleep um die UI bei API-Anfragen zu testen
+from flask import Flask, request, Response, jsonify     #jsonify macht direkt eine Flask.Response anstatt String
 from flask.helpers import url_for
 from flask.templating import render_template
 from flask_login import LoginManager, current_user
@@ -26,12 +28,13 @@ def checkverfuegbarkeit(materialien):
     dict_verfuegbar = {}
     ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all()
     for m in materialien:
-        verfuegbar = True
         if json.loads(m.Eigenschaften).get('zaehlbar',False):
             dict_verfuegbar[m.idMaterial] =json.loads(m.Eigenschaften).get('anzahl',1)
+        else:
+            dict_verfuegbar[m.idMaterial] = True
         for a in ausleihen:
             if int(m.idMaterial) in [int(x) for x in a.materialien.split(",")]:
-                if a.ts_beginn <= dt.now() <= a.ts_ende:
+                if a.ts_beginn <= date.today() <= a.ts_ende:
                     if json.loads(m.Eigenschaften).get('zaehlbar',False) == False:
                         dict_verfuegbar[m.idMaterial] = False
                     else:
@@ -194,12 +197,12 @@ def materialDetails(idMaterial):
     verfuegbarkeit = checkverfuegbarkeit(material_details)
     for a in ausleihen:
         if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
-            if a.ts_beginn > dt.now():
+            if a.ts_beginn > date.today():
                 ausleihen_filtered_future.append(a)
             else:
                 ausleihen_filtered_past.append(a)
     if len(ausleihen_filtered_past):
-        zuletzt_ausgeliehen_Tage = (dt.now() - ausleihen_filtered_past[0].ts_beginn).days
+        zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_beginn).days
     else: 
         zuletzt_ausgeliehen_Tage = None
     return render_template('material_details.html', apps=current_user.views(), material_details=material_details, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
@@ -223,6 +226,28 @@ def user_loader(user_id):
     return Benutzer.query.get(user_id)
 
 
+@app.route('/api/material')
+@login_required
+def material_api():
+    #sleep(1)  # Verzögerung um UI zu testen. VORSICHT: sleep verzögert Sekunden, nicht Millisekunden
+    material = Material.query.filter_by(idMaterial = request.args.get('id')).first()
+    verfuegbarkeit = checkverfuegbarkeit([material])
+    if verfuegbarkeit.get(material.idMaterial):     # Hier die Abfrage nach dem Ende der Reservierung...
+        ...
+    else:                                           # ...oder nach dem Beginn der Nächsten
+        ...
+    antwort = {'verfuegbarkeit': verfuegbarkeit,'id': material.idMaterial, 'name': material.name, 'kategorie': {'id': material.Kategorie.idKategorie, 'name':material.Kategorie.name}, 'eigenschaften': json.loads(material.Eigenschaften)}
+    return jsonify(antwort)
+
+@app.route('/api/material/checkout', methods=['POST'])
+@login_required
+def checkout():
+    debug(request.form['id'])
+    neue_aktivitaet = Aktivitaet(int(request.form.get('id')), dt.utcfromtimestamp(int(request.form.get('timestamp')[:-3])), int(request.form.get('menge')), current_user.benutzername, request.form.get('bemerkung'))
+    db.session.add(neue_aktivitaet)
+    db.session.commit()
+    return Response(status=200)
+
 # Datenbank-Klassen
 
 class Aktivitaet(db.Model):
@@ -236,6 +261,14 @@ class Aktivitaet(db.Model):
     bemerkung = db.Column('bemerkung',db.String(), nullable=True)
     Material = relationship('Material')
     Ersteller = relationship('Benutzer')
+
+    def __init__(self, mat_id, ts_ausgecheckt, menge, benutzer, bemerkung) -> None:
+        super().__init__()
+        self.MaterialId = mat_id
+        self.ausgecheckt = ts_ausgecheckt
+        self.menge = menge
+        self.ersteller_benutzername = benutzer
+        self.bemerkung = bemerkung
 
 
 class Ausleihe(db.Model):
