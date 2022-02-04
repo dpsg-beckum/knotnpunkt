@@ -7,7 +7,7 @@
                 <div class="card mb-5">
                     <div class="d-flex flex-row-reverse bd-highlight">
                         <div class="p-2 bd-highlight">
-                            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#ModalMaterialEdit">
+                            <button type="button" class="btn" id="editButton" data-bs-toggle="modal" data-bs-target="#ModalMaterialEdit">
                                 <img src="{{url_for('static', filename='pencil.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
                             </button>
                         </div>
@@ -17,7 +17,7 @@
                             <img src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}"  class="img-fluid rounded-start" alt="">
                         </div>
                         <div class="col-md-8">
-                            <div class="card-body">
+                            <div class="card-body" id="materialInfoCardBody">
                                 <h5 class="card-title">{{m.name}}</h5>
                                 <p class="card-text">{{ jsonRef.loads(m.Eigenschaften).get('beschreibung',"-") }}</p>
                                 {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
@@ -36,7 +36,7 @@
                                     {% endif %}
                                 {% endif %}
                                 {%if zuletzt_ausgeliehen_Tage%}<p class="card-text"><small class="text-muted">Zuletzt ausgeliehen: Vor {{zuletzt_ausgeliehen_Tage}} {% if zuletzt_ausgeliehen_Tage == 1 %}Tag{% else %}Tagen{% endif %}</small></p>{%endif%}
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalMaterialReservieren">Reservieren</button>
+                                <button type="button" class="btn btn-primary" id="reservierenButton" data-bs-toggle="modal" data-bs-target="#ModalMaterialReservieren">Reservieren</button>
                             </div>
                         </div>
                     </div>

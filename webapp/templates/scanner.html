@@ -82,6 +82,9 @@
                             url: '/material/' + gescannte_id,   //holt sich die Material-Detail-Seite und bindet sie in das modal ein
                             success: function (result) {    
                                 $('#contentScreen').html(jQuery.parseHTML(result)[18].children[0].children[0].children.contentBlock.children[0]);
+                                $('#editButton').hide();
+                                $('#reservierenButton').hide();
+                                $('#materialInfoCardBody').append('<a class="btn btn-warning" href="/material/' + gescannte_id + '">Mehr Details</a>')
                             }
                         })
                         $.ajax({            //holt sich den Namen des Materials für die alert-Box
