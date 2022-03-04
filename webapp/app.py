@@ -9,6 +9,7 @@ from flask.helpers import url_for
 from flask.templating import render_template
 from flask_login import LoginManager, current_user
 from flask_login.utils import login_required, login_user, logout_user
+from flask_migrate import Migrate
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import Boolean, Integer
 from sqlalchemy import desc
@@ -43,15 +44,15 @@ def checkverfuegbarkeit(materialien):
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
-print(hu.naturaltime(dt.now()-dt.strptime("2021-11-01 10:23", '%Y-%m-%d %H:%M')))
 app = Flask(__name__)
 app.secret_key = b'c\xb4A+K\xf7\xe9\xab\xb4,\x0c\xc8\xec\x82\xf0\xde'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database-test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.jinja_env.globals.update(naturaltime=util)
-db = SQLAlchemy(app, )
 login_manager = LoginManager()
 login_manager.init_app(app)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 @app.route('/')
@@ -334,12 +335,12 @@ class Kategorie(db.Model):
     name = db.Column(db.String(45), nullable=False)
     istZaehlbar = db.Column(db.String(45), nullable=False)
 
-class Label(db.Model):
-    __tablename__ = 'Label'
+# class Label(db.Model):
+#     __tablename__ = 'Label'
 
-    idLabel = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(45), nullable=False)
-    datentyp = db.Column(db.String(45), nullable=False)
+#     idLabel = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(45), nullable=False)
+#     datentyp = db.Column(db.String(45), nullable=False)
 
 class Benutzer(db.Model):
     __tablename__ = 'Benutzer'
@@ -405,40 +406,40 @@ class Benutzer(db.Model):
     def __repr__(self):
         return f"<User {self.benutzername} {self.Rolle.schreibenEinstellungen}>"
 
-class Standarteigenschaft(db.Model):
-    __tablename__ = 'Standarteigenschaft'
+# class Standarteigenschaft(db.Model):
+#     __tablename__ = 'Standarteigenschaft'
 
-    Kategorie_idKategorie = db.Column(db.ForeignKey('Kategorie.idKategorie'), primary_key=True, nullable=False, index=True)
-    Label_idLabel = db.Column(db.ForeignKey('Label.idLabel'), primary_key=True, nullable=False, index=True)
-    wertInt = db.Column(db.String(45))
-    wertString = db.Column(db.String(45))
-    wertBool = db.Column(db.String(45))
+#     Kategorie_idKategorie = db.Column(db.ForeignKey('Kategorie.idKategorie'), primary_key=True, nullable=False, index=True)
+#     Label_idLabel = db.Column(db.ForeignKey('Label.idLabel'), primary_key=True, nullable=False, index=True)
+#     wertInt = db.Column(db.String(45))
+#     wertString = db.Column(db.String(45))
+#     wertBool = db.Column(db.String(45))
 
-    Kategorie = relationship('Kategorie')
-    Label = relationship('Label')
+#     Kategorie = relationship('Kategorie')
+#     Label = relationship('Label')
 
-class Aktion(db.Model):
-    __tablename__ = 'Aktion'
+# class Aktion(db.Model):
+#     __tablename__ = 'Aktion'
 
-    idAktion = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(45), nullable=False)
-    beginn = db.Column(DATETIME(fsp=4), nullable=False)
-    ende = db.Column(DATETIME(fsp=4), nullable=False)
-    ansprechpartnerRef = db.Column(db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True)
-    Adresse_idAdresse = db.Column(db.ForeignKey('Adresse.idAdresse'), nullable=False, index=True)
+#     idAktion = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(45), nullable=False)
+#     beginn = db.Column(DATETIME(fsp=4), nullable=False)
+#     ende = db.Column(DATETIME(fsp=4), nullable=False)
+#     ansprechpartnerRef = db.Column(db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True)
+#     Adresse_idAdresse = db.Column(db.ForeignKey('Adresse.idAdresse'), nullable=False, index=True)
 
-    Adresse = relationship('Adresse')
-    Benutzer = relationship('Benutzer')
+#     Adresse = relationship('Adresse')
+#     Benutzer = relationship('Benutzer')
 
-class Lager(db.Model):
-    __tablename__ = 'Lager'
+# class Lager(db.Model):
+#     __tablename__ = 'Lager'
 
-    idLager = db.Column(db.Integer, primary_key=True)
-    adresseRef = db.Column(db.ForeignKey('Adresse.idAdresse'), nullable=False, index=True)
-    ansprechpartnerRef = db.Column(db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True)
+#     idLager = db.Column(db.Integer, primary_key=True)
+#     adresseRef = db.Column(db.ForeignKey('Adresse.idAdresse'), nullable=False, index=True)
+#     ansprechpartnerRef = db.Column(db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True)
 
-    Adresse = relationship('Adresse')
-    Benutzer = relationship('Benutzer')
+#     Adresse = relationship('Adresse')
+#     Benutzer = relationship('Benutzer')
 
 class Material(db.Model):
     __tablename__ = 'Material'
@@ -471,17 +472,17 @@ class Rolle(db.Model):
     def __str__(self):
         return f"<Rolle {self.name}>"
     
-class Eigenschaft(db.Model):
-    __tablename__ = 'Eigenschaft'
+# class Eigenschaft(db.Model):
+#     __tablename__ = 'Eigenschaft'
 
-    Material_idMaterial = db.Column(db.ForeignKey('Material.idMaterial'), primary_key=True, nullable=False, index=True)
-    Label_idLabel = db.Column(db.ForeignKey('Label.idLabel'), primary_key=True, nullable=False, index=True)
-    wertInt = db.Column(db.String(45))
-    wertString = db.Column(db.String(45))
-    wertBool = db.Column(db.String(45))
+#     Material_idMaterial = db.Column(db.ForeignKey('Material.idMaterial'), primary_key=True, nullable=False, index=True)
+#     Label_idLabel = db.Column(db.ForeignKey('Label.idLabel'), primary_key=True, nullable=False, index=True)
+#     wertInt = db.Column(db.String(45))
+#     wertString = db.Column(db.String(45))
+#     wertBool = db.Column(db.String(45))
 
-    Label = relationship('Label')
-    Material = relationship('Material')
+#     Label = relationship('Label')
+#     Material = relationship('Material')
 
 
 if __name__ == '__main__':
