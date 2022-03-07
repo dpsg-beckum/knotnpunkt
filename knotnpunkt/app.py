@@ -47,7 +47,7 @@ def checkverfuegbarkeit(materialien):
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
 app = Flask(__name__)
 app.secret_key = b'c\xb4A+K\xf7\xe9\xab\xb4,\x0c\xc8\xec\x82\xf0\xde'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database-test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.jinja_env.globals.update(naturaltime=util)
 login_manager = LoginManager()
