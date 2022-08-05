@@ -1,16 +1,14 @@
-from .models import * 
 from email.policy import default
 from os import name
 from datetime import datetime as dt
 from datetime import date
 from statistics import median_grouped
 from time import sleep          #time.sleep um die UI bei API-Anfragen zu testen
-from flask import Flask, request, Response, jsonify     #jsonify macht direkt eine Flask.Response anstatt String
+from flask import Flask, request, Response, jsonify, Blueprint     #jsonify macht direkt eine Flask.Response anstatt String
 from flask.helpers import url_for
 from flask.templating import render_template
 from flask_login import LoginManager, current_user
 from flask_login.utils import login_required, login_user, logout_user
-from flask_migrate import Migrate
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import Boolean, Integer
 from sqlalchemy import desc
@@ -20,11 +18,17 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import debug
 import json
-import humanize as hu
+from .models import * 
+# from . import login_manager
+# from . import app, login_manager
+
+
+views = Blueprint("views", __name__, template_folder="templates")
 
 def util(datetime):
-   _t = hu.i18n.activate("de_DE")
-   return hu.naturaltime(dt.now()-dt.strptime(json.loads(datetime).get('zuletztGescannt'), '%Y-%m-%d %H:%M'))
+    ...
+#    _t = hu.i18n.activate("de_DE")
+#    return hu.naturaltime(dt.now()-dt.strptime(json.loads(datetime).get('zuletztGescannt'), '%Y-%m-%d %H:%M'))
 
 def checkverfuegbarkeit(materialien):
     dict_verfuegbar = {}
@@ -45,23 +49,23 @@ def checkverfuegbarkeit(materialien):
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
-app = Flask(__name__)
-app.secret_key = b'c\xb4A+K\xf7\xe9\xab\xb4,\x0c\xc8\xec\x82\xf0\xde'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.jinja_env.globals.update(naturaltime=util)
-login_manager = LoginManager()
-login_manager.init_app(app)
+# app = Flask(__name__)
+# app.secret_key = b'c\xb4A+K\xf7\xe9\xab\xb4,\x0c\xc8\xec\x82\xf0\xde'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database.db'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.jinja_env.globals.update(naturaltime=util)
+# login_manager = LoginManager()
+# login_manager.init_app(app)
 # db = SQLAlchemy(app)
-db.init_app(app)
-migrate = Migrate(app, db)
+# db.init_app(app)
+# migrate = Migrate(app, db)
 
 
-@app.route('/')
+@views.route('/')
 def redirectToLogin():
     return redirect(url_for('login'))
 
-@app.route("/login", methods=['GET', 'POST'])
+@views.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
             return redirect(url_for('home'))
@@ -84,7 +88,7 @@ def login():
             error = 'Benutzername oder Passwort falsch.'
     return render_template('login.html', error = error)
 
-@app.route('/logout', methods=['GET'])
+@views.route('/logout', methods=['GET'])
 @login_required
 def logout():
     user = current_user
@@ -95,13 +99,13 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/home')
+@views.route('/home')
 @login_required
 def home():
     return render_template('home.html', apps=current_user.views())
 
 
-@app.route("/benutzer", methods=['GET', 'POST'])
+@views.route("/benutzer", methods=['GET', 'POST'])
 @login_required
 def benutzer():
     if request.method =='POST':
@@ -124,7 +128,7 @@ def benutzer():
 
 
 
-@app.route('/profil/<benutzername>', methods=['GET', 'POST'])
+@views.route('/profil/<benutzername>', methods=['GET', 'POST'])
 @login_required
 def profil(benutzername):
     fehlermeldung = ""
@@ -165,7 +169,7 @@ def profil(benutzername):
     else:
         return Response(f'Du hast leider keinen Zugriff auf das Profil von {benutzername}.', 401)
 
-@app.route("/material", methods=['GET', 'POST'])
+@views.route("/material", methods=['GET', 'POST'])
 @login_required
 def material():
     if request.method == 'POST':
@@ -188,10 +192,10 @@ def material():
         verfuegbarkeit = checkverfuegbarkeit(materialien)
         kategorien = Kategorie.query.all()
         debug(current_user.benutzername)
-        return render_template('material.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
+        return render_template('material.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, dtRef=dt)
 
 
-@app.route('/material/<idMaterial>', methods=['GET', 'POST'])
+@views.route('/material/<idMaterial>', methods=['GET', 'POST'])
 @login_required
 def materialDetails(idMaterial):
     if request.method == 'POST':
@@ -231,9 +235,9 @@ def materialDetails(idMaterial):
         else: 
             zuletzt_ausgeliehen_Tage = None
         kategorien = Kategorie.query.all()
-        return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
+        return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, dtRef=dt)
 
-@app.route('/reservieren/<idMaterial>', methods=['POST'])
+@views.route('/reservieren/<idMaterial>', methods=['POST'])
 @login_required
 def materialReservieren(idMaterial):
     neueReservierung = Ausleihe(ersteller_benutzername = current_user.benutzername,ts_erstellt = dt.now(),ts_beginn = dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"), ts_ende = dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),materialien = str(idMaterial),empfaenger = request.form.get('empfaenger'), beschreibung= request.form.get('beschreibung'))
@@ -241,26 +245,26 @@ def materialReservieren(idMaterial):
     db.session.commit()
     return redirect('/material')
 
-@app.route("/kalender")
+@views.route("/kalender")
 @login_required
 def kalender():
     return render_template('kalender.html', apps=current_user.views())
 
-@app.route("/einstellungen")
+@views.route("/einstellungen")
 @login_required
 def einstellungen():
     return render_template('server_einstellungen.html', apps=current_user.views())
 
-@app.route('/scanner')
+@views.route('/scanner')
 def scanner():
     return render_template('scanner.html')
 
-@login_manager.user_loader
-def user_loader(user_id):
-    return Benutzer.query.get(user_id)
+# @login_manager.user_loader
+# def user_loader(user_id):
+#     return Benutzer.query.get(user_id)
 
 
-@app.route('/api/material')
+@views.route('/api/material')
 @login_required
 def material_api():
     #sleep(1)  # Verzögerung um UI zu testen. VORSICHT: sleep verzögert Sekunden, nicht Millisekunden
@@ -273,7 +277,7 @@ def material_api():
     antwort = {'verfuegbarkeit': verfuegbarkeit,'id': material.idMaterial, 'name': material.name, 'kategorie': {'id': material.Kategorie.idKategorie, 'name':material.Kategorie.name}, 'eigenschaften': json.loads(material.Eigenschaften)}
     return jsonify(antwort)
 
-@app.route('/api/material/checkout', methods=['POST'])
+@views.route('/api/material/checkout', methods=['POST'])
 @login_required
 def checkout():
     debug(request.form['id'])
