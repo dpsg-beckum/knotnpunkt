@@ -2,7 +2,8 @@ from flask import Flask
 from flask_login import LoginManager
 from secrets import token_bytes
 from .models import *
-from .views import views
+from .api import api
+from .ui_endpoints import ui
 
 app = Flask(__name__)
 app.secret_key = token_bytes(12)
@@ -10,8 +11,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.jinja_env.globals.update(naturaltime=util)
 
-app.register_blueprint(views)
-# app.register_blueprint(api)
+app.register_blueprint(ui)
+app.register_blueprint(api)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
