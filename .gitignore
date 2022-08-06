@@ -134,3 +134,9 @@ database/database_model.mwb.bak
 kontnpunkt.code-workspace
 webapp/tempCodeRunnerFile.py
 webapp/__pycache__/app.cpython-38.pyc
+
+# Frontend
+/node_modules/
+/public/build/
+
+.DS_Store
