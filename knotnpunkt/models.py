@@ -1,3 +1,4 @@
+from logging import warn
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 # from werkzeug.security import generate_password_hash, check_password_hash
@@ -102,30 +103,38 @@ class Benutzer(db.Model):
         return self.benutzername
 
     def views(self):
-        rechte = [key for key, value in self.rechte().items() if value == True]
+        rechte = [key for key, value in self.rechte(new_mode=True).items() if value[0] or value[1]]
         ansichten = []
         for r in rechte:
             if "kalender" in r:
-                ansichten.append(('Kalender'))
+                ansichten.append({"name":'kalender', "titel":'Kalender'})
             if "benutzer" in r:
-                ansichten.append('Benutzer')
+                ansichten.append({"name":'benutzer', "titel":'Benutzer'})
             if "material" in r:
-                ansichten.append("Material")
+                ansichten.append({"name":'material', "titel":'Material'})
             if "einstellungen" in r:
-                ansichten.append("Einstellungen")
-        return list(dict.fromkeys(ansichten))
+                ansichten.append({"name":'einstellungen', "titel":'Einstellungen'})
+        return list(ansichten)
 
-    def rechte(self):
-        return {
-        'benutzerSchreiben': self.Rolle.schreibenBenutzer,
-        'benutzerLesen': self.Rolle.lesenBenutzer,
-        'materialSchreiben': self.Rolle.schreibenMaterial,
-        'materialLesen': self.Rolle.lesenMaterial,
-        'kalenderSchreiben': self.Rolle.schreibenKalender,
-        'kalenderLesen': self.Rolle.lesenKalender,
-        'einstellungenSchreiben': self.Rolle.schreibenEinstellungen,
-        'einstellungenLesen': self.Rolle.lesenEinstellungen}
-        
+    def rechte(self, new_mode=False):
+        if new_mode:
+            return {
+        'benutzer': (self.Rolle.schreibenBenutzer, self.Rolle.lesenBenutzer),
+        'materialSchreiben': (self.Rolle.schreibenMaterial, self.Rolle.lesenMaterial),
+        'kalenderSchreiben': (self.Rolle.schreibenKalender, self.Rolle.lesenKalender),
+        'einstellungenSchreiben': (self.Rolle.schreibenEinstellungen, self.Rolle.lesenEinstellungen)
+        }
+        else:
+            warn("rechte() ist veraltet. Nutze new_mode=True für Übergangszeit")
+            return {
+            'benutzerSchreiben': self.Rolle.schreibenBenutzer,
+            'benutzerLesen': self.Rolle.lesenBenutzer,
+            'materialSchreiben': self.Rolle.schreibenMaterial,
+            'materialLesen': self.Rolle.lesenMaterial,
+            'kalenderSchreiben': self.Rolle.schreibenKalender,
+            'kalenderLesen': self.Rolle.lesenKalender,
+            'einstellungenSchreiben': self.Rolle.schreibenEinstellungen,
+            'einstellungenLesen': self.Rolle.lesenEinstellungen}
 
     def __repr__(self):
         return f"<User {self.benutzername} {self.Rolle.schreibenEinstellungen}>"
