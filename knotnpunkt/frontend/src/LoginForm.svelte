@@ -1,11 +1,12 @@
 <script>
-import { debug } from "svelte/internal";
-
-    import { current_user } from "./stores.js";
+    import { createEventDispatcher } from "svelte";
+    import { current_user, current_view } from "./stores.js";
     export let benutzername = "";
+
     let passwort = "";
     let fetching = false;
-    let errorMsg = ""
+    let errorMsg = "";
+    const dispatch = createEventDispatcher();
 
     async function login() {
         fetching = true;
@@ -21,20 +22,26 @@ import { debug } from "svelte/internal";
             .then(function (data) {
                 fetching = false;
                 console.log(data);
-                if (data.success==true) {
+                if (data.success == true) {
                     $current_user = {
-                        benutzername: benutzername,
+                        benutzername: data.benutzername,
+                        rolle: data.rolle,
                         isAuthenticated: true,
-                        apps: data.apps
+                        apps: data.apps,
                     };
-                    console.log($current_user);
+                    console.log(data.apps);
+                    $current_view = "mainmenu";
                 } else {
-                    errorMsg = "Benutzername oder Passwort falsch."
+                    errorMsg = "Benutzername oder Passwort falsch.";
                 }
             })
             .catch((err) => {
                 console.log(err);
             });
+    }
+
+    function showRegistration() {
+        $current_view = "registration";
     }
 </script>
 
@@ -117,10 +124,10 @@ import { debug } from "svelte/internal";
         <div class="col-md-4 d-flex justify-content-center mt-2">
             <div class="">
                 <div>
-                    <a
-                        class="link-secondary"
-                        href="/register"
-                        style="font-size: 0.8em">Neues Konto erstellen</a
+                    <button
+                        class="btn btn-link link-secondary"
+                        on:click={showRegistration}
+                        style="font-size: 0.8em">Neues Konto erstellen</button
                     >
                     {#if fetching == true}
                         <p>Bitte warten...</p>

@@ -76,7 +76,8 @@ def login():
         response["success"] = False
         response["error"] = 'Benutzername oder Passwort falsch.'
     else:
-        response["beutzername"] = user.benutzername
+        response["benutzername"] = user.benutzername
+        response["rolle"] = user.Rolle.name
         # Prüfe ob Passwort richtig ist
         if user.passwort == data['passwort']:
             debug(f'{user.benutzername} hat sich angemeldet, Rolle: {user.Rolle.name}')
