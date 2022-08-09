@@ -10,7 +10,7 @@
     data-bs-backdrop="true"
 >
     <div class="offcanvas-header">
-        {#if $current_user.isAuthenticated}
+        {#if $current_user.authenticated}
         <div class="offcanvas-title d-sm-block" id="offcanvas">
             <h6>Herzlich Willkommen,</h6>
             <h5 class="dropdown" style="font-weight: bold;">
@@ -40,7 +40,7 @@
                     </li>
                 </ul>
             </h5>
-            <h6 style="color: grey;">admin</h6>
+            <h6 style="color: grey;">{$current_user.rolle}</h6>
         </div>
             {/if}
         <button
@@ -55,7 +55,7 @@
             class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start"
             id="menu"
         >
-        {#if $current_user.isAuthenticated}
+        {#if $current_user.authenticated}
         <li class="nav-item">
             <button class="btn btn-link nav-link text-truncate" on:click={e=>{$current_view="mainmenu";window.jQuery('#offcanvas').offcanvas('toggle');}}>
                 <i class="fs-5 bi-house">Startseite</i>

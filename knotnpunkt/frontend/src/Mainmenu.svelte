@@ -1,11 +1,25 @@
 <script>
     import { current_user } from "./stores.js";
+
+    function handleTest(event) {
+        fetch("/api/accountInfo", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        })
+            .then((response) => response.json())
+            .then(function (data) {
+                console.log(data)
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
 </script>
 
 <div class="container">
     <!-- Page Heading -->
     <h1 class="my-4">
-        Wilkommen zurück, {current_user.benutzername}
+        Wilkommen zurück, {$current_user.name}
     </h1>
 
     <div class="row">
@@ -32,5 +46,6 @@
                 </div>
             </div>
         {/each}
+        <button on:click={handleTest}>Test</button>
     </div>
 </div>

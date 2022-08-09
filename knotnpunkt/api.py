@@ -3,7 +3,8 @@ from os import name
 from datetime import datetime as dt
 from datetime import date
 from statistics import median_grouped
-from time import sleep          #time.sleep um die UI bei API-Anfragen zu testen
+from time import sleep
+from urllib import response          #time.sleep um die UI bei API-Anfragen zu testen
 from flask import Flask, request, Response, jsonify, Blueprint , abort    #jsonify macht direkt eine Flask.Response anstatt String
 from flask.helpers import url_for
 from flask.templating import render_template
@@ -30,22 +31,22 @@ def util(datetime):
 #    _t = hu.i18n.activate("de_DE")
 #    return hu.naturaltime(dt.now()-dt.strptime(json.loads(datetime).get('zuletztGescannt'), '%Y-%m-%d %H:%M'))
 
-def checkverfuegbarkeit(materialien):
-    dict_verfuegbar = {}
-    ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all()
-    for m in materialien:
-        if json.loads(m.Eigenschaften).get('zaehlbar',False):
-            dict_verfuegbar[m.idMaterial] =json.loads(m.Eigenschaften).get('anzahl',1)
-        else:
-            dict_verfuegbar[m.idMaterial] = True
-        for a in ausleihen:
-            if int(m.idMaterial) in [int(x) for x in a.materialien.split(",")]:
-                if a.ts_beginn <= date.today() <= a.ts_ende:
-                    if json.loads(m.Eigenschaften).get('zaehlbar',False) == False:
-                        dict_verfuegbar[m.idMaterial] = False
-                    else:
-                        dict_verfuegbar[m.idMaterial] = dict_verfuegbar[m.idMaterial] -1
-    return dict_verfuegbar
+# def checkverfuegbarkeit(materialien):
+#     dict_verfuegbar = {}
+#     ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all()
+#     for m in materialien:
+#         if json.loads(m.Eigenschaften).get('zaehlbar',False):
+#             dict_verfuegbar[m.idMaterial] =json.loads(m.Eigenschaften).get('anzahl',1)
+#         else:
+#             dict_verfuegbar[m.idMaterial] = True
+#         for a in ausleihen:
+#             if int(m.idMaterial) in [int(x) for x in a.materialien.split(",")]:
+#                 if a.ts_beginn <= date.today() <= a.ts_ende:
+#                     if json.loads(m.Eigenschaften).get('zaehlbar',False) == False:
+#                         dict_verfuegbar[m.idMaterial] = False
+#                     else:
+#                         dict_verfuegbar[m.idMaterial] = dict_verfuegbar[m.idMaterial] -1
+#     return dict_verfuegbar
 
 
 # logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s: %(message)s')
@@ -65,10 +66,32 @@ def checkverfuegbarkeit(materialien):
 # def redirectToLogin():
 #     return redirect(url_for('login'))
 
+@api.route('/debug')
+def debugrequest():
+    # raise TypeError()
+    response = Benutzer.query.all()
+    print(response)
+    return jsonify(response)
+
+
+@api.route('/accountInfo')
+def accountInfo():
+    response ={"action": "/api/accountInfo", "user": {"authenticated": False}}
+    if current_user.is_authenticated:
+        response["user"]["authenticated"] = True
+        response["user"]["benutzername"]=current_user.benutzername
+        response["user"]["apps"] = current_user.views()
+        response["user"]["emailAdresse"] = current_user.emailAdresse
+        response["user"]["name"] = current_user.name
+        response["user"]["rolle"] = current_user.Rolle.name
+    return jsonify(response)
+
+
 @api.route("/login", methods=['POST'])
 def login():
     data = json.loads(request.data)
     response = {"action": "/api/login"}
+    print(data['benutzername'])
     user = Benutzer.query.get(data['benutzername'])
     # Prüfe ob Benutzername vergeben ist
     if not user: 
@@ -81,7 +104,7 @@ def login():
         # Prüfe ob Passwort richtig ist
         if user.passwort == data['passwort']:
             debug(f'{user.benutzername} hat sich angemeldet, Rolle: {user.Rolle.name}')
-            login_user(user, remember=True)
+            login_user(user, remember=False)
             response["apps"] = user.views()
             response["success"] = True
         else: 
@@ -117,15 +140,15 @@ def login():
             error = 'Benutzername oder Passwort falsch.'
     return abort(403)
 
-# @api.route('/logout', methods=['GET'])
-# @login_required
-# def logout():
-#     user = current_user
-#     user.authenticated = False
-#     db.session.add(user)
-#     db.session.commit()
-#     logout_user()
-#     return redirect(url_for('login'))
+@api.route('/logout', methods=['GET'])
+@login_required
+def logout():
+    user = current_user
+    # user.authenticated = False
+    # db.session.add(user)
+    # db.session.commit()
+    logout_user()
+    return redirect(url_for('/'))
 
 
 # @api.route('/home')

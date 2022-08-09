@@ -13,6 +13,7 @@
         fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            // credentials: "include",
             body: JSON.stringify({
                 benutzername: benutzername,
                 passwort: passwort,
@@ -39,7 +40,6 @@
                 console.log(err);
             });
     }
-
     function showRegistration() {
         $current_view = "registration";
     }

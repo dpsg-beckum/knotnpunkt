@@ -50,6 +50,13 @@ class Adresse(db.Model):
     postleitzahl = db.Column(db.String(45))
     ort = db.Column(db.String(45), nullable=False)
 
+    def __init__(self, straße, hausnummer, postleitzahl, ort) -> None:
+        super().__init__()
+        self.hausnummer = hausnummer
+        self.straße = straße
+        self.postleitzahl = postleitzahl
+        self.ort = ort
+
     def __str__(self):
         return f"<Adresse {id}>"
 
@@ -89,13 +96,16 @@ class Benutzer(db.Model):
         self.adresseRef = 1
         self.rolleRef = idRolle
         self.eingeloggt = False
-
+      
+    @property
     def is_active(self):
         return True
 
+    @property
     def is_authenticated(self):
-        return self.eingeloggt
+        return self.is_active
 
+    @property
     def is_anonymous(self):
         return False
     
@@ -138,6 +148,9 @@ class Benutzer(db.Model):
 
     def __repr__(self):
         return f"<User {self.benutzername} {self.Rolle.schreibenEinstellungen}>"
+
+    # def __dict__():
+    #     return {"test": True}
 
 # class Standarteigenschaft(db.Model):
 #     __tablename__ = 'Standarteigenschaft'

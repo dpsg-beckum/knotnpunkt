@@ -6,10 +6,29 @@
 	import LoginForm from "./LoginForm.svelte";
 	import Mainmenu from "./Mainmenu.svelte";
 	import RegistrationForm from "./RegistrationForm.svelte";
-
 	import jQuery from 'jquery';
-
 	onMount(() => {window.jQuery = jQuery;	});
+
+	function updateUserInfo(){
+		fetch("/api/accountInfo", {
+				method: "GET",
+				headers: { "Content-Type": "application/json" },
+			})
+				.then((response) => response.json())
+				.then(function (data) {
+					if (data.user.authenticated == true) {
+						$current_view = "mainmenu";
+						$current_user = data.user;
+					} else {
+						$current_view = "login";
+					}
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+	}
+	updateUserInfo();
+	// console.log($current_user);
 </script>
 
 <Sidebar />
@@ -20,7 +39,7 @@
 		<RegistrationForm/>
 	{:else if $current_view == "mainmenu"}
 		<Mainmenu />
-	{:else if $current_view.name == "profil"}
+	{:else if $current_view == "profil"}
 		<!-- <Profil /> -->
 		<p>Profil von {$current_view.user}</p>
 	{/if}
