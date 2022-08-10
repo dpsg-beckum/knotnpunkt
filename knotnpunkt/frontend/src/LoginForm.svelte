@@ -1,19 +1,17 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import { current_user, current_view } from "./stores.js";
-    export let benutzername = "";
-
+    let benutzername = "";
     let passwort = "";
     let fetching = false;
     let errorMsg = "";
     const dispatch = createEventDispatcher();
 
-    async function login() {
+    async function handleLogin() {
         fetching = true;
         fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            // credentials: "include",
             body: JSON.stringify({
                 benutzername: benutzername,
                 passwort: passwort,
@@ -24,14 +22,10 @@
                 fetching = false;
                 console.log(data);
                 if (data.success == true) {
-                    $current_user = {
-                        benutzername: data.benutzername,
-                        rolle: data.rolle,
-                        isAuthenticated: true,
-                        apps: data.apps,
-                    };
-                    console.log(data.apps);
-                    $current_view = "mainmenu";
+                    dispatch("getUserInfo", {origin: "login"});
+                    // $current_view = "mainmenu";
+
+                    // dispatch("login", user);
                 } else {
                     errorMsg = "Benutzername oder Passwort falsch.";
                 }
@@ -61,7 +55,7 @@
                     <div class="card-title text-center">
                         <h1>Anmeldung</h1>
                     </div>
-                    <form on:submit|preventDefault={login}>
+                    <form on:submit|preventDefault={handleLogin}>
                         <input
                             id="csrf_token"
                             name="csrf_token"
@@ -107,8 +101,7 @@
 
                                 <button
                                     type="submit"
-                                    class="btn"
-                                    style="background-color: var(--farbe2)"
+                                    class="btn btn-success"
                                     >Anmelden</button
                                 >
                             </div>

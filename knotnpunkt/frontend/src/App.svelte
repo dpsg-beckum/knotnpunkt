@@ -6,37 +6,62 @@
 	import LoginForm from "./LoginForm.svelte";
 	import Mainmenu from "./Mainmenu.svelte";
 	import RegistrationForm from "./RegistrationForm.svelte";
-	import jQuery from 'jquery';
-	onMount(() => {window.jQuery = jQuery;	});
+	import LoadingScreen from "./LoadingScreen.svelte"
+	import jQuery from "jquery";
+	onMount(() => {window.jQuery = jQuery;});
+	window.printUser = () => {
+		console.log($current_user);
+	};
 
-	function updateUserInfo(){
+	function getUserInfo(event) {
+		console.log(event);
 		fetch("/api/accountInfo", {
-				method: "GET",
-				headers: { "Content-Type": "application/json" },
+			method: "GET",
+			headers: { "Content-Type": "application/json" },
+		})
+			.then((response) => response.json())
+			.then(function (data) {
+				$current_user = data.user;
+				console.log($current_user);
 			})
-				.then((response) => response.json())
-				.then(function (data) {
-					if (data.user.authenticated == true) {
-						$current_view = "mainmenu";
-						$current_user = data.user;
-					} else {
-						$current_view = "login";
-					}
-				})
-				.catch((err) => {
-					console.log(err);
-				});
+			.catch((err) => {
+				console.log(err);
+			});
 	}
-	updateUserInfo();
-	// console.log($current_user);
+
+	function logout(event) {
+		fetch("/api/logout", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+		})
+			.then((response) => response.json())
+			.then(function (data) {
+				getUserInfo({details:{origin: "logout"}});
+				window.jQuery("#offcanvas").offcanvas("toggle");
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}
+	
+	getUserInfo({details:{origin: "init"}});
+	
+	$:{if ($current_user.authenticated== false) {
+		$current_view = "login";
+	}else if ($current_user.authenticated == true){
+		$current_view="mainmenu";
+	};}
 </script>
 
-<Sidebar />
+<Sidebar on:logout={logout}/>
 <div class="container-fluid" style="margin-bottom:4em">
-	{#if $current_view == "login"}
-		<LoginForm/>
+	{#if $current_view == "loading"}
+		<LoadingScreen/>
+	{:else if $current_view == "login"}
+		<LoginForm on:getUserInfo={getUserInfo}/>
+		<!-- <LoginForm on:getUserInfo={(event)=>{console.log(event)}}/>  -->
 	{:else if $current_view == "registration"}
-		<RegistrationForm/>
+		<RegistrationForm />
 	{:else if $current_view == "mainmenu"}
 		<Mainmenu />
 	{:else if $current_view == "profil"}

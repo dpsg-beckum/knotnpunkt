@@ -93,62 +93,27 @@ def login():
     response = {"action": "/api/login"}
     print(data['benutzername'])
     user = Benutzer.query.get(data['benutzername'])
-    # Prüfe ob Benutzername vergeben ist
-    if not user: 
-        debug(f"Benutzername {data['benutzername']} ist nicht in der Datenbank vorhanden")
+    # Prüfe ob Benutzername vergeben ist und das richtige Passwort angegeben wurde
+    if not user or not user.passwort == data['passwort']: 
+        debug(f"Falsche Anmeldeinformationen")
         response["success"] = False
         response["error"] = 'Benutzername oder Passwort falsch.'
-    else:
-        response["benutzername"] = user.benutzername
-        response["rolle"] = user.Rolle.name
-        # Prüfe ob Passwort richtig ist
-        if user.passwort == data['passwort']:
-            debug(f'{user.benutzername} hat sich angemeldet, Rolle: {user.Rolle.name}')
-            login_user(user, remember=False)
-            response["apps"] = user.views()
-            response["success"] = True
-        else: 
-            debug(f"Falsches Passwort für {data['benutzername']}")
-            response["success"] = False
-            response["error"] = 'Benutzername oder Passwort falsch.'            
+        return jsonify(response)
+    response["benutzername"] = user.benutzername
+    # response["rolle"] = user.Rolle.name
+    login_user(user, remember=False)
+    debug(f'{user.benutzername} hat sich angemeldet, Rolle: {user.Rolle.name}')
+    # response["apps"] = user.views()
+    response["success"] = True           
     return jsonify(response)
 
-
-
-
-
-
-    if current_user.is_authenticated:
-            # return redirect(url_for('ui.home'))
-            return jsonify({'benutzername': current_user.benutzername})
-    error = None
-    if request.method == 'POST': 
-        user = Benutzer.query.get(data['benutzername'])
-        if user:
-            if user.passwort == data['passwort']:
-                debug(f'{user.benutzername} hat sich angemeldet, Rolle: {user.Rolle.name}')
-                user.authenticated = True
-                db.session.add(user)
-                db.session.commit()
-                login_user(user, remember=True)
-                return jsonify({'benutzername': current_user.benutzername})
-            else: 
-                debug(f"Falsches Passwort für {data['benutzername']}")
-                error = 'Benutzername oder Passwort falsch.'
-        else:
-            debug(f"Benutzername {data['benutzername']} ist nicht in der Datenbank vorhanden")
-            error = 'Benutzername oder Passwort falsch.'
-    return abort(403)
-
-@api.route('/logout', methods=['GET'])
+@api.route('/logout', methods=['POST'])
 @login_required
 def logout():
-    user = current_user
-    # user.authenticated = False
-    # db.session.add(user)
-    # db.session.commit()
-    logout_user()
-    return redirect(url_for('/'))
+    response =  {"action": "/api/logout", "benutzername": current_user.benutzername}
+    if logout_user():
+        response["success"] = True
+    return jsonify(response)
 
 
 # @api.route('/home')

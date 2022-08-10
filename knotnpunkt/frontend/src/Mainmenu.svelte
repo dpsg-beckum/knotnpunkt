@@ -1,19 +1,19 @@
 <script>
     import { current_user } from "./stores.js";
 
-    function handleTest(event) {
-        fetch("/api/accountInfo", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-            .then((response) => response.json())
-            .then(function (data) {
-                console.log(data)
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
+    // function handleTest(event) {
+    //     fetch("/api/accountInfo", {
+    //         method: "GET",
+    //         headers: { "Content-Type": "application/json" },
+    //     })
+    //         .then((response) => response.json())
+    //         .then(function (data) {
+    //             console.log(data)
+    //         })
+    //         .catch((err) => {
+    //             console.log(err);
+    //         });
+    // }
 </script>
 
 <div class="container">
@@ -46,6 +46,6 @@
                 </div>
             </div>
         {/each}
-        <button on:click={handleTest}>Test</button>
+        <!-- <button on:click={handleTest}>Test</button> -->
     </div>
 </div>
