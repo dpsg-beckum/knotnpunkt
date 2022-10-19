@@ -20,6 +20,7 @@ import logging
 from logging import debug
 import json
 from .models import * 
+from time import sleep
 # from . import login_manager
 # from . import app, login_manager
 
@@ -122,28 +123,34 @@ def logout():
 #     return render_template('home.html', apps=current_user.views())
 
 
-# @api.route("/benutzer", methods=['GET', 'POST'])
-# @login_required
-# def benutzer():
-#     if request.method =='POST':
-#         debug(request.form)
-#         debug(Rolle.query.filter_by(name="admin").first().idRolle)
-#         neuerBenutzer = Benutzer(request.form.get('benutzername'), request.form.get('name'), request.form.get('email'), f"{request.form.get('benutzername')}", Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle)
-#         db.session.add(neuerBenutzer)
-#         db.session.commit()
-#         return redirect("/benutzer")
-#     else:
-#         if current_user.Rolle.schreibenBenutzer:
-#             erlaubeBearbeiten = True
-#         else:
-#             erlaubeBearbeiten = False
-#         liste = Benutzer.query.order_by(Benutzer.name).all()
-#         rollen = Rolle.query.all()
-        
-#         return render_template('benutzer.html', apps=current_user.views(), benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
+@api.route("/benutzer/<benutzername>", methods=['GET'])
+@login_required
+def benutzerprofil(benutzername):
+    sleep(0.4)
+    user = user = Benutzer.query.get(benutzername)
+    response = {"action": f"/api/benutzer{benutzername}"}
+    if user:
+        response["success"] = True
+        response["user"]= {
+        "authenticated": True,
+        "benutzername":current_user.benutzername,
+        "apps": current_user.views(),
+        "emailAdresse": current_user.emailAdresse,
+        "name": current_user.name,
+        "rolle": current_user.Rolle.name,
+        }
+    return response
 
 
-
+# Old POST handling of benutzer API
+    # if request.method =='POST':
+    #     debug(request.form)
+    #     debug(Rolle.query.filter_by(name="admin").first().idRolle)
+    #     neuerBenutzer = Benutzer(request.form.get('benutzername'), request.form.get('name'), request.form.get('email'), f"{request.form.get('benutzername')}", Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle)
+    #     db.session.add(neuerBenutzer)
+    #     db.session.commit()
+    #     return redirect("/benutzer")
+    # else:
 
 # @api.route('/profil/<benutzername>', methods=['GET', 'POST'])
 # @login_required

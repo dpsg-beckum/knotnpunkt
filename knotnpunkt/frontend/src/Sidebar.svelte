@@ -4,9 +4,28 @@
     import { current_user, current_view } from "./stores";
     const dispatch = createEventDispatcher();
 
+    function toggleSidebar() {
+        window.jQuery("#offcanvas").offcanvas("toggle");
+    }
+
     function handleLogout(event) {
-        console.log("Logout");
-        dispatch("logout", {origin: "sidebar"});
+        dispatch("logout", { origin: "sidebar" });
+        toggleSidebar();
+    }
+
+    function handleOwnProfile(event) {
+        dispatch("openProfile", { benutzername: $current_user.benutzername });
+        toggleSidebar();
+    }
+
+    function handleMainmenu(event) {
+        $current_view = "mainmenu";
+        toggleSidebar();
+    }
+
+    function handleRegistration(event) {
+        $current_view = "registration";
+        toggleSidebar();
     }
 </script>
 
@@ -36,8 +55,9 @@
                         aria-labelledby="dropdown"
                     >
                         <li>
-                            <button class="btn btn-link dropdown-item"
-                                >Profil</button
+                            <button
+                                class="btn btn-link dropdown-item"
+                                on:click={handleOwnProfile}>Profil</button
                             >
                         </li>
 
@@ -71,10 +91,7 @@
                 <li class="nav-item">
                     <button
                         class="btn btn-link nav-link text-truncate"
-                        on:click={(e) => {
-                            $current_view = "mainmenu";
-                            window.jQuery("#offcanvas").offcanvas("toggle");
-                        }}
+                        on:click={handleMainmenu}
                     >
                         <i class="fs-5 bi-house">Startseite</i>
                     </button>
@@ -82,20 +99,15 @@
                 <li class="nav-item">
                     <button
                         class="btn btn-link nav-link text-truncate"
-                        on:click={(e) => ($current_view = "registration")}
+                        on:click={handleRegistration}
                     >
                         <i class="fs-5 bi-house">Scanner</i>
                     </button>
                 </li>
                 <li class="nav-item">
                     <button
-                        href="/profil/admin"
                         class="btn btn-link nav-link text-truncate"
-                        on:click={(e) =>
-                            ($current_view = {
-                                name: "profil",
-                                user: $current_user.benutzername,
-                            })}
+                        on:click={handleOwnProfile}
                     >
                         <i class="fs-5 bi-house">Mein Konto</i>
                     </button>

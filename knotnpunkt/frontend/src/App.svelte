@@ -8,6 +8,8 @@
 	import RegistrationForm from "./RegistrationForm.svelte";
 	import LoadingScreen from "./LoadingScreen.svelte"
 	import jQuery from "jquery";
+import Profil from "./Profil.svelte";
+
 	onMount(() => {window.jQuery = jQuery;});
 	window.printUser = () => {
 		console.log($current_user);
@@ -43,6 +45,31 @@
 				console.log(err);
 			});
 	}
+
+	function openProfile(event) {
+		$current_view = "loading";
+		fetch("/api/benutzer/"+event.detail.benutzername, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        })
+            .then((response) => response.json())
+            .then(function (data) {
+                console.log(data);
+				$current_view = {name: "profil", benutzer: data.user};
+                // if (data.success == true) {
+                //     benutzer = data.user;
+                //     if (benutzer.benutzername == $current_user.benutzername) {
+                //         edit = true
+                //     }
+                // } else {
+                //     errorMsg = "Ein Fehler ist aufgetreten.";
+                // }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+		
+	}
 	
 	getUserInfo({details:{origin: "init"}});
 	
@@ -53,7 +80,7 @@
 	};}
 </script>
 
-<Sidebar on:logout={logout}/>
+<Sidebar on:logout={logout} on:openProfile={openProfile}/>
 <div class="container-fluid" style="margin-bottom:4em">
 	{#if $current_view == "loading"}
 		<LoadingScreen/>
@@ -64,9 +91,9 @@
 		<RegistrationForm />
 	{:else if $current_view == "mainmenu"}
 		<Mainmenu />
-	{:else if $current_view == "profil"}
+	{:else if $current_view.name == "profil"}
 		<!-- <Profil /> -->
-		<p>Profil von {$current_view.user}</p>
+		<Profil benutzer={$current_view.benutzer}/>
 	{/if}
 </div>
 <Navigation />
