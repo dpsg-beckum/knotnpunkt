@@ -36,7 +36,7 @@
                                     {% endif %}
                                 {% endif %}
                                 {%if zuletzt_ausgeliehen_Tage%}<p class="card-text"><small class="text-muted">Zuletzt ausgeliehen: Vor {{zuletzt_ausgeliehen_Tage}} {% if zuletzt_ausgeliehen_Tage == 1 %}Tag{% else %}Tagen{% endif %}</small></p>{%endif%}
-                                <button type="button" class="btn btn-primary" id="reservierenButton" data-bs-toggle="modal" data-bs-target="#ModalMaterialReservieren">Reservieren</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalMaterialReservieren" value="{{m.idMaterial}}" id="{{m.name}}" onclick="addtoList(this.id)">Reservieren</button>
                             </div>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                     </div>
 
                     <div class="modal-body">
-                        <form action="{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten">                
+                        <form action="/material/{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten">                
                             <div class="row">
                                 <div class="col-xl-6 border mx-xl-2 py-2">
                                     <div class="mb-3 row">
@@ -189,20 +189,20 @@
                                 <h5 class="modal-title" id="ModalMaterialReservierenLabel">Material reservieren</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body d-grid gap-3">
                                 <form action="/reservieren/{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten"> 
-                                    <div class="row">
+                                    <div class="row p-2">
                                         <div class="col-xl-11 border mx-xl-2 py-2">
                                             <div class="mb-3 row">
                                                 <div class="col-3 mt-1 text-xl-end">Von:</div>
-                                                <div class="col-xl"><input type="date" class="form-control" name="reservieren_von"></div>
+                                                <div class="col-xl"><input type="date" class="form-control" name="reservieren_von" required></div>
                                             </div>
                                             <div class="mb-3 row">
                                                 <div class="col-3 mt-1 text-xl-end">Bis:</div>
-                                                <div class="col-xl"><input type="date" class="form-control" name="reservieren_bis"></div>
+                                                <div class="col-xl"><input type="date" class="form-control" name="reservieren_bis" required></div>
                                             </div>
                                             <div class="mb-3 row">
-                                                <div class="col-3 mt-1 text-xl-end">Ausleiher (wenn selbst, leer lassen):</div>
+                                                <div class="col-3 mt-1 text-xl-end">Ausleiher:</div>
                                                 <div class="col-xl"><input type="text" class="form-control" name="empfaenger"></div>
                                             </div>
                                             <div class="mb-3 row">
@@ -211,8 +211,8 @@
                                             </div>
                                         </div> 
                                     </div>
-                                    <div class="row">
-                                        <h4>Weitere Materialien reservieren:</h4>
+                                    <div class="row p-2">
+                                        <h5>Weitere Materialien reservieren:</h5>
                                         <div class="accordion" id="accordionExample">
                                             {% for k in kategorienListe %}
                                                 <div class="accordion-item">
@@ -224,22 +224,22 @@
                                                     <div id="collapse{{k.idKategorie}}" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                                         <div class="accordion-body">
                                                             <ul class="list-group list-group-flush">
-                                                                {%for m in materialListe%}
-                                                                    {% if m.Kategorie_idKategorie == k.idKategorie%}
+                                                                {%for m2 in materialListe%}
+                                                                    {% if m2.Kategorie_idKategorie == k.idKategorie and m2.idMaterial != m.idMaterial%}
                                                                         <li class="list-group-item bg-light">
                                                                             <div class="row">
                                                                                 <div class="col-auto">
                                                                                     <img style="height: 4em;"
-                                                                                        src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}" alt="">
+                                                                                        src="{{url_for('static', filename='{}_icon.svg'.format(m2.Kategorie.name))}}" alt="">
                                                                                 </div>
-                                                                                <div class="col">
-                                                                                    <h5>{{m.name}}</h5>
+                                                                                <div class="col-auto">
+                                                                                    <h5>{{m2.name}}</h5>
+                                                                                    <div>verfügbar</div>
                                                                                 </div>
-                                                                                <div class="col">
-                                                                                    verfügbar
-                                                                                </div>
-                                                                                <div class="col">
-                                                                                    <button type="button" class="btn btn-primary">Hinzufügen</button>
+                                                                                <div class="col-auto">
+                                                                                    <!-- <button type="button" class="btn btn-primary" value="{{m2.idMaterial}}" id="{{m2.name}}" onclick="addtoList(this.id)"> -->
+                                                                                        <img src="{{url_for('static', filename='add.svg')}}" id="{{m2.name}}" value="{{m2.idMaterial}}" style="height: 2em;margin-bottom:0.4em;" onclick="addtoList(this.id)">
+                                                                                    <!-- </button> -->
                                                                                 </div>
                                                                             </div>
                                                                         </li>
@@ -253,9 +253,10 @@
                                             
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="mb-3 row">
+                                    <div class=" p-2 row justify-content-center">
+                                        <div class="col-sm-3">
                                             <button class="btn btn-success btn-sm" type="submit">Prüfen & Reservieren</button>
+                                            <input hidden id="lblListe" name="reservierte_Materialien"></input>
                                         </div>
                                     </div>
                                 </form>
@@ -266,4 +267,24 @@
         
             
     {% endfor %}
+    <script>
+        Reservierungsliste = []
+        function addtoList(clicked_id) {
+            console.log(document.getElementById(clicked_id).src)
+            if (document.getElementById(clicked_id).innerText === "Reservieren"){
+                Reservierungsliste.push(document.getElementById(clicked_id).value);
+            }
+            else if (document.getElementById(clicked_id).src === "{{url_for('static', filename='minus.svg')}}"){ //Hier noch überarbeiten. Vllt mit Vergleich zur ID ob in Liste
+                console.log("log1")
+                Reservierungsliste.pop(document.getElementById(clicked_id).value);
+                document.getElementById(clicked_id).src = "{{url_for('static', filename='add.svg')}}";
+            }else{
+                console.log("log2")
+                Reservierungsliste.push(document.getElementById(clicked_id).value);
+                document.getElementById(clicked_id).src = "{{url_for('static', filename='minus.svg')}}"
+            }
+            document.getElementById('lblListe').value = Reservierungsliste;
+            console.log(Reservierungsliste)
+        }
+    </script>
 {% endblock%}

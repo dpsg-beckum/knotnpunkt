@@ -196,7 +196,6 @@ def materialDetails(idMaterial):
         material_update.name = request.form.get('name')
         material_update.Kategorie_idKategorie = request.form.get('kategorie')
         eigenschaften = json.loads(material_update.Eigenschaften)
-        debug(type(eigenschaften))
         if request.form.get('farbeCheckbox'):
             eigenschaften['farbe'] = request.form.get('farbe')
         if request.form.get('rhArtNummer'):
@@ -233,7 +232,15 @@ def materialDetails(idMaterial):
 @app.route('/reservieren/<idMaterial>', methods=['POST'])
 @login_required
 def materialReservieren(idMaterial):
-    neueReservierung = Ausleihe(ersteller_benutzername = current_user.benutzername,ts_erstellt = dt.now(),ts_beginn = dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"), ts_ende = dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),materialien = str(idMaterial),empfaenger = request.form.get('empfaenger'), beschreibung= request.form.get('beschreibung'))
+    debug(request.form.get('reservierte_Materialien'))
+    neueReservierung = Ausleihe(
+        ersteller_benutzername = current_user.benutzername,
+        ts_erstellt = dt.now(),
+        ts_beginn = dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"), 
+        ts_ende = dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),
+        materialien = request.form.get('reservierte_Materialien'),
+        empfaenger = request.form.get('empfaenger') if request.form.get('empfaenger') else current_user.benutzername,
+        beschreibung= request.form.get('beschreibung'))
     db.session.add(neueReservierung)
     db.session.commit()
     return redirect('/material')
