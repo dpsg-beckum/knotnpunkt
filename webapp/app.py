@@ -195,7 +195,6 @@ def materialDetails(idMaterial):
         material_update.name = request.form.get('name')
         material_update.Kategorie_idKategorie = request.form.get('kategorie')
         eigenschaften = json.loads(material_update.Eigenschaften)
-        debug(type(eigenschaften))
         if request.form.get('farbeCheckbox'):
             eigenschaften['farbe'] = request.form.get('farbe')
         if request.form.get('rhArtNummer'):
