@@ -270,21 +270,17 @@
     <script>
         Reservierungsliste = []
         function addtoList(clicked_id) {
-            console.log(document.getElementById(clicked_id).src)
             if (document.getElementById(clicked_id).innerText === "Reservieren"){
                 Reservierungsliste.push(document.getElementById(clicked_id).value);
             }
             else if (document.getElementById(clicked_id).src === "{{url_for('static', filename='minus.svg')}}"){ //Hier noch überarbeiten. Vllt mit Vergleich zur ID ob in Liste
-                console.log("log1")
                 Reservierungsliste.pop(document.getElementById(clicked_id).value);
                 document.getElementById(clicked_id).src = "{{url_for('static', filename='add.svg')}}";
             }else{
-                console.log("log2")
                 Reservierungsliste.push(document.getElementById(clicked_id).value);
                 document.getElementById(clicked_id).src = "{{url_for('static', filename='minus.svg')}}"
             }
             document.getElementById('lblListe').value = Reservierungsliste;
-            console.log(Reservierungsliste)
         }
     </script>
 {% endblock%}
