@@ -236,6 +236,14 @@ def einstellungen():
 def scanner():
     return render_template('scanner.html')
 
+@views.route('/qrcode-generator', methods=['GET'])
+@login_required
+def qrcode_generator():
+    materialien = Material.query.all()
+    kategorien = Kategorie.query.all()
+    return render_template('qrgenerator.html', apps=current_user.views(), materialListe = materialien, kategorienListe=kategorien)
+
+
 
 @views.route('/api/material')
 @login_required
