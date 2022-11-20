@@ -4,34 +4,39 @@ Hier entsteht die Zelte- und Materialverwaltung der [DPSG St. Stephanus Beckum](
 
 ## Herunterladen und Testen
 
-### Python
-```
+### Voraussetzungen:
++ python
++ yarn
++ git
+
+### 1. Repository klonen
+```bash 
 git clone https://github.com/dpsg-beckum/knotnpunkt.git
-
 cd knotnpunkt
+```
 
+### 2. Python-Umgebung vorbereiten
+```bash
+python -m venv .venv
 pip install -r reqirements.txt
-
-cd webapp
-
-python app.py
+. .venv/bin/activate
 ```
 
-### Docker
+### 3. JavaScript-Bibliotheken installieren
+```bash
+yarn install 
 ```
-git clone https://github.com/dpsg-beckum/knotnpunkt.git
 
-cd knotnpunkt
-
-docker build -t knotnpunkt:latest .
-
-docker run -d --name knotnpunkt -p 5000:5000 knotnpunkt:latest
+### 5. Flask-Server starten
+```bash
+flask run
 ```
+
 Standardbenutzername und Passwort:
-```
+
 Benutzername: admin
 Passwort: admin
-```
+
 
 
 ---
