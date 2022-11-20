@@ -1,6 +1,43 @@
 {%extends "base.html"%}
 
+{% block additionalHeader%}
+<link href="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/main.css')}}" rel='stylesheet' />
+<script src="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/main.js')}}"></script>
+{%endblock%}
+
 {% block content%}
+<div id='kalendar'></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('kalendar');
+        // Liste Materialliste von API abrufe
+        fetch("/api/material", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        })
+            .then((response) => response.json())
+            .then(function (data) {
+                // Kalender erstellen
+                var calendar = new FullCalendar.Calendar(calendarEl,{
+                    schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+                    headerToolbar: {
+                        left: 'prev today next',
+                        center: 'title',
+                        right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
+                    },
+                    aspectRatio: 1.0,
+                    initialView: 'resourceTimelineMonth',
+                    resourceGroupField: 'Kategorie',
+                    
+                    resources: data.result
+                });
+                // Todo: Verfügbarkeiten abrufen
+                calendar.render();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
 
-
+    });
+</script>
 {% endblock%}
