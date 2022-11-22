@@ -167,7 +167,7 @@ def materialDetails(idMaterial):
         material_update = Material.query.filter_by(idMaterial = idMaterial).first()
         material_update.name = request.form.get('name')
         material_update.Kategorie_idKategorie = request.form.get('kategorie')
-        eigenschaften = json.loads(material_update.Eigenschaften)
+        eigenschaften = material_update.Eigenschaften
         if request.form.get('farbeCheckbox'):
             eigenschaften['farbe'] = request.form.get('farbe')
         if request.form.get('rhArtNummer'):
@@ -178,7 +178,7 @@ def materialDetails(idMaterial):
                 eigenschaften['zaehlbar'] = True
             else:
                 eigenschaften['zaehlbar'] = False
-        material_update.Eigenschaften = json.dumps(eigenschaften)
+        material_update.Eigenschaften = eigenschaften
         db.session.commit()
         return redirect('/material/'+idMaterial)
     else:

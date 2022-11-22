@@ -172,7 +172,7 @@ class Material(db.Model):
     __tablename__ = 'Material'
     idMaterial = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
-    Eigenschaften = db.Column(db.Text, nullable=True)
+    Eigenschaften = db.Column(db.JSON, nullable=True)
     Kategorie_idKategorie = db.Column(db.ForeignKey('Kategorie.idKategorie'), nullable=False, index=True)
     Kategorie = relationship('Kategorie')
 
