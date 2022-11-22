@@ -15,7 +15,7 @@ def convertTime(datetime):
 
 def checkverfuegbarkeit(materialien):
     dict_verfuegbar = {}
-    ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all()
+    ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_von)).all()
     for m in materialien:
         if m.Eigenschaften.get('zaehlbar', False):
             dict_verfuegbar[m.idMaterial] = m.Eigenschaften.get('anzahl', 1)

@@ -184,18 +184,18 @@ def materialDetails(idMaterial):
     else:
         material_details = Material.query.filter_by(idMaterial = idMaterial).all()
         materialien = Material.query.all()
-        ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
+        ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_von)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
         ausleihen_filtered_future = []
         ausleihen_filtered_past = []
         verfuegbarkeit = checkverfuegbarkeit(material_details)
         for a in ausleihen:
             if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
-                if a.ts_beginn > date.today():
+                if a.ts_von > date.today():
                     ausleihen_filtered_future.append(a)
                 else:
                     ausleihen_filtered_past.append(a)
         if len(ausleihen_filtered_past):
-            zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_beginn).days
+            zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_von).days
         else: 
             zuletzt_ausgeliehen_Tage = None
         kategorien = Kategorie.query.all()
@@ -209,8 +209,8 @@ def materialReservieren(idMaterial):
     neueReservierung = Ausleihe(
         ersteller_benutzername = current_user.benutzername,
         ts_erstellt = dt.now(),
-        ts_beginn = dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"), 
-        ts_ende = dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),
+        ts_von = dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"), 
+        ts_bis = dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),
         materialien = request.form.get('reservierte_Materialien'),
         empfaenger = request.form.get('empfaenger') if request.form.get('empfaenger') else current_user.benutzername,
         beschreibung= request.form.get('beschreibung'))

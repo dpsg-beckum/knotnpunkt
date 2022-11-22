@@ -1,7 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
-# from sqlalchemy.sql.sqltypes import Boolean, Integer
-# from sqlalchemy import desc
 from sqlalchemy.dialects.mysql import DATETIME
 
 
@@ -37,11 +35,15 @@ class Ausleihe(db.Model):
     ersteller_benutzername = db.Column('Benutzer_benutzername',db.String(45),db.ForeignKey('Benutzer.benutzername'), nullable=False, index=True)
     empfaenger = db.Column('empfaenger', db.String(45), nullable=True)
     ts_erstellt = db.Column('ts_erstellt', db.DateTime, nullable=False)
-    ts_beginn = db.Column('ts_von', db.Date, nullable=False)
-    ts_ende = db.Column('ts_bis', db.Date, nullable=False)
+    ts_von = db.Column('ts_von', db.Date, nullable=False)
+    ts_bis = db.Column('ts_bis', db.Date, nullable=False)
     beschreibung = db.Column('beschreibung',db.String(), nullable=True)
     materialien = db.Column('materialien',db.String(), nullable=False)
     Ersteller = relationship('Benutzer')
+
+    def __repr__(self) -> str:
+        props = {k:v for k, v in self.__dict__.items() if k in self.__table__.columns.keys() }
+        return f"<Ausleihe {props}>"
 
 class Adresse(db.Model):
     __tablename__ = 'Adresse'
