@@ -4,7 +4,8 @@ import json
 from datetime import datetime as dt
 from datetime import date
 from .database.db import (
-    Ausleihe
+    Ausleihe,
+    Material,
 )
 
 
@@ -27,6 +28,28 @@ def checkverfuegbarkeit(materialien):
                     if m.Eigenschaften.get('zaehlbar', False) == False:
                         dict_verfuegbar[m.idMaterial] = False
                     else:
-                        dict_verfuegbar[m.idMaterial] = dict_verfuegbar[m.idMaterial] -1
+                        dict_verfuegbar[m.idMaterial] = dict_verfuegbar[m.idMaterial] - 1
     return dict_verfuegbar
 
+
+def get_ausleihen_fuer_material(materialien: list[Material] | str) -> list:
+    """Abfrage nach den Ausleihen in der Datenbank, die bestimmte Materialien
+    enthalten
+
+    Args:
+        materialien (list[Material] | str): Liste von Material-Klassen oder einzelne id
+
+    Returns:
+        list: Enthält ein Tupel für jedes Material: z. B. 
+        [(<Material 1>, [<Ausleihe 1>, <Ausleihe 2>]), (<Material 2>, [<Ausleihe 1>]),
+    """
+    if isinstance(materialien, str):
+        materialien = Material.query.filter_by(idMaterial=material).all()
+    elif not isinstance(materialien, list):
+        return None
+    ausleihen = [(a, a.materialien.split(",")) for a in Ausleihe.query.all()]
+    if ausleihen == []:
+        return None
+    result = {m.idMaterial: [a[0] for a in ausleihen if str(
+        m.idMaterial) in a[1]] for m in materialien}
+    return result
