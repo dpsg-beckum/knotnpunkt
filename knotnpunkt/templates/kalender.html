@@ -1,37 +1,66 @@
 {%extends "base.html"%}
 
 {% block additionalHeader%}
-<link href="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/main.css')}}" rel='stylesheet' />
 <script src="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/main.js')}}"></script>
+<script src="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/locales/de.js')}}"></script>
+<link href="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/main.css')}}" rel='stylesheet' />
+<link href="{{url_for('static', filename='/node_modules/@fortawesome/fontawesome-free/css/all.css')}}" rel='stylesheet'>
 {%endblock%}
 
 {% block content%}
-<div id='kalendar'></div>
+<div class="container">
+    <div class="row">
+        <div class="col m-0">
+            <div class="col border border-dark p-2" id='kalendar'></div>
+        </div>
+    </div>
+</div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('kalendar');
-        // Liste Materialliste von API abrufe
-        fetch("/api/material", {
+        fetch("/api/material?includeAvailability=true", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
             .then((response) => response.json())
-            .then(function (data) {
-                // Kalender erstellen
-                var calendar = new FullCalendar.Calendar(calendarEl,{
+            .then(function (payload) {
+                events = []
+                for (m in payload.data) {
+                    for (a in payload.data[m].verfuegbarkeit) {
+                        events.push({
+                            "resourceId": payload.data[m].idMaterial,
+                            "title": payload.data[m].verfuegbarkeit[a].empfaenger,
+                            "start": payload.data[m].verfuegbarkeit[a].ts_von,
+                            "end": payload.data[m].verfuegbarkeit[a].ts_bis
+                        })
+                    }
+                }
+                console.log(events)
+                console.log(payload.data)
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    locale: "de",
+                    themeSystem: "bootstrap",
                     schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
                     headerToolbar: {
-                        left: 'prev today next',
+                        left: 'prev,today,next',
                         center: 'title',
-                        right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
+                        right: ''
                     },
-                    aspectRatio: 1.0,
+                    aspectRatio: 0.5,
+                    slotMinWidth: 70,
+                    slotLabelFormat: [{week: "numeric"}, { weekday: 'short', day: "numeric" }], 
+                    nowIndicator: true,
                     initialView: 'resourceTimelineMonth',
-                    resourceGroupField: 'Kategorie',
-                    
-                    resources: data.result
+                    resourceGroupField: 'Kategorie_idKategorie',
+                    resourceAreaColumns: [
+                        {
+                            field: 'name',
+                            headerContent: 'Name'
+                        }
+                    ],
+                    resources: payload.data,
+                    events: events,
                 });
-                // Todo: Verfügbarkeiten abrufen
                 calendar.render();
             })
             .catch((err) => {
