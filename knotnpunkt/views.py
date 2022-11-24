@@ -167,7 +167,7 @@ def materialDetails(idMaterial):
         material_update = Material.query.filter_by(idMaterial = idMaterial).first()
         material_update.name = request.form.get('name')
         material_update.Kategorie_idKategorie = request.form.get('kategorie')
-        eigenschaften = json.loads(material_update.Eigenschaften)
+        eigenschaften = material_update.Eigenschaften
         if request.form.get('farbeCheckbox'):
             eigenschaften['farbe'] = request.form.get('farbe')
         if request.form.get('rhArtNummer'):
@@ -178,24 +178,24 @@ def materialDetails(idMaterial):
                 eigenschaften['zaehlbar'] = True
             else:
                 eigenschaften['zaehlbar'] = False
-        material_update.Eigenschaften = json.dumps(eigenschaften)
+        material_update.Eigenschaften = eigenschaften
         db.session.commit()
         return redirect('/material/'+idMaterial)
     else:
         material_details = Material.query.filter_by(idMaterial = idMaterial).all()
         materialien = Material.query.all()
-        ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_beginn)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
+        ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_von)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
         ausleihen_filtered_future = []
         ausleihen_filtered_past = []
         verfuegbarkeit = checkverfuegbarkeit(material_details)
         for a in ausleihen:
             if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
-                if a.ts_beginn > date.today():
+                if a.ts_von > date.today():
                     ausleihen_filtered_future.append(a)
                 else:
                     ausleihen_filtered_past.append(a)
         if len(ausleihen_filtered_past):
-            zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_beginn).days
+            zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_von).days
         else: 
             zuletzt_ausgeliehen_Tage = None
         kategorien = Kategorie.query.all()
@@ -209,8 +209,8 @@ def materialReservieren(idMaterial):
     neueReservierung = Ausleihe(
         ersteller_benutzername = current_user.benutzername,
         ts_erstellt = dt.now(),
-        ts_beginn = dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"), 
-        ts_ende = dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),
+        ts_von = dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"), 
+        ts_bis = dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),
         materialien = request.form.get('reservierte_Materialien'),
         empfaenger = request.form.get('empfaenger') if request.form.get('empfaenger') else current_user.benutzername,
         beschreibung= request.form.get('beschreibung'))
@@ -245,28 +245,28 @@ def qrcode_generator():
 
 
 
-@views.route('/api/material')
-@login_required
-def material_api():
-    #sleep(1)  # Verzögerung um UI zu testen. VORSICHT: sleep verzögert Sekunden, nicht Millisekunden
-    material = Material.query.filter_by(idMaterial = request.args.get('id')).first()
-    verfuegbarkeit = checkverfuegbarkeit([material])
-    if verfuegbarkeit.get(material.idMaterial):     # Hier die Abfrage nach dem Ende der Reservierung...
-        ...
-    else:                                           # ...oder nach dem Beginn der Nächsten
-        ...
-    antwort = {'verfuegbarkeit': verfuegbarkeit,'id': material.idMaterial, 'name': material.name, 'kategorie': {'id': material.Kategorie.idKategorie, 'name':material.Kategorie.name}, 'eigenschaften': json.loads(material.Eigenschaften)}
-    return jsonify(antwort)
+# @views.route('/api/material')
+# @login_required
+# def material_api():
+#     #sleep(1)  # Verzögerung um UI zu testen. VORSICHT: sleep verzögert Sekunden, nicht Millisekunden
+#     material = Material.query.filter_by(idMaterial = request.args.get('id')).first()
+#     verfuegbarkeit = checkverfuegbarkeit([material])
+#     if verfuegbarkeit.get(material.idMaterial):     # Hier die Abfrage nach dem Ende der Reservierung...
+#         ...
+#     else:                                           # ...oder nach dem Beginn der Nächsten
+#         ...
+#     antwort = {'verfuegbarkeit': verfuegbarkeit,'id': material.idMaterial, 'name': material.name, 'kategorie': {'id': material.Kategorie.idKategorie, 'name':material.Kategorie.name}, 'eigenschaften': json.loads(material.Eigenschaften)}
+#     return jsonify(antwort)
 
 
-@views.route('/api/material/checkout', methods=['POST'])
-@login_required
-def checkout():
-    debug(request.form['id'])
-    neue_aktivitaet = Aktivitaet(int(request.form.get('id')), dt.utcfromtimestamp(int(request.form.get('timestamp')[:-3])), int(request.form.get('menge')), current_user.benutzername, request.form.get('bemerkung'))
-    db.session.add(neue_aktivitaet)
-    db.session.commit()
-    return Response(status=200)
+# @views.route('/api/material/checkout', methods=['POST'])
+# @login_required
+# def checkout():
+#     debug(request.form['id'])
+#     neue_aktivitaet = Aktivitaet(int(request.form.get('id')), dt.utcfromtimestamp(int(request.form.get('timestamp')[:-3])), int(request.form.get('menge')), current_user.benutzername, request.form.get('bemerkung'))
+#     db.session.add(neue_aktivitaet)
+#     db.session.commit()
+#     return Response(status=200)
 
 
 # if __name__ == '__main__':

@@ -27,10 +27,10 @@
                                 <div>{{m.Kategorie.name}}</div>
                             </div>
                             <div class="col">
-                                {% if jsonRef.loads(m.Eigenschaften).get('zaehlbar',False) %}
+                                {% if m.Eigenschaften.get('zaehlbar',False) %}
                                     {% if verfuegbarkeit[m.idMaterial]>0 %}
                                         <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
-                                        {{jsonRef.loads(m.Eigenschaften).get('anzahl')}}</div>
+                                        {{m.Eigenschaften.get('anzahl')}}</div>
                                     {% else %}
                                         <div class="text-danger">Nicht verfügbar</div>
                                     {% endif %}
@@ -46,15 +46,15 @@
                             <div class="col d-none d-sm-block">
                                 <div>{{naturaltime(m.Eigenschaften)}}</div>
                                 <div>
-                                    {#naturaltime(dtRef.now()-dtRef.strptime(jsonRef.loads(m.Eigenschaften).get('zuletztGescannt'),
+                                    {#naturaltime(dtRef.now()-dtRef.strptime(m.Eigenschaften.get('zuletztGescannt'),
                                     '%Y-%m-%d %H:%M'))#}</div>
                                 <div style="font-size: 0.8em;">Zuletzt Geändert</div>
                             </div>
                         </div>
                         <div class="row">
-                            <!-- {% if jsonRef.loads(m.Eigenschaften).get('farbe',False) %}
+                            <!-- {% if m.Eigenschaften.get('farbe',False) %}
                                         <div style="border-radius: 0.5em" class="bg-primary w-auto">
-                                            {{jsonRef.loads(m.Eigenschaften).get('farbe',False)}}
+                                            {{m.Eigenschaften.get('farbe',False)}}
                                         </div>
                                         {% endif %} -->
 

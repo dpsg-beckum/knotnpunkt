@@ -7,7 +7,7 @@ from .database.db import (
 )
 import logging
 from . views import views  # Import routes to register as blueprints
-# from .api import api 
+from .api import api 
 from .utils import convertTime
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ app.jinja_env.globals.update(naturaltime=convertTime)
 
 # Register Blueprints
 app.register_blueprint(views)
-# app.register_blueprint(api)
+app.register_blueprint(api)
 
 
 db.init_app(app)
