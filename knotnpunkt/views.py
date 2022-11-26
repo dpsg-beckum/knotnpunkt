@@ -41,7 +41,8 @@ def login():
     if request.method == 'POST': 
         user = Benutzer.query.get(request.form['benutzername'])
         if user:
-            if user.passwort == request.form['passwort']:
+            if user.passwort == request.form['passwort'] or user.check_passwort(request.form['passwort']):
+                # TODO: Change login to hash-only by removing "or"-statement
                 debug(f'{user.benutzername} hat sich angemeldet, Rolle: {user.Rolle.name}')
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
@@ -113,7 +114,7 @@ def profil(benutzername):
                     user.rolleRef = Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle
                 if request.form.get('passwort', None):
                     if request.form.get('passwort') == request.form.get('passwortBestaetigung'):
-                        user.passwort = request.form.get('passwort')
+                        user.set_passwort(request.form.get('passwort'))
                         debug("Passwort wurde geaendert!")
                         db.session.add(user)
                         db.session.commit()
