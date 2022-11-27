@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import DATETIME
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 db = SQLAlchemy()
@@ -89,10 +89,16 @@ class Benutzer(db.Model):
         self.benutzername = benutzername
         self.name = name
         self.emailAdresse = emailAdresse
-        self.passwort = passwort
+        self.passwort = generate_password_hash(passwort) 
         self.adresseRef = 1
         self.rolleRef = idRolle
         self.eingeloggt = False
+
+    def check_passwort(self, pwd: str)-> bool:
+        return check_password_hash(self.passwort, pwd)
+
+    def set_passwort(self, neues_passwort: str)-> None:
+        self.passwort = generate_password_hash(neues_passwort)
 
     def is_active(self):
         return True
