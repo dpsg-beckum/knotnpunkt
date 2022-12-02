@@ -14,7 +14,26 @@
                     </div>
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}"  class="img-fluid rounded-start" alt="">
+                            <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner" style=" width:100%; height: 200px !important;">
+                                    <div class="carousel-item active" style=" width:100%; height: 200px !important;"> 
+                                        <img src="data:image/jpg;base64,{{ image0 }}"  class="img-thumbnail mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain'>
+                                    </div>
+                                    {% for image in images %}
+                                        <div class="carousel-item" style=" width:100%; height: 200px !important;"> 
+                                            <img src="data:image/jpg;base64,{{ image }}"  class="img-thumbnail mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain' >
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                  <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                  <span class="visually-hidden">Next</span>
+                                </button>
+                              </div>
                         </div>
                         <div class="col-md-8">
                             <div class="card-body" id="materialInfoCardBody">
@@ -73,7 +92,7 @@
                     </div>
 
                     <div class="modal-body">
-                        <form action="/material/{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten">                
+                        <form action="/material/{{m.idMaterial}}" enctype="multipart/form-data" method="POST" id="formMaterialBearbeiten">                
                             <div class="row">
                                 <div class="col-xl-6 border mx-xl-2 py-2">
                                     <div class="mb-3 row">
@@ -142,7 +161,7 @@
                                         <div class="mb-3 row">
                                             <div class="col-2 mt-1 text-xl-end">Bild</div>
                                             <div class="col-xl-3">
-                                                <input type="file" class="form-control" disabled>
+                                                <input type="file" name="pic" class="form-control"/>
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
@@ -267,6 +286,13 @@
         
             
     {% endfor %}
+
+
+    <form action="/material/upload" enctype="multipart/form-data" method="POST"> 
+        <input type="file" name="pic" />
+        <input type="submit" value="Upload a file"/>
+     </form>
+
     <script>
         Reservierungsliste = []
         function addtoList(clicked_id) {

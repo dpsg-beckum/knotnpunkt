@@ -10,6 +10,7 @@ from werkzeug.utils import redirect
 from logging import debug
 # from .. import logger
 import json
+import base64
 import humanize as hu
 from .database import db
 from .database.db import (
@@ -20,10 +21,10 @@ from .database.db import (
     Kategorie,
     Ausleihe,
     Rolle,
-    Adresse
+    Adresse,
+    Img
 )
 from .utils import checkverfuegbarkeit
-
 
 views = Blueprint("views", __name__, template_folder="templates")
 
@@ -180,6 +181,18 @@ def materialDetails(idMaterial):
             else:
                 eigenschaften['zaehlbar'] = False
         material_update.Eigenschaften = eigenschaften
+        print("Here")
+        pic = request.files['pic']
+        print(pic)
+        if not pic:
+            return 'No pic uploaded!', 400
+        material_id = idMaterial
+        mimetype = pic.mimetype
+        if not material_id or not mimetype:
+            return 'Bad upload!', 400
+        img = Img(img=pic.read(), Material_idMaterial=material_id, mimetype=mimetype)
+        db.session.add(img)
+
         db.session.commit()
         return redirect('/material/'+idMaterial)
     else:
@@ -200,7 +213,11 @@ def materialDetails(idMaterial):
         else: 
             zuletzt_ausgeliehen_Tage = None
         kategorien = Kategorie.query.all()
-        return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
+        material_images = Img.query.filter_by(Material_idMaterial = idMaterial).all()
+        base64_images = [base64.b64encode(image.img).decode('utf-8') for image in material_images]
+        base64_image0 = base64_images[0]
+        base64_image1 = base64_images[1:]
+        return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, image0=base64_image0, images=base64_image1)
 
 
 @views.route('/reservieren/<idMaterial>', methods=['POST'])
@@ -218,6 +235,34 @@ def materialReservieren(idMaterial):
     db.session.add(neueReservierung)
     db.session.commit()
     return redirect('/material')
+
+
+@views.route('/material/upload', methods=['POST'])
+@login_required
+def upload():
+    pic = request.files['pic']
+    if not pic:
+        return 'No pic uploaded!', 400
+    material_id = 1
+    mimetype = pic.mimetype
+    if not material_id or not mimetype:
+        return 'Bad upload!', 400
+
+    img = Img(img=pic.read(), Material_idMaterial=material_id, mimetype=mimetype)
+    db.session.add(img)
+    db.session.commit()
+
+    return 'Img Uploaded!', 200
+
+
+@views.route('/img/<int:id2>')
+@login_required
+def get_img(id2):
+    img = Img.query.filter_by(img_id=id2).first()
+    if not img:
+        return 'Img Not Found!', 404
+
+    return Response(img.img, mimetype=img.mimetype)
 
 
 @views.route("/kalender")
