@@ -219,3 +219,8 @@ class Eigenschaft(db.Model):
     Label = relationship('Label')
     Material = relationship('Material')
 
+class Img(db.Model):
+    img_id = db.Column(db.Integer, primary_key=True)
+    Material_idMaterial = db.Column(db.ForeignKey('Material.idMaterial'), primary_key=True, nullable=False, index=True)
+    img = db.Column(db.String(), nullable=False)
+    mimetype = db.Column(db.String(), nullable=False)
