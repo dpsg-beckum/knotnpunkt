@@ -19,13 +19,19 @@
                                 <div class="carousel-inner" style=" width:100%; height: 200px !important;">
                                     <button type="button" class="btn" id="editImgButton" data-bs-toggle="modal" data-bs-target="#ModalImg" style=" width:100%; height: 200px !important;">
                                         <div class="carousel-item active" style=" width:100%; height: 200px !important;"> 
-                                            <img src="data:image/jpg;base64,{{ images[0][1] }}"  class="img-fluid mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain'>
+                                            {% if images[0] != None %}
+                                                <img src="data:image/jpg;base64,{{ images[0][1] }}"  class="img-fluid mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain'>
+                                            {% else %}
+                                                <img src="{{url_for('static', filename='Zelte_icon.svg')}}"  class="img-fluid mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain'>
+                                            {% endif %}    
                                         </div>
-                                        {% for image in images[1:] %}
-                                            <div class="carousel-item" style=" width:100%; height: 200px !important;"> 
-                                                <img src="data:image/jpg;base64,{{ image[1] }}"  class="img-fluid mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain' >
-                                            </div>
-                                        {% endfor %}
+                                        {% if images[1:]|length > 0 %}
+                                            {% for image in images[1:] %}
+                                                <div class="carousel-item" style=" width:100%; height: 200px !important;"> 
+                                                    <img src="data:image/jpg;base64,{{ image[1] }}"  class="img-fluid mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain' >
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
                                     </button>
                                 </div>
                                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">

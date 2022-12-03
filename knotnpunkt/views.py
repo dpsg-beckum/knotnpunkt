@@ -185,12 +185,12 @@ def materialDetails(idMaterial):
     material_images = Img.query.filter_by(Material_idMaterial = idMaterial).all()
     img_dict = {}
     img_id_list = []
-    for image in material_images:
-        #img_dict[image.img_id] = base64.b64encode(image.img).decode('utf-8')
-        img_id_list.append([image.img_id, base64.b64encode(image.img).decode('utf-8')])
-    #base64_images = [base64.b64encode(image.img).decode('utf-8') for image in material_images]
-    #images_ids = [image.img_id for image in material_images]
-    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, images = img_id_list)#image0=base64_image0, images=base64_images
+    if material_images:
+        for image in material_images:
+            img_id_list.append([image.img_id, base64.b64encode(image.img).decode('utf-8')])
+    else:
+        img_id_list.append(None)
+    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, images = img_id_list)
 
 
 @views.route('/material/edit/<idMaterial>', methods=['POST'])
