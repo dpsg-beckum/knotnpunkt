@@ -165,11 +165,16 @@
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
-                                            <div class="col-2 text-xl-end"><input type="checkbox" name="farbeCheckbox"
-                                                    id="farbeCheckbox" onclick="farbeCheckboxOnClick(this.checked)" checked> Farbe</div>
-                                            <div class="col-xl-3">
-                                                <input type="color" class="form-control" id="farbauswahl" name="farbe">
+                                            <div class="col" style="position:relative; width:100%; height: 100px !important;"> 
+                                                <img src="{{url_for('static', filename='minus.svg')}}" id="1" value="1" style="height: 2em; position:absolute; right:20px; top:5px" onclick="">
+                                                <img src="data:image/jpg;base64,{{ image0 }}"  class="img-thumbnail mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain' >
                                             </div>
+                                            {% for image in images %}
+                                                <div class="col" style="position:relative; width:100%; height: 100px !important;"> 
+                                                    <img src="{{url_for('static', filename='minus.svg')}}" id="1" value="1" style="height: 2em; position:absolute; right:20px; top:5px" onclick="">
+                                                    <img src="data:image/jpg;base64,{{ image }}"  class="img-thumbnail mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain' >
+                                                </div>
+                                            {% endfor %}
                                         </div>
                                     </div>
                                     <div class="tab-pane " id="anschaffung-tab" role="tabpanel">
