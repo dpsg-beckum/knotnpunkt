@@ -5,16 +5,8 @@
         <div class="container mx-auto" style="max-width: 800px;">
             <div class="row">
                 <div class="card mb-5">
-                    <div class="d-flex flex-row-reverse bd-highlight">
-                        <div class="p-2 bd-highlight">
-                            <button type="button" class="btn" id="editButton" data-bs-toggle="modal" data-bs-target="#ModalMaterialEdit">
-                                <img src="{{url_for('static', filename='pencil.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
-                            </button>
-                        </div>
-                    </div>
                     <div class="row g-0">
                         <div class="col-md-4">
-                            
                             <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
                                 <div class="carousel-inner" style=" width:100%; height: 200px !important;">
                                     <button type="button" class="btn" id="editImgButton" data-bs-toggle="modal" data-bs-target="#ModalImg" style=" width:100%; height: 200px !important;">
@@ -66,6 +58,9 @@
                                 {% endif %}
                                 {%if zuletzt_ausgeliehen_Tage%}<p class="card-text"><small class="text-muted">Zuletzt ausgeliehen: Vor {{zuletzt_ausgeliehen_Tage}} {% if zuletzt_ausgeliehen_Tage == 1 %}Tag{% else %}Tagen{% endif %}</small></p>{%endif%}
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalMaterialReservieren" value="{{m.idMaterial}}" id="{{m.name}}" onclick="addtoList(this.id)">Reservieren</button>
+                                <button type="button" class="btn" id="editButton" data-bs-toggle="modal" data-bs-target="#ModalMaterialEdit">
+                                    <img src="{{url_for('static', filename='pencil.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -307,20 +302,22 @@
                                 
                             </div>
                         </form>
-                        <h6>Bilder durch Klicken löschen:</h6>
-                        <ul class="list-group">
-                            {% for image in images %}
-                            <li class="list-group-item">
-                                <form action="/img/delete/{{image[0]}}/{{m.idMaterial}}" enctype="multipart/form-data" method="GET" id="formImgDelete"> 
-                                    <div class="col" style="position:relative; width:100%; height: 100px !important;"> 
-                                        <button type="submit" style='height: 100%; width: 100%; object-fit: contain; background-color: transparent; border:0px'>
-                                            <img src="data:image/jpg;base64,{{ image[1] }}"  class="img-fluid" alt="" style='height: 100%; width: 100%; object-fit: contain' >
-                                        </button>
-                                    </div>
-                                </form>
-                            </li>
-                        </ul>
-                    {% endfor %} 
+                        {% if images[0] != None %}
+                            <h6>Bilder durch Klicken löschen:</h6>
+                            <ul class="list-group">
+                                {% for image in images %}
+                                    <li class="list-group-item">
+                                        <form action="/img/delete/{{image[0]}}/{{m.idMaterial}}" enctype="multipart/form-data" method="GET" id="formImgDelete"> 
+                                            <div class="col" style="position:relative; width:100%; height: 100px !important;"> 
+                                                <button type="submit" style='height: 100%; width: 100%; object-fit: contain; background-color: transparent; border:0px'>
+                                                    <img src="data:image/jpg;base64,{{ image[1] }}"  class="img-fluid" alt="" style='height: 100%; width: 100%; object-fit: contain' >
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </li>
+                                {% endfor %} 
+                            </ul>
+                        {% endif %}
                         </ul>   
                     </div>
                 </div>
