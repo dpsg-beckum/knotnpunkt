@@ -16,45 +16,50 @@
             <ul class="row list-group">
                 {% for m in materialListe %}
                 <li class="list-group-item bg-light">
-                    <a href="/material/{{m.idMaterial}}" class="text-decoration-none text-dark">
+                    <a href="/material/{{m[0].idMaterial}}" class="text-decoration-none text-dark">
                         <div class="row">
                             <div class="col-auto">
-                                <img style="height: 4em;"
-                                    src="{{url_for('static', filename='{}_icon.svg'.format(m.Kategorie.name))}}" alt="">
+                                <!-- <img style="height: 4em;"
+                                    src="{{url_for('static', filename='{}_icon.svg'.format(m[0].Kategorie.name))}}" alt=""> -->
+                                    {% if m[1] !=  None %}
+                                        <img src="data:image/jpg;base64,{{ m[1] }}"  class="img-fluid" alt="" style="height: 4em;">
+                                    {% else %}
+                                        <img style="height: 4em;" src="{{url_for('static', filename='{}_icon.svg'.format(m[0].Kategorie.name))}}" alt="">
+                                    {% endif %}
                             </div>
                             <div class="col">
-                                <h5>{{m.name}}</h5>
-                                <div>{{m.Kategorie.name}}</div>
+                                <h5>{{m[0].name}}</h5>
+                                <div>{{m[0].Kategorie.name}}</div>
                             </div>
                             <div class="col">
-                                {% if m.Eigenschaften.get('zaehlbar',False) %}
-                                    {% if verfuegbarkeit[m.idMaterial]>0 %}
-                                        <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
-                                        {{m.Eigenschaften.get('anzahl')}}</div>
+                                {% if m[0].Eigenschaften.get('zaehlbar',False) %}
+                                    {% if verfuegbarkeit[m[0].idMaterial]>0 %}
+                                        <div class="text-success">{{verfuegbarkeit[m[0].idMaterial]}} /
+                                        {{m[0].Eigenschaften.get('anzahl')}}</div>
                                     {% else %}
                                         <div class="text-danger">Nicht verfügbar</div>
                                     {% endif %}
             
                                 {% else %}
-                                    {% if verfuegbarkeit[m.idMaterial]==True %}
+                                    {% if verfuegbarkeit[m[0].idMaterial]==True %}
                                         <div class="text-success">Verfügbar</div>
-                                    {% elif verfuegbarkeit[m.idMaterial]==False%}
+                                    {% elif verfuegbarkeit[m[0].idMaterial]==False%}
                                         <div class="text-danger">Nicht verfügbar</div>
                                     {% endif %}
                                 {% endif %}
                             </div>
                             <div class="col d-none d-sm-block">
-                                <div>{{naturaltime(m.Eigenschaften)}}</div>
+                                <div>{{naturaltime(m[0].Eigenschaften)}}</div>
                                 <div>
-                                    {#naturaltime(dtRef.now()-dtRef.strptime(m.Eigenschaften.get('zuletztGescannt'),
+                                    {#naturaltime(dtRef.now()-dtRef.strptime(m[0].Eigenschaften.get('zuletztGescannt'),
                                     '%Y-%m-%d %H:%M'))#}</div>
                                 <div style="font-size: 0.8em;">Zuletzt Geändert</div>
                             </div>
                         </div>
                         <div class="row">
-                            <!-- {% if m.Eigenschaften.get('farbe',False) %}
+                            <!-- {% if m[0].Eigenschaften.get('farbe',False) %}
                                         <div style="border-radius: 0.5em" class="bg-primary w-auto">
-                                            {{m.Eigenschaften.get('farbe',False)}}
+                                            {{m[0].Eigenschaften.get('farbe',False)}}
                                         </div>
                                         {% endif %} -->
 

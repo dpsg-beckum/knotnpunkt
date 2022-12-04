@@ -140,7 +140,6 @@ def profil(benutzername):
 @login_required
 def material():
     if request.method == 'POST':
-        debug(request.form.get('rhArtNummer'))
         eigenschaften = {"anzahl": int(request.form.get('anzahl'))}
         if request.form.get('farbeCheckbox'):
             eigenschaften['farbe'] = request.form.get('farbe')
@@ -158,8 +157,15 @@ def material():
         materialien = Material.query.all()
         verfuegbarkeit = checkverfuegbarkeit(materialien)
         kategorien = Kategorie.query.all()
-        debug(current_user.benutzername)
-        return render_template('material.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
+        material_list = []
+        for material in materialien:
+            id = material.idMaterial
+            image = Img.query.filter_by(Material_idMaterial = id).first()
+            if image != None:
+                material_list.append([material, base64.b64encode(image.img).decode('utf-8')])
+            else:
+                material_list.append([material, None])
+        return render_template('material.html', apps=current_user.views(), materialListe=material_list, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
 
 
 @views.route('/material/<idMaterial>', methods=['GET'])
@@ -183,7 +189,6 @@ def materialDetails(idMaterial):
         zuletzt_ausgeliehen_Tage = None
     kategorien = Kategorie.query.all()
     material_images = Img.query.filter_by(Material_idMaterial = idMaterial).all()
-    img_dict = {}
     img_id_list = []
     if material_images:
         for image in material_images:
