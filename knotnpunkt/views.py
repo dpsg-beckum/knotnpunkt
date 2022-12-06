@@ -10,6 +10,7 @@ from werkzeug.utils import redirect
 from logging import debug
 # from .. import logger
 import json
+import base64
 import humanize as hu
 from .database import db
 from .database.db import (
@@ -20,10 +21,10 @@ from .database.db import (
     Kategorie,
     Ausleihe,
     Rolle,
-    Adresse
+    Adresse,
+    Img
 )
 from .utils import checkverfuegbarkeit
-
 
 views = Blueprint("views", __name__, template_folder="templates")
 
@@ -139,7 +140,6 @@ def profil(benutzername):
 @login_required
 def material():
     if request.method == 'POST':
-        debug(request.form.get('rhArtNummer'))
         eigenschaften = {"anzahl": int(request.form.get('anzahl'))}
         if request.form.get('farbeCheckbox'):
             eigenschaften['farbe'] = request.form.get('farbe')
@@ -157,50 +157,66 @@ def material():
         materialien = Material.query.all()
         verfuegbarkeit = checkverfuegbarkeit(materialien)
         kategorien = Kategorie.query.all()
-        debug(current_user.benutzername)
-        return render_template('material.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
+        material_list = []
+        for material in materialien:
+            id = material.idMaterial
+            image = Img.query.filter_by(Material_idMaterial = id).first()
+            if image != None:
+                material_list.append([material, base64.b64encode(image.img).decode('utf-8')])
+            else:
+                material_list.append([material, None])
+        return render_template('material.html', apps=current_user.views(), materialListe=material_list, kategorienListe=kategorien, verfuegbarkeit = verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
 
 
-@views.route('/material/<idMaterial>', methods=['GET', 'POST'])
+@views.route('/material/<idMaterial>', methods=['GET'])
 @login_required
 def materialDetails(idMaterial):
-    if request.method == 'POST':
-        material_update = Material.query.filter_by(idMaterial = idMaterial).first()
-        material_update.name = request.form.get('name')
-        material_update.Kategorie_idKategorie = request.form.get('kategorie')
-        eigenschaften = material_update.Eigenschaften
-        if request.form.get('farbeCheckbox'):
-            eigenschaften['farbe'] = request.form.get('farbe')
-        if request.form.get('rhArtNummer'):
-            eigenschaften['rhArtNummer'] = request.form.get('rhArtNummer')
-        if request.form.get('anzahl'):
-            if int(request.form.get('anzahl'))>1:
-                eigenschaften['anzahl'] = int(request.form.get('anzahl'))
-                eigenschaften['zaehlbar'] = True
+    material_details = Material.query.filter_by(idMaterial = idMaterial).all()
+    materialien = Material.query.all()
+    ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_von)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
+    ausleihen_filtered_future = []
+    ausleihen_filtered_past = []
+    verfuegbarkeit = checkverfuegbarkeit(material_details)
+    for a in ausleihen:
+        if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
+            if a.ts_von > date.today():
+                ausleihen_filtered_future.append(a)
             else:
-                eigenschaften['zaehlbar'] = False
-        material_update.Eigenschaften = eigenschaften
-        db.session.commit()
-        return redirect('/material/'+idMaterial)
+                ausleihen_filtered_past.append(a)
+    if len(ausleihen_filtered_past):
+        zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_von).days
+    else: 
+        zuletzt_ausgeliehen_Tage = None
+    kategorien = Kategorie.query.all()
+    material_images = Img.query.filter_by(Material_idMaterial = idMaterial).all()
+    img_id_list = []
+    if material_images:
+        for image in material_images:
+            img_id_list.append([image.img_id, base64.b64encode(image.img).decode('utf-8')])
     else:
-        material_details = Material.query.filter_by(idMaterial = idMaterial).all()
-        materialien = Material.query.all()
-        ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_von)).all() #Hier schon direkt Filtern ob MaterialID(Int) in Ausgeliehenem Material(Str) ist? 
-        ausleihen_filtered_future = []
-        ausleihen_filtered_past = []
-        verfuegbarkeit = checkverfuegbarkeit(material_details)
-        for a in ausleihen:
-            if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
-                if a.ts_von > date.today():
-                    ausleihen_filtered_future.append(a)
-                else:
-                    ausleihen_filtered_past.append(a)
-        if len(ausleihen_filtered_past):
-            zuletzt_ausgeliehen_Tage = (date.today() - ausleihen_filtered_past[0].ts_von).days
-        else: 
-            zuletzt_ausgeliehen_Tage = None
-        kategorien = Kategorie.query.all()
-        return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt)
+        img_id_list.append(None)
+    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe = materialien, kategorienListe=kategorien, ausleihListeZukunft = ausleihen_filtered_future, ausleihListeAlt = ausleihen_filtered_past, verfuegbarkeit = verfuegbarkeit, zuletzt_ausgeliehen_Tage = zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, images = img_id_list)
+
+
+@views.route('/material/edit/<idMaterial>', methods=['POST'])
+@login_required
+def materialDetailsEdit(idMaterial):
+    material_update = Material.query.filter_by(idMaterial = idMaterial).first()
+    material_update.name = request.form.get('name')
+    material_update.Kategorie_idKategorie = request.form.get('kategorie')
+    eigenschaften = material_update.Eigenschaften
+    if request.form.get('farbeCheckbox'):
+        eigenschaften['farbe'] = request.form.get('farbe')
+    if request.form.get('rhArtNummer'):
+        eigenschaften['rhArtNummer'] = request.form.get('rhArtNummer')
+    if request.form.get('anzahl'):
+        if int(request.form.get('anzahl'))>1:
+            eigenschaften['anzahl'] = int(request.form.get('anzahl'))
+            eigenschaften['zaehlbar'] = True
+        else:
+            eigenschaften['zaehlbar'] = False
+    material_update.Eigenschaften = eigenschaften
+    return redirect('/material/'+idMaterial)
 
 
 @views.route('/reservieren/<idMaterial>', methods=['POST'])
@@ -218,6 +234,30 @@ def materialReservieren(idMaterial):
     db.session.add(neueReservierung)
     db.session.commit()
     return redirect('/material')
+
+
+@views.route('/img/upload/<idMaterial>', methods=['POST'])
+@login_required
+def upload_img(idMaterial):
+    pic = request.files['pic']
+    if not pic:
+        return 'No pic uploaded!', 400
+    material_id = idMaterial
+    mimetype = pic.mimetype
+    if not material_id or not mimetype:
+        return 'Bad upload!', 400
+    img = Img(img=pic.read(), Material_idMaterial=material_id, mimetype=mimetype)
+    db.session.add(img)
+    db.session.commit()
+    return redirect('/material/'+idMaterial)
+
+
+@views.route('/img/delete/<id>/<idMaterial>') #, methods=['POST']
+@login_required
+def delete_img(id, idMaterial):
+    Img.query.filter_by(img_id=id).delete()
+    db.session.commit()
+    return redirect('/material/'+idMaterial)
 
 
 @views.route("/kalender")
