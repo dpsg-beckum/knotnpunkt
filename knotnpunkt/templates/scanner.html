@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content%}
-<div class="row"> <!-- alert-Box, die bei Erfolg auftaucht -->  
+<div class="row"> <!-- alert-Box, die bei Erfolg auftaucht -->
     <div class="alert alert-success alert-dismissible fade show" id="checkoutErfolgreich" role="alert">
         Fertig, <span id="nameDesGescannten" style="font-weight: bold"></span> wurde ausgeliehen, Viel Spaß damit.
         <!-- TODO: Hier anzeigen bis wann mans zurückgebracht haben muss -->
@@ -12,7 +12,7 @@
 <!-- Platzhalter-div für den Scanner -->
 <div class="row">
     <div class="col-md-4 mx-auto">
-        <div class="container-" id="reader"></div>      
+        <div class="container-" id="reader"></div>
     </div>
 </div>
 <script src="{{url_for('static', filename='html5-qrcode.min.js')}}" type="text/javascript"></script>
@@ -72,28 +72,40 @@
             html5QrCode = new Html5Qrcode(/* element id */ "reader");
             html5QrCode.start(cameraId, { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText, decodedResult) => {       // Was passiert wenn ein Code gescannt wurde:
-                    gescannte_id = decodedText.slice(1);
                     console.log('Code erkannt:', decodedText)
                     html5QrCode.pause();                 // Scanner stoppen
-                    if (decodedText[0] == 'm') {        // Hier noch Pruefung ob es ein knotnpunkt-Code ist
-                        $('#checkoutErfolgreich').hide();
-                        $('#scannerSuccessModal').modal('show');    //Zeige Dialogfenster
-                        $.ajax({
-                            url: '/material/' + gescannte_id,   //holt sich die Material-Detail-Seite und bindet sie in das modal ein
-                            success: function (result) {    
-                                $('#contentScreen').html(jQuery.parseHTML(result)[18].children[0].children[0].children.contentBlock.children[0]);
-                                $('#editButton').hide();
-                                $('#reservierenButton').hide();
-                                $('#materialInfoCardBody').append('<a class="btn btn-warning" href="/material/' + gescannte_id + '">Mehr Details</a>')
+                    fetch("/api/qrcode/decode", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: decodedText
+                    }).then((r) => r.json())
+                        .then(function (data) {
+                            console.log(data);
+                            if (data.success == true) {
+                                $('#checkoutErfolgreich').hide();
+                                $('#scannerSuccessModal').modal('show');    //Zeige Dialogfenster
+                                $.ajax({
+                                    url: '/material/' + data.id,   //holt sich die Material-Detail-Seite und bindet sie in das modal ein
+                                    success: function (result) {
+                                        $('#contentScreen').html(jQuery.parseHTML(result)[18].children[0].children[0].children.contentBlock.children[0]);
+                                        $('#editButton').hide();
+                                        $('#reservierenButton').hide();
+                                        $('#materialInfoCardBody').append('<a class="btn btn-warning" href="/material/' + data.id + '">Mehr Details</a>')
+                                    }
+                                })
+                                $.ajax({            //holt sich den Namen des Materials für die alert-Box
+                                    url: '/api/material?id=' + data.id,
+                                    success: function (result) {
+                                        console.log(result);
+                                        $('#nameDesGescannten').html(result.name)
+                                    }
+                                })
+                            }else{
+                                html5QrCode.resume();
                             }
                         })
-                        $.ajax({            //holt sich den Namen des Materials für die alert-Box
-                            url: '/api/material?id='+ gescannte_id, 
-                            success: function (result) {
-                                console.log(result);
-                                $('#nameDesGescannten').html(result.name)
-                        }})
-                    }
                 },
                 (errorMessage) => { console.log('Ein Fehler ist aufgetreten:', errorMessage) })
                 .catch((err) => { console.log('Ein Fehler ist aufgetreten:', err) });
@@ -101,7 +113,7 @@
     }).catch(err => { console.log('Ein Fehler ist aufgetreten:', err) });
 
     //Wenn das modal geschlossen wird, wird der Scanner wieder aktiviert
-    $('#scannerSuccessModal').on('hidden.bs.modal', function (e) {html5QrCode.resume()})
+    $('#scannerSuccessModal').on('hidden.bs.modal', function (e) { html5QrCode.resume() })
 </script>
 
 {%endblock%}

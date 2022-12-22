@@ -18,7 +18,7 @@
                                         {%for m2 in materialListe%}
                                             {% if m2.Kategorie_idKategorie == k.idKategorie%}
                                                 <li class="list-group-item bg-light">
-                                                    <div class="row" id="{{m2.name}}" value="{{m2.idMaterial}}" onclick="changeqrvalue(this.id)">
+                                                    <div class="row" id="{{m2.idMaterial}}" value="{{m2.idMaterial}}" onclick="changeqrvalue(this.id)">
                                                         <div class="col-auto">
                                                             <img style="height: 4em;"
                                                                 src="{{url_for('static', filename='{}_icon.svg'.format(m2.Kategorie.name))}}" alt="">
@@ -41,7 +41,7 @@
         <div class="row align-self-center">
             <div class="col align-self-center" id="druck-bereich">
                 <h2 id="header" class="text-center">Material auswählen</h2>
-                <img id="qrcode_id" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Example" onclick="print()"  class="rounded mx-auto d-block" alt="">
+                <div class="text-center" id="qrcode"></div>
             </div>
         </div>
     </div>
@@ -50,13 +50,21 @@
 
     <script>
         function changeqrvalue(clicked_id) {
-            document.getElementById("header").innerHTML = clicked_id
-            document.getElementById("qrcode_id").src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + clicked_id
+            fetch("/api/qrcode/generator?id="+clicked_id, {
+            method: "GET",
+            headers: {"Content-Type": "application/json"},
+        })
+            .then((response) => response.json())
+            .then(function (data) {
+                document.getElementById("qrcode").innerHTML = data.qrcode;
+                document.getElementById("header").innerHTML = data.name
+                document.getElementsByClassName("segno")[0].onclick = function(){print()};
+            })
         }
 
         function print() {
             var win = window.open('','', "popup");
-            win.document.write('<h1>'+document.getElementById("header").innerHTML + '</h2><br><img src="' + document.getElementById("qrcode_id").src+ '" onload="window.print();window.close()" />');
+            win.document.write(document.getElementById("druck-bereich").innerHTML + '<script>window.print();window.close()</scri'+ 'pt>');
             win.focus();
             }
     </script>
