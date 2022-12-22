@@ -9,7 +9,7 @@ import logging
 from . views import views  # Import routes to register as blueprints
 from .api import api 
 from .utils import convertTime
-
+from ._version import __version__
 app = Flask(__name__)
 app.secret_key = token_bytes(12)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database.db'
