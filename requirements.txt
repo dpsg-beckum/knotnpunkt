@@ -12,5 +12,6 @@ MarkupSafe==2.1.1
 pybase64==1.2.3
 pycparser==2.21
 python-dotenv==0.21.0
+segno==1.5.2
 SQLAlchemy==1.4.44
 Werkzeug==2.2.2

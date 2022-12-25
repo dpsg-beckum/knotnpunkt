@@ -1,63 +1,76 @@
 {%extends "base.html"%}
 
 {% block content%}
-    <div class="container mx-auto" style="max-width: 800px;">
-        <div class="row">
-            <div class="col">
-                <div class="accordion" id="accordionExample"></div>
-                    {% for k in kategorienListe %}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="heading{{k.idKategorie}}">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{k.idKategorie}}" aria-expanded="true" aria-controls="collapse{{k.idKategorie}}">
-                                    {{k.name}}
-                                </button>
-                            </h2>
-                            <div id="collapse{{k.idKategorie}}" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                <div class="accordion-body">
-                                    <ul class="list-group list-group-flush">
-                                        {%for m2 in materialListe%}
-                                            {% if m2.Kategorie_idKategorie == k.idKategorie%}
-                                                <li class="list-group-item bg-light">
-                                                    <div class="row" id="{{m2.name}}" value="{{m2.idMaterial}}" onclick="changeqrvalue(this.id)">
-                                                        <div class="col-auto">
-                                                            <img style="height: 4em;"
-                                                                src="{{url_for('static', filename='{}_icon.svg'.format(m2.Kategorie.name))}}" alt="">
-                                                        </div>
-                                                        <div class="col-auto">
-                                                            <h5>{{m2.name}}</h5>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            {% endif %}
-                                        {%endfor%}
-                                    </ul>
+<div class="container mx-auto" style="max-width: 800px;">
+    <div class="row">
+        <div class="col">
+            <div class="accordion" id="accordionExample"></div>
+            {% for k in kategorienListe %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{k.idKategorie}}">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapse{{k.idKategorie}}" aria-expanded="true"
+                        aria-controls="collapse{{k.idKategorie}}">
+                        {{k.name}}
+                    </button>
+                </h2>
+                <div id="collapse{{k.idKategorie}}" class="accordion-collapse collapse show"
+                    aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <ul class="list-group list-group-flush">
+                            {%for m2 in materialListe%}
+                            {% if m2.Kategorie_idKategorie == k.idKategorie%}
+                            <li class="list-group-item bg-light">
+                                <div class="row" id="{{m2.idMaterial}}" value="{{m2.idMaterial}}"
+                                    onclick="changeqrvalue(this.id)">
+                                    <div class="col-auto">
+                                        <img style="height: 4em;"
+                                            src="{{url_for('static', filename='{}_icon.svg'.format(m2.Kategorie.name))}}"
+                                            alt="">
+                                    </div>
+                                    <div class="col-auto">
+                                        <h5>{{m2.name}}</h5>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+                            </li>
+                            {% endif %}
+                            {%endfor%}
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row align-self-center">
-            <div class="col align-self-center" id="druck-bereich">
-                <h2 id="header" class="text-center">Material auswählen</h2>
-                <img id="qrcode_id" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Example" onclick="print()"  class="rounded mx-auto d-block" alt="">
-            </div>
+            {% endfor %}
         </div>
     </div>
+</div>
+<div class="row align-self-center">
+    <div class="col align-self-center" id="druck-bereich">
+        <h2 id="header" class="text-center">Material auswählen</h2>
+        <div class="text-center" id="qrcode"></div>
+    </div>
+</div>
+</div>
 
 
 
-    <script>
-        function changeqrvalue(clicked_id) {
-            document.getElementById("header").innerHTML = clicked_id
-            document.getElementById("qrcode_id").src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + clicked_id
-        }
+<script>
+    function changeqrvalue(clicked_id) {
+        fetch("/api/qrcode/generator?id=" + clicked_id, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        })
+            .then((response) => response.json())
+            .then(function (data) {
+                document.getElementById("qrcode").innerHTML = data.qrcode;
+                document.getElementById("header").innerHTML = data.name
+                document.getElementsByClassName("segno")[0].onclick = function () { print() };
+            })
+    }
 
-        function print() {
-            var win = window.open('','', "popup");
-            win.document.write('<h1>'+document.getElementById("header").innerHTML + '</h2><br><img src="' + document.getElementById("qrcode_id").src+ '" onload="window.print();window.close()" />');
-            win.focus();
-            }
-    </script>
+    function print() {
+        var win = window.open('', '', "popup");
+        win.document.write(document.getElementById("druck-bereich").innerHTML + '<script>window.print();window.close()</scri' + 'pt>');
+        win.focus();
+    }
+</script>
 {% endblock%}
