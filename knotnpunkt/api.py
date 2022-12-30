@@ -1,6 +1,6 @@
 import json
 from datetime import datetime as dt
-from flask import Blueprint, request, abort
+from flask import Blueprint, request, abort, send_file
 from flask_login import login_required, current_user
 import segno
 from .database.json_encoder import DatabaseEncoder
@@ -16,6 +16,12 @@ from .database.db import (
 )
 from .utils import get_ausleihen_fuer_material
 from ._version import __version__
+from .export.file_generators import (
+    SVGGenerator,
+    ExportError,
+    PDFGenerator,
+)
+
 
 api = Blueprint("api", __name__, template_folder="templates",
                 url_prefix="/api")
@@ -55,7 +61,6 @@ def qr_generator():
     if artikel is None:
         abort(404)
     code_string = f"knotnpunkt{__version__}:/{artikel.Kategorie.name}/{id}/\nName: {artikel.name}\nQR-Code erstellt: {dt.now():%d.%m.%Y %R}\nVon {current_user.name} ({current_user.benutzername})"
-    print(code_string)
     qrcode = segno.make(content=code_string, micro=False)
     return {"qrcode": qrcode.svg_inline(scale=5), "name": artikel.name}
 
@@ -72,3 +77,23 @@ def decode_qrcode():
         return {"success": False}
     data = code_string.replace("\n", "").split("/")
     return {"success": True, "id": data[2]}
+
+
+@api.route("/material/export", methods=['POST'])
+@login_required
+def test():
+    if request.method != 'POST':
+        abort(405) # Method Not allowed
+    if not isinstance(request.json.get('artikel_ids'), list):
+        abort(404)
+    artikel_ids = request.json.get("artikel_ids")
+    try:
+        if request.args.get("type") == "pdf":
+            generator = PDFGenerator()
+            pdf = generator.generate_pdf(Material.query.filter(Material.idMaterial.in_(artikel_ids)).all())
+            return send_file(pdf, mimetype="application/pdf")
+        else:
+            generator = SVGGenerator()
+            return generator.generate_svg(Material.query.filter(Material.idMaterial.in_(artikel_ids)).all())
+    except ExportError as e:
+        return {"success": False, "msg": e.args[0]}
