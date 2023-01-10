@@ -1,0 +1,12 @@
+{
+    "custom_templates":[],
+    "default_templates":[
+        {
+            "id": 1,
+            "name": "Labels A4",
+            "dateiname": "labels_a4.svg.jinja2",
+            "artikel_pro_seite": 35
+        }
+    ],
+    "standard_id": 1
+}
