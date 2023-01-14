@@ -1,13 +1,20 @@
+import logging
+from os import (
+    environ,
+    path,
+    getcwd,
+)
+from pathlib import Path
+from secrets import token_bytes
 from flask import Flask
 from flask_login import LoginManager
-from secrets import token_bytes
 from knotnpunkt.database import db
 from .database.db import (
     Benutzer,
 )
-import logging
+from .database.setup import initial_data
 from . views import views  # Import routes to register as blueprints
-from .api import api 
+from .api import api
 from .utils import convertTime
 from ._version import __version__
 app = Flask(__name__)
