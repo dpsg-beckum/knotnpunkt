@@ -137,3 +137,6 @@ webapp/__pycache__/app.cpython-38.pyc
 
 # Javascript Modules
 **/node_modules/
+
+# knotnpunkt database
+database.db
