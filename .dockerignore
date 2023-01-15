@@ -25,3 +25,5 @@
 **/values.dev.yaml
 LICENSE
 README.md
+cert.pem
+key.pem

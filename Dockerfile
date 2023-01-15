@@ -14,5 +14,8 @@ ENV KP_DATABASE_PATH=/data/knotnpunkt.db
 COPY . /app
 
 RUN yarn install
+RUN openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
+    -subj "/C=DE/ST=Denial/L=Germany/O=DPSG Beckum/CN=knotnpunkt" \
+    -keyout key.pem  -out cert.pem
 
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--certfile", "cert.pem", "--keyfile", "key.pem", "knotnpunkt.__init__:app"]
