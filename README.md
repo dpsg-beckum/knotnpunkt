@@ -32,6 +32,26 @@ yarn install
 flask run
 ```
 
+## Docker-Container starten
+
+### 1. Repository klonen
+```bash 
+git clone https://github.com/dpsg-beckum/knotnpunkt.git
+cd knotnpunkt
+```
+### 2. Docker-Image erzeugen:
+```
+docker build --tag knotnpunkt .
+```
+#### 3. Docker-Container starten
+```
+docker run -p 8080:8080 knotnpunkt
+```
+### Optional: HTTPS aktivieren
+```
+docker run --rm -it -p 8080:8080 knotnpunkt --certfile /path/to/cert.pem --keyfile /path/to/key.pem
+```
+
 Standardbenutzername und Passwort:
 
 Benutzername: admin
