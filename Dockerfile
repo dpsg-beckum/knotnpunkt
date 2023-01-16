@@ -20,3 +20,4 @@ RUN yarn install
 
 # CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--certfile", "cert.pem", "--keyfile", "key.pem", "knotnpunkt.__init__:app"]
 ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:8080", "knotnpunkt.__init__:app"]
+CMD []
