@@ -2,28 +2,100 @@
 
 {% block content%}
 <div class="container">
-    <h1 class="my-4">
-        Wilkommen zurück, {{current_user.name}}
-    </h1>
-
-    <div class="row">
-        <h3>Deine nächsten Ausleihen:</h3>
-        <ul class="list-group list-group-flush">
-            {% for a in ausleihen_alt %}
-            <li class="list-group-item">
-                - <strong>{{a.empfaenger}} →</strong> {{a.ts_von.strftime("%d.%m.%Y")}} bis
-                {{a.ts_bis.strftime("%d.%m.%Y")}}
-                <ul class="list-group list-group-flush">
-                    {% for m in a.materialien %}
-                    <li class="list-group-item">
-                        - <strong>{{m}} →</strong>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </li>
-            {% endfor %}
-        </ul>
+    <div class="row justify-content-center">
+        <h1 style="text-align: center;">
+            Wilkommen zurück, {{current_user.name}}
+        </h1>
     </div>
+    <div class="row mt-5 justify-content-center">
+        <div class="col-sm-4">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <h4 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Deine nächsten Ausleihen:
+                        </button>
+                    </h4>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                        data-bs-parent="#accordionExample">
+                        {% if ausleihen_zukunft|length > 0 %}
+                        <ul class="list-group list-group-flush">
+                            {% for a in ausleihen_zukunft %}
+                            <li class="list-group-item">
+                                <h5>{{ loop.index }}. {{a.empfaenger}}</h5>
+                                <h6>{{a.ts_von.strftime("%d.%m.%Y")}} bis {{a.ts_bis.strftime("%d.%m.%Y")}}</h6>
+                                <ul class="list-group list-group-flush">
+                                    {% for m in a.materialien %}
+                                    <li class="list-group-item">
+                                        - {{m.name}}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p style="text-align: center;">keine neuen Ausleihen</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+
+                <div class="accordion-item">
+                    <h4 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Deine vergangenen Ausleihen:
+                        </button>
+                    </h4>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                        data-bs-parent="#accordionExample">
+                        {% if ausleihen_alt|length > 0 %}
+                        <ul class="list-group list-group-flush">
+                            {% for a in ausleihen_alt %}
+                            <li class="list-group-item">
+                                <h5>{{ loop.index }}. {{a.empfaenger}}</h5>
+                                <h6>{{a.ts_von.strftime("%d.%m.%Y")}} bis {{a.ts_bis.strftime("%d.%m.%Y")}}</h6>
+                                <ul class="list-group list-group-flush">
+                                    {% for m in a.materialien %}
+                                    <li class="list-group-item">
+                                        - {{m.name}}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p style="text-align: center;">keine vergangenen Ausleihen</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h4 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Beliebteste Materialien:
+                        </button>
+                    </h4>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                        data-bs-parent="#accordionExample">
+                        {% for key, value in stats.items() %}
+                        <div class="progress mt-3">
+                            <div class="progress-bar" role="progressbar" style="width: {{ value / max *100}}%;"
+                                aria-valuenow="{{value}}" aria-valuemin="0" aria-valuemax="{{max}}">{{key}} - {{value}}%
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 </div>
 
 {% endblock%}
