@@ -7,4 +7,9 @@ services:
       context: .
       dockerfile: ./Dockerfile
     ports:
-      - 5000:5000
+      - 8080:8080
+    volumes:
+      - knotnpunkt_data:/data
+
+volumes:
+  knotnpunkt_data:

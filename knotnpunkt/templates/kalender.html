@@ -1,6 +1,7 @@
 {%extends "base.html"%}
 
 {% block additionalHeader%}
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <script src="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/main.js')}}"></script>
 <script src="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/locales/de.js')}}"></script>
 <link href="{{url_for('static', filename='/node_modules/fullcalendar-scheduler/main.css')}}" rel='stylesheet' />
@@ -48,7 +49,7 @@
                     },
                     aspectRatio: 0.5,
                     slotMinWidth: 70,
-                    slotLabelFormat: [{week: "numeric"}, { weekday: 'short', day: "numeric" }], 
+                    slotLabelFormat: [{ week: "numeric" }, { weekday: 'short', day: "numeric" }],
                     nowIndicator: true,
                     initialView: 'resourceTimelineMonth',
                     resourceGroupField: 'Kategorie_idKategorie',
