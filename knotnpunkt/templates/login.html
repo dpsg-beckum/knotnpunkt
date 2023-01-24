@@ -30,6 +30,11 @@
               class="img-fluid" alt="Sample image">
           </div>
           <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+            {% if error %}
+            <div class="d-flex alert alert-danger mt-1" role="alert">
+              {{error}}
+            </div>
+            {% endif %}
             <form action="login" method="post">
 
               <!-- Email input -->
