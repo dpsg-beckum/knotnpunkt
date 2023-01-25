@@ -90,6 +90,7 @@ def home():
             ausleihen_filtered_past.append(ausleihe)
     stats_dict = dict()
     stats_dict1 = dict()
+    max_value = 0
     if len(stats_list) > 0:
         for i in stats_list:
             stats_dict[str(i)] = stats_dict.get(str(i), 0)+1
@@ -178,8 +179,10 @@ def material():
         debug(eigenschaften)
         if int(eigenschaften['anzahl']) > 1:
             eigenschaften['verfuegbar'] = 1
-        eigenschaften['zuletztGescannt'] = dt.strftime(dt.now(), "%Y-%m-%d %H:%M")
-        neuesMaterial = Material(request.form.get('name'), request.form.get('kategorie'), eigenschaften)
+        eigenschaften['zuletztGescannt'] = dt.strftime(
+            dt.now(), "%Y-%m-%d %H:%M")
+        neuesMaterial = Material(request.form.get(
+            'name'), request.form.get('kategorie'), eigenschaften)
         db.session.add(neuesMaterial)
         db.session.commit()
         return redirect('/material')
