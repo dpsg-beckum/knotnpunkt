@@ -137,3 +137,8 @@ webapp/__pycache__/app.cpython-38.pyc
 
 # Javascript Modules
 **/node_modules/
+
+# knotnpunkt database and certificates
+database.db
+cert.pem
+key.pem

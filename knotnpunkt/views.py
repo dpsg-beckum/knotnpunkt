@@ -178,10 +178,8 @@ def material():
         debug(eigenschaften)
         if int(eigenschaften['anzahl']) > 1:
             eigenschaften['verfuegbar'] = 1
-        eigenschaften['zuletztGescannt'] = dt.strftime(
-            dt.now(), "%Y-%m-%d %H:%M")
-        neuesMaterial = Material(request.form.get('name'), request.form.get(
-            'kategorie'), json.dumps(eigenschaften))
+        eigenschaften['zuletztGescannt'] = dt.strftime(dt.now(), "%Y-%m-%d %H:%M")
+        neuesMaterial = Material(request.form.get('name'), request.form.get('kategorie'), eigenschaften)
         db.session.add(neuesMaterial)
         db.session.commit()
         return redirect('/material')
