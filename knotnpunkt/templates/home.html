@@ -82,6 +82,7 @@
                     </h4>
                     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
                         data-bs-parent="#accordionExample">
+                        {% if stats|length > 0 %}
                         {% for key, value in stats.items() %}
                         <div class="progress mt-3">
                             <div class="progress-bar" role="progressbar" style="width: {{ value / max *100}}%;"
@@ -89,6 +90,9 @@
                             </div>
                         </div>
                         {% endfor %}
+                        {% else %}
+                        <p style="text-align: center;">keine Daten</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
