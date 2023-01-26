@@ -43,19 +43,14 @@ def login():
         user = Benutzer.query.get(request.form['benutzername'])
         if user:
             if user.passwort == request.form['passwort'] or user.check_passwort(request.form['passwort']):
-                # TODO: Change login to hash-only by removing "or"-statement
-                debug(
-                    f'{user.benutzername} hat sich angemeldet, Rolle: {user.Rolle.name}')
+                # TODO: Change login to hash-only by removing "or"-statement Update: could be relevant for #44
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
-            else:
-                debug(f"Falsches Passwort für {request.form['benutzername']}")
-                error = 'Benutzername oder Passwort falsch.'
+            else: 
+                error = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
         else:
-            debug(
-                f"Benutzername {request.form['benutzername']} ist nicht in der Datenbank vorhanden")
-            error = 'Benutzername oder Passwort falsch.'
-    return render_template('login.html', error=error)
+            error = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
+    return render_template('login.html', error = error)
 
 
 @views.route('/logout', methods=['GET'])
