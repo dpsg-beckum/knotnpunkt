@@ -50,7 +50,7 @@ def login():
             elif user.check_passwort(request.form['passwort']):
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
-            else: 
+            else:
                 error_msg = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
         else:
             error_msg = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
@@ -105,8 +105,6 @@ def home():
 @login_required
 def benutzer():
     if request.method == 'POST':
-        debug(request.form)
-        debug(Rolle.query.filter_by(name="admin").first().idRolle)
         neuerBenutzer = Benutzer(request.form.get('benutzername'), request.form.get('name'), request.form.get(
             'email'), f"{request.form.get('benutzername')}", Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle)
         db.session.add(neuerBenutzer)
@@ -119,7 +117,6 @@ def benutzer():
             erlaubeBearbeiten = False
         liste = Benutzer.query.order_by(Benutzer.name).all()
         rollen = Rolle.query.all()
-
         return render_template('benutzer.html', apps=current_user.views(), benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
 
 
@@ -127,7 +124,7 @@ def benutzer():
 @login_required
 def profil(benutzername):
     error_msg = ""
-        if request.method == 'POST':
+    if request.method == 'POST':
         if current_user.benutzername == benutzername or current_user.Rolle.schreibenBenutzer:
             # User edits own profile
             user = Benutzer.query.get(benutzername)
@@ -159,11 +156,11 @@ def profil(benutzername):
     elif request.method == 'GET':
         if current_user.Rolle.lesenBenutzer is False and current_user.benutzername is not benutzername:
             return Response(f'Du hast keinen Zugriff auf das Profil von {benutzername}.', 401)
-            user = Benutzer.query.get(benutzername)
-            rollen = Rolle.query.all()
+        user = Benutzer.query.get(benutzername)
+        rollen = Rolle.query.all()
         if current_user.Rolle.schreibenBenutzer:
             edit_permission = True
-            else:
+        else:
             edit_permission = False
         if request.args.get("initialLogin"):
             error_msg = "Vergib ein eigenes Passwort, um dein Konto zu aktivieren."
