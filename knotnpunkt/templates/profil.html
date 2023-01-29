@@ -56,10 +56,10 @@
                 </div>
                 <div class="col-sm-9 text-secondary">
                   {% if edit  and user.Rolle.name != 'admin'%}
-                  <select class="form-control" id="inputRolle" name="rolle">
+                  <select class="form-select" id="inputRolle" name="rolle">
                     {%for r in roles%}
                     {%if r.name not in ['admin', 'api'] or current_user.Rolle.name == 'admin'%}
-                    <option value="{{r.name}}" {%if user.Rolle.name==r.name %}selected="selected" {%endif%}>{{r.name}}
+                    <option {%if user.Rolle.name==r.name %}selected{%endif%} value="{{r.name}}">{{r.name}}
                     </option>
                     {%endif%}
                     {%endfor%}

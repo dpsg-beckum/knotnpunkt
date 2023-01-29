@@ -76,10 +76,11 @@
                     <h6 class="mb-0">Rolle</h6>
                 </div>
                 <div class="col-sm-9 text-secondary">
-                    <select class="form-control" id="inputRolle" name="rolle">
+                    <select class="form-select" id="inputRolle" name="rolle">
                         {%for r in roles%}
-                        {%if r.name not in ['admin', 'api'] or current_user.Rolle.name == 'admin'%}<option value="{{r.name}}">{{r.name}}
-                        </option>{%endif%}
+                            {%if r.name not in ['admin', 'api'] or current_user.Rolle.name == 'admin'%}
+                                <option value="{{r.name}}" {%if r.name == 'leiter'%}selected{%endif%}>{{r.name}}</option>
+                            {%endif%}
                         {%endfor%}
                     </select>
                 </div>
