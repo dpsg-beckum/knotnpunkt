@@ -36,9 +36,11 @@ def redirectToLogin():
 
 @views.route("/login", methods=['GET', 'POST'])
 def login():
+    error_msg = ""
     if current_user.is_authenticated:
         return redirect(url_for('views.home'))
-    error = None
+    if request.args.get("newPassword"):
+        error_msg = "Bitte melde dich mit deinem neuen Passwort an."
     if request.method == 'POST':
         user = Benutzer.query.get(request.form['benutzername'])
         if user:
@@ -49,10 +51,10 @@ def login():
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
             else: 
-                error = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
+                error_msg = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
         else:
-            error = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
-    return render_template('login.html', error = error)
+            error_msg = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
+    return render_template('login.html', error=error_msg)
 
 
 @views.route('/logout', methods=['GET'])
