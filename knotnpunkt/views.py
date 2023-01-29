@@ -42,8 +42,10 @@ def login():
     if request.method == 'POST':
         user = Benutzer.query.get(request.form['benutzername'])
         if user:
-            if user.passwort == request.form['passwort'] or user.check_passwort(request.form['passwort']):
-                # TODO: Change login to hash-only by removing "or"-statement Update: could be relevant for #44
+            if user.passwort == request.form.get('passwort'):
+                login_user(user, remember=True)
+                return redirect(url_for(".profil", benutzername=user.benutzername, initialLogin=True))
+            elif user.check_passwort(request.form['passwort']):
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
             else: 
@@ -122,15 +124,15 @@ def benutzer():
 @views.route('/profil/<benutzername>', methods=['GET', 'POST'])
 @login_required
 def profil(benutzername):
-    fehlermeldung = ""
-    if current_user.Rolle.lesenBenutzer or current_user.benutzername == benutzername:
+    error_msg = ""
         if request.method == 'POST':
-            debug(request.form)
+        if current_user.benutzername == benutzername or current_user.Rolle.schreibenBenutzer:
+            # User edits own profile
             user = Benutzer.query.get(benutzername)
             if request.form.get("delete", "off") == 'on':
+                # User deletes own profile
                 db.session.delete(user)
                 db.session.commit()
-                debug("user gelöscht")
                 return redirect('/benutzer')
             else:
                 user.benutzername = request.form['benutzername']
@@ -139,27 +141,33 @@ def profil(benutzername):
                 if request.form.get('rolle'):
                     user.rolleRef = Rolle.query.filter_by(
                         name=request.form.get('rolle')).first().idRolle
-                if request.form.get('passwort', None):
+                if request.form.get('passwort'):
                     if request.form.get('passwort') == request.form.get('passwortBestaetigung'):
                         user.set_passwort(request.form.get('passwort'))
-                        debug("Passwort wurde geaendert!")
                         db.session.add(user)
                         db.session.commit()
+                        logout_user()
+                        return redirect(url_for("views.login", newPassword=True))
                     else:
-                        fehlermeldung = "Bitte bestätige dein neues Passwort"
+                        error_msg = "Änderung fehlgeschlagen. Bitte bestätige dein Passwort."
+                        return redirect(url_for("views.profil", benutzername=benutzername, missingPwdConfirm=True))
                 db.session.add(user)
                 db.session.commit()
                 return redirect('/benutzer')
-        else:
+    elif request.method == 'GET':
+        if current_user.Rolle.lesenBenutzer is False and current_user.benutzername is not benutzername:
+            return Response(f'Du hast keinen Zugriff auf das Profil von {benutzername}.', 401)
             user = Benutzer.query.get(benutzername)
             rollen = Rolle.query.all()
-            if current_user.Rolle.schreibenBenutzer and user.Rolle.name != 'admin' or current_user.Rolle.name == 'admin':
-                erlaubeBearbeiten = True
+        if current_user.Rolle.schreibenBenutzer:
+            edit_permission = True
             else:
-                erlaubeBearbeiten = False
-            return render_template('profil.html', apps=current_user.views(), user=user, roles=rollen, edit=erlaubeBearbeiten, error=fehlermeldung)
-    else:
-        return Response(f'Du hast leider keinen Zugriff auf das Profil von {benutzername}.', 401)
+            edit_permission = False
+        if request.args.get("initialLogin"):
+            error_msg = "Vergib ein eigenes Passwort, um dein Konto zu aktivieren."
+        elif request.args.get('missingPwdConfirm'):
+            error_msg = "Bitte bestätige das neues Passwort."
+        return render_template('profil.html', apps=current_user.views(), user=user, roles=rollen, edit=edit_permission, error=error_msg)
 
 
 @views.route("/material", methods=['GET', 'POST'])
