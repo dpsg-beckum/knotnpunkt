@@ -1,345 +1,385 @@
 {%extends "base.html"%}
 
 {% block content%}
-    {% for m in material_details %}
-        <div class="container mx-auto" style="max-width: 800px;">
-            <div class="row">
-                <div class="card mb-5">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-inner" style=" width:100%; height: 200px !important;">
-                                    <button type="button" class="btn" id="editImgButton" data-bs-toggle="modal" data-bs-target="#ModalImg" style=" width:100%; height: 200px !important;">
-                                        <div class="carousel-item active" style=" width:100%; height: 200px !important;"> 
-                                            {% if images[0] != None %}
-                                                <img src="data:image/jpg;base64,{{ images[0][1] }}"  class="img-fluid mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain'>
-                                            {% else %}
-                                                <img src="{{url_for('static', filename='Zelte_icon.svg')}}"  class="img-fluid mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain'>
-                                            {% endif %}    
-                                        </div>
-                                        {% if images[1:]|length > 0 %}
-                                            {% for image in images[1:] %}
-                                                <div class="carousel-item" style=" width:100%; height: 200px !important;"> 
-                                                    <img src="data:image/jpg;base64,{{ image[1] }}"  class="img-fluid mx-auto d-block" alt="" style='height: 100%; width: 100%; object-fit: contain' >
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </button>
-                                </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                                </button>
-                            </div>
-                            
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card-body" id="materialInfoCardBody">
-                                <h5 class="card-title">{{m.name}}</h5>
-                                <p class="card-text">{{ m.Eigenschaften.get('beschreibung',"-") }}</p>
-                                {% if m.Eigenschaften.get('zaehlbar',False) %}
-                                    {% if verfuegbarkeit[m.idMaterial]>0 %}
-                                        <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
-                                        {{m.Eigenschaften.get('anzahl')}}</div>
+{% for m in material_details %}
+<div class="container mx-auto" style="max-width: 800px;">
+    <div class="row">
+        <div class="card mb-5">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner" style=" width:100%; height: 200px !important;">
+                            <button type="button" class="btn" id="editImgButton" data-bs-toggle="modal"
+                                data-bs-target="#ModalImg" style=" width:100%; height: 200px !important;">
+                                <div class="carousel-item active" style=" width:100%; height: 200px !important;">
+                                    {% if images[0] != None %}
+                                    <img src="data:image/jpg;base64,{{ images[0][1] }}"
+                                        class="img-fluid mx-auto d-block" alt=""
+                                        style='height: 100%; width: 100%; object-fit: contain'>
                                     {% else %}
-                                        <div class="text-danger">Nicht verfügbar</div>
+                                    <img src="{{url_for('static', filename='Zelte_icon.svg')}}"
+                                        class="img-fluid mx-auto d-block" alt=""
+                                        style='height: 100%; width: 100%; object-fit: contain'>
                                     {% endif %}
-        
-                                {% else %}
-                                    {% if verfuegbarkeit[m.idMaterial]==True %}
-                                        <div class="text-success">Verfügbar</div>
-                                    {% elif verfuegbarkeit[m.idMaterial]==False%}
-                                        <div class="text-danger">Nicht verfügbar</div>
-                                    {% endif %}
+                                </div>
+                                {% if images[1:]|length > 0 %}
+                                {% for image in images[1:] %}
+                                <div class="carousel-item" style=" width:100%; height: 200px !important;">
+                                    <img src="data:image/jpg;base64,{{ image[1] }}" class="img-fluid mx-auto d-block"
+                                        alt="" style='height: 100%; width: 100%; object-fit: contain'>
+                                </div>
+                                {% endfor %}
                                 {% endif %}
-                                {%if zuletzt_ausgeliehen_Tage%}<p class="card-text"><small class="text-muted">Zuletzt ausgeliehen: Vor {{zuletzt_ausgeliehen_Tage}} {% if zuletzt_ausgeliehen_Tage == 1 %}Tag{% else %}Tagen{% endif %}</small></p>{%endif%}
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalMaterialReservieren" value="{{m.idMaterial}}" id="{{m.name}}" onclick="addtoList(this.id)">Reservieren</button>
-                                <button type="button" class="btn" id="editButton" data-bs-toggle="modal" data-bs-target="#ModalMaterialEdit">
-                                    <img src="{{url_for('static', filename='pencil.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
-                                </button>
+                            </button>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+                    <div class="card-body" id="materialInfoCardBody">
+                        <h5 class="card-title"><b>{{m.name}}</b></h5>
+                        <p class="card-text">{{ m.Eigenschaften.get('beschreibung',"-") }}</p>
+                        <br>
+                        <b>Verpackung:</b>
+                        <br>
+                        <p class="card-text">{{ m.Eigenschaften.get('verpackung',"-") }}</p>
+                        {% if m.Eigenschaften.get('zaehlbar',False) %}
+                        {% if verfuegbarkeit[m.idMaterial]>0 %}
+                        <div class="text-success">{{verfuegbarkeit[m.idMaterial]}} /
+                            {{m.Eigenschaften.get('anzahl')}}</div>
+                        {% else %}
+                        <div class="text-danger">Nicht verfügbar</div>
+                        {% endif %}
+
+                        {% else %}
+                        {% if verfuegbarkeit[m.idMaterial]==True %}
+                        <div class="text-success">Verfügbar</div>
+                        {% elif verfuegbarkeit[m.idMaterial]==False%}
+                        <div class="text-danger">Nicht verfügbar</div>
+                        {% endif %}
+                        {% endif %}
+                        {%if zuletzt_ausgeliehen_Tage%}<p class="card-text"><small class="text-muted">Zuletzt
+                                ausgeliehen: Vor {{zuletzt_ausgeliehen_Tage}} {% if zuletzt_ausgeliehen_Tage == 1
+                                %}Tag{% else %}Tagen{% endif %}</small></p>{%endif%}
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#ModalMaterialReservieren" value="{{m.idMaterial}}" id="{{m.name}}"
+                            onclick="addtoList(this.id)">Reservieren</button>
+                        <button type="button" class="btn" id="editButton" data-bs-toggle="modal"
+                            data-bs-target="#ModalMaterialEdit">
+                            <img src="{{url_for('static', filename='pencil.svg')}}"
+                                style="height: 1.2em;margin-bottom:0.4em;">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <h4>Als nächstes ausgeliehen von:</h4>
+
+        <ul class="list-group list-group-flush">
+            {% for a in ausleihListeZukunft %}
+            <li class="list-group-item">- <strong>{{a.empfaenger}} →</strong> {{a.ts_von.strftime("%d.%m.%Y")}} bis
+                {{a.ts_bis.strftime("%d.%m.%Y")}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="row" style="padding-top: 30px;">
+        <h4>Zuletzt ausgeliehen von:</h4>
+        <ul class="list-group list-group-flush">
+            {% for a in ausleihListeAlt %}
+            <li class="list-group-item">- <strong>{{a.empfaenger}} →</strong> {{a.ts_von.strftime("%d.%m.%Y")}} bis
+                {{a.ts_bis.strftime("%d.%m.%Y")}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
+
+<!-- Modal Material Bearbeiten -->
+<div class="modal fade" id="ModalMaterialEdit" tabindex="-1" aria-labelledby="ModalMaterialEditLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalMaterialEditLabel">Material bearbeiten</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form action="/material/edit/{{m.idMaterial}}" enctype="multipart/form-data" method="POST"
+                    id="formMaterialBearbeiten">
+                    <div class="row">
+                        <div class="col-xl-6 border mx-xl-2 py-2">
+                            <div class="mb-3 row">
+                                <div class="col-3 mt-1 text-xl-end">* Name</div>
+                                <div class="col-xl">
+                                    <input type="text" class="form-control" id="floatingInput" value="{{m.name}}"
+                                        name="name" required>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-3 mt-1 text-xl-end">Kategorie</div>
+                                <div class="col-xl">
+                                    <select class="form-select" aria-label=".form-select-lg example" name="kategorie">
+                                        {%for k in kategorienListe%}
+                                        <option value="{{k.idKategorie}}">{{k.name}}</option>
+                                        {%endfor%}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class=" mb-3 row">
+                                <div class="col-3 mt-1 text-xl-end">Anzahl</div>
+                                <div class="col-xl">
+                                    <input type="number" class="form-control" id="floatingInput"
+                                        value="{% if m.Eigenschaften.get('zaehlbar',False) %}{{m.Eigenschaften.get('anzahl')}}{% else %}{{1}}{% endif %}"
+                                        name="anzahl">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 mt-2 mt-xl-0 mx-xl-2 py-2">
+
+                            <div class="text-danger">* Pflichtfeld</div>
+
+                        </div>
+                    </div>
+
+                    <div>
+
+                        <div class="nav nav-tabs mb-3 mt-1" id="nav-tab-details" role="tablist">
+                            <button class="nav-link active" id="nav-beschreibung-tab" data-bs-toggle="tab"
+                                data-bs-target="#beschreibung-tab" type="button" role="tab">Beschreibung</button>
+
+                            <button class="nav-link" id="nav-anschaffung-tab" data-bs-toggle="tab"
+                                data-bs-target="#anschaffung-tab" type="button" role="tab">Anschaffung</button>
+
+                            <button class="nav-link" id="nav-verpackung-tab" data-bs-toggle="tab"
+                                data-bs-target="#verpackung-tab" type="button" role="tab">Verpackung</button>
+
+                        </div>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane show acive" id="beschreibung-tab" role="tabpanel">
+                                <div class="mb-3 row">
+                                    <div class="col-2 mt-1 text-xl-end">Beschreibung</div>
+                                    <div class="col-xl-3">
+                                        <textarea class="form-control" id="textareabeschreibung" name="beschreibung"
+                                            rows="3">{{m.Eigenschaften.get('beschreibung',"-")}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane " id="anschaffung-tab" role="tabpanel">
+                                <div class="mb-3 row">
+                                    <div class="col-2 mt-1 text-xl-end">Rüsthaus-Artikelnummer</div>
+                                    <div class="col-xl-3">
+                                        <input type="text" class="form-control" id="floatingInput" placeholder=""
+                                            name="rhArtNummer" value="{{m.Eigenschaften.get('rhArtNummer'," -")}}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="verpackung-tab" role="tabpanel">
+                                <div class="mb-3 row">
+                                    <div class="col-2 mt-1 text-xl-end">Verpackung</div>
+                                    <div class="col-xl-3">
+                                        <input type="text" class="form-control" id="floatingInput" placeholder=""
+                                            name="verpackung" value="{{m.Eigenschaften.get('verpackung'," -")}}">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <h4>Als nächstes ausgeliehen von:</h4>
-                
-                <ul class="list-group list-group-flush">
-                    {% for a in ausleihListeZukunft %}
-                        <li class="list-group-item">- <strong>{{a.empfaenger}} →</strong> {{a.ts_von.strftime("%d.%m.%Y")}} bis {{a.ts_bis.strftime("%d.%m.%Y")}}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="row" style="padding-top: 30px;">
-                <h4>Zuletzt ausgeliehen von:</h4>
-                <ul class="list-group list-group-flush">
-                    {% for a in ausleihListeAlt %}
-                        <li class="list-group-item">- <strong>{{a.empfaenger}} →</strong> {{a.ts_von.strftime("%d.%m.%Y")}} bis {{a.ts_bis.strftime("%d.%m.%Y")}}</li>
-                    {% endfor %}
-                </ul>
+                    <div class="row justify-content-end">
+                        <div class="col-sm-2">
+                            <button class="btn btn-success" type="submit">Speichern</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
 
-        
-        
-        <!-- Modal Material Bearbeiten -->
-        <div class="modal fade" id="ModalMaterialEdit" tabindex="-1" aria-labelledby="ModalMaterialEditLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title" id="ModalMaterialEditLabel">Material bearbeiten</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <form action="/material/edit/{{m.idMaterial}}" enctype="multipart/form-data" method="POST" id="formMaterialBearbeiten">                
-                            <div class="row">
-                                <div class="col-xl-6 border mx-xl-2 py-2">
-                                    <div class="mb-3 row">
-                                        <div class="col-3 mt-1 text-xl-end">* Name</div>
-                                        <div class="col-xl">
-                                            <input type="text" class="form-control" id="floatingInput" value="{{m.name}}" name="name" required>
-                                        </div>
-                                    </div>
-                                    <div class=" mb-3 row">
-                                        <div class="col-3 mt-1 text-xl-end">Beschreibung</div>
-                                        <div class="col-xl">
-                                            <input type="textarea" class="form-control" id="floatingInput" value="{{m.Eigenschaften.get('beschreibung')}}" name="beschreibung">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <div class="col-3 mt-1 text-xl-end">Kategorie</div>
-                                        <div class="col-xl">
-                                            <select class="form-select" aria-label=".form-select-lg example" name="kategorie">
-                                                <!-- <option selected="{{kategorienListe}}"</option> -->
-                                                {%for k in kategorienListe%}
-                                                <option value="{{k.idKategorie}}">{{k.name}}</option>
-                                                {%endfor%}
-                                            </select>
-                                        </div>
-                                    </div>
-                
-                                    <div class=" mb-3 row">
-                                        <div class="col-3 mt-1 text-xl-end">Anzahl</div>
-                                        <div class="col-xl">
-                                            <input type="number" class="form-control" id="floatingInput" value="{% if m.Eigenschaften.get('zaehlbar',False) %}{{m.Eigenschaften.get('anzahl')}}{% else %}{{1}}{% endif %}" name="anzahl">
-                                        </div>
-                                    </div>
-                
-                
-                                    <!-- Hier neues Felder einfügen -->
-                
-                                </div>
-                
-                                <div class="col-xl-4 mt-2 mt-xl-0 mx-xl-2 py-2">
-                
-                                    <div class="text-danger">* Pflichtfeld</div>
-                
-                                </div>
-                            </div>
-                
-                            <div>
-                
-                                <div class="nav nav-tabs mb-3 mt-1" id="nav-tab-details" role="tablist">
-                
-                                    <button class="nav-link active" id="nav-aussehen-tab" data-bs-toggle="tab"
-                                        data-bs-target="#groesse-tab" type="button" role="tab">Größe & Aussehen</button>
-                
-                                    <button class="nav-link" id="nav-anschaffung-tab" data-bs-toggle="tab"
-                                        data-bs-target="#anschaffung-tab" type="button" role="tab">Anschaffung</button>
-                
-                                    <button class="nav-link" id="nav-verpackung-tab" data-bs-toggle="tab"
-                                        data-bs-target="#verpackung-tab" type="button" role="tab">Verpackung & Transport</button>
-                
-                                    <button class="nav-link" id="nav-verleih-tab" data-bs-toggle="tab" data-bs-target="#verleih-tab"
-                                        type="button" role="tab">Verleih</button>
-                
-                                </div>
-                                <div class="tab-content" id="nav-tabContent">
-                                    <div class="tab-pane active show" id="groesse-tab" role="tabpanel">
-                                        <div class="mb-3 row">
-                                            <div class="col-2 mt-1 text-xl-end">Bild</div>
-                                            <div class="col-xl-3">
-                                                <input type="file" name="pic" class="form-control"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane " id="anschaffung-tab" role="tabpanel">
-                                        <div class="mb-3 row">
-                                            <div class="col-2 mt-1 text-xl-end">Rüsthaus-Artikelnummer</div>
-                                            <div class="col-xl-3">
-                                                <input type="text" class="form-control" id="floatingInput" placeholder=""
-                                                    name="rhArtNummer">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane" id="verpackung-tab" role="tabpanel">
-                                        Verpackung
-                                    </div>
-                                    <div class="tab-pane" id="verleih-tab" role="tabpanel">
-                                        Verleih
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row justify-content-end">
-                                <div class="col-sm-2">
-                                    <button class="btn btn-success" type="submit">Speichern</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+<!-- Modal Material Reservierung -->
+<div class="modal fade" id="ModalMaterialReservieren" tabindex="-1" aria-labelledby="ModalMaterialReservierenLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalMaterialReservierenLabel">Material reservieren</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </div>
-
-        <!-- Modal Material Reservierung -->
-        <div class="modal fade" id="ModalMaterialReservieren" tabindex="-1" aria-labelledby="ModalMaterialReservierenLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="ModalMaterialReservierenLabel">Material reservieren</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body d-grid gap-3">
-                        <form action="/reservieren/{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten"> 
-                            <div class="row p-2">
-                                <div class="col-xl-11 border mx-xl-2 py-2">
-                                    <div class="mb-3 row">
-                                        <div class="col-3 mt-1 text-xl-end">Von:</div>
-                                        <div class="col-xl"><input type="date" class="form-control" name="reservieren_von" required></div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <div class="col-3 mt-1 text-xl-end">Bis:</div>
-                                        <div class="col-xl"><input type="date" class="form-control" name="reservieren_bis" required></div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <div class="col-3 mt-1 text-xl-end">Ausleiher:</div>
-                                        <div class="col-xl"><input type="text" class="form-control" name="empfaenger"></div>
-                                    </div>
-                                    <div class="mb-3 row">
-                                        <div class="col-3 mt-1 text-xl-end">Anmerkungen:</div>
-                                        <div class="col-xl"><input type="text" class="form-control" name="beschreibung"></div>
-                                    </div>
-                                </div> 
+            <div class="modal-body d-grid gap-3">
+                <form action="/reservieren/{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten">
+                    <div class="row p-2">
+                        <div class="col-xl-11 border mx-xl-2 py-2">
+                            <div class="mb-3 row">
+                                <div class="col-3 mt-1 text-xl-end">Von:</div>
+                                <div class="col-xl"><input type="date" class="form-control" name="reservieren_von"
+                                        required></div>
                             </div>
-                            <div class="row p-2">
-                                <h5>Weitere Materialien reservieren:</h5>
-                                <div class="accordion" id="accordionExample">
-                                    {% for k in kategorienListe %}
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="heading{{k.idKategorie}}">
-                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{k.idKategorie}}" aria-expanded="true" aria-controls="collapse{{k.idKategorie}}">
-                                                    {{k.name}}
-                                                </button>
-                                            </h2>
-                                            <div id="collapse{{k.idKategorie}}" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                                <div class="accordion-body">
-                                                    <ul class="list-group list-group-flush">
-                                                        {%for m2 in materialListe%}
-                                                            {% if m2.Kategorie_idKategorie == k.idKategorie and m2.idMaterial != m.idMaterial%}
-                                                                <li class="list-group-item bg-light">
-                                                                    <div class="row">
-                                                                        <div class="col-auto">
-                                                                            <img style="height: 4em;"
-                                                                                src="{{url_for('static', filename='{}_icon.svg'.format(m2.Kategorie.name))}}" alt="">
-                                                                        </div>
-                                                                        <div class="col-auto">
-                                                                            <h5>{{m2.name}}</h5>
-                                                                            <div>verfügbar</div>
-                                                                        </div>
-                                                                        <div class="col-auto">
-                                                                            <!-- <button type="button" class="btn btn-primary" value="{{m2.idMaterial}}" id="{{m2.name}}" onclick="addtoList(this.id)"> -->
-                                                                                <img src="{{url_for('static', filename='add.svg')}}" id="{{m2.name}}" value="{{m2.idMaterial}}" style="height: 2em;margin-bottom:0.4em;" onclick="addtoList(this.id)">
-                                                                            <!-- </button> -->
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-                                                            {% endif %}
-                                                        {%endfor%}
-                                                    </ul>
+                            <div class="mb-3 row">
+                                <div class="col-3 mt-1 text-xl-end">Bis:</div>
+                                <div class="col-xl"><input type="date" class="form-control" name="reservieren_bis"
+                                        required></div>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-3 mt-1 text-xl-end">Ausleiher:</div>
+                                <div class="col-xl"><input type="text" class="form-control" name="empfaenger"></div>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-3 mt-1 text-xl-end">Anmerkungen:</div>
+                                <div class="col-xl"><input type="text" class="form-control" name="beschreibung"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row p-2">
+                        <h5>Weitere Materialien reservieren:</h5>
+                        <div class="accordion" id="accordionExample">
+                            {% for k in kategorienListe %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{k.idKategorie}}">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{k.idKategorie}}" aria-expanded="true"
+                                        aria-controls="collapse{{k.idKategorie}}">
+                                        {{k.name}}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{k.idKategorie}}" class="accordion-collapse collapse show"
+                                    aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        <ul class="list-group list-group-flush">
+                                            {%for m2 in materialListe%}
+                                            {% if m2.Kategorie_idKategorie == k.idKategorie and m2.idMaterial !=
+                                            m.idMaterial%}
+                                            <li class="list-group-item bg-light">
+                                                <div class="row">
+                                                    <div class="col-auto">
+                                                        <img style="height: 4em;"
+                                                            src="{{url_for('static', filename='{}_icon.svg'.format(m2.Kategorie.name))}}"
+                                                            alt="">
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <h5>{{m2.name}}</h5>
+                                                        <div>verfügbar</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <!-- <button type="button" class="btn btn-primary" value="{{m2.idMaterial}}" id="{{m2.name}}" onclick="addtoList(this.id)"> -->
+                                                        <img src="{{url_for('static', filename='add.svg')}}"
+                                                            id="{{m2.name}}" value="{{m2.idMaterial}}"
+                                                            style="height: 2em;margin-bottom:0.4em;"
+                                                            onclick="addtoList(this.id)">
+                                                        <!-- </button> -->
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                    
+                                            </li>
+                                            {% endif %}
+                                            {%endfor%}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                            <div class=" p-2 row justify-content-center">
-                                <div class="col-sm-3">
-                                    <button class="btn btn-success btn-sm" type="submit">Prüfen & Reservieren</button>
-                                    <input hidden id="lblListe" name="reservierte_Materialien"></input>
-                                </div>
-                            </div>
-                        </form>
+                            {% endfor %}
+
+                        </div>
                     </div>
-                </div>
+                    <div class=" p-2 row justify-content-center">
+                        <div class="col-sm-3">
+                            <button class="btn btn-success btn-sm" type="submit">Prüfen & Reservieren</button>
+                            <input hidden id="lblListe" name="reservierte_Materialien"></input>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Modal Bilder bearbeiten -->
-        <div class="modal fade" id="ModalImg" tabindex="-1" aria-labelledby="ModalImgBearbeiten aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="ModalImgLabel">Bilder hinzufügen oder löschen</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal Bilder bearbeiten -->
+<div class="modal fade" id="ModalImg" tabindex="-1" aria-labelledby="ModalImgBearbeiten aria-hidden=" true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalImgLabel">Bilder hinzufügen oder löschen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-grid gap-3">
+                <h6>Bilder hochladen:</h6>
+                <form action="/img/upload/{{m.idMaterial}}" enctype="multipart/form-data" method="POST"
+                    id="formImgUpload">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <input type="file" name="pic" id="picupload" class="form-control"
+                                onchange="fileuploadcheck()" />
+                        </div>
+                        <div class="col-sm-4">
+                            <button class="btn btn-success" type="submit" id="imguploadbtn"
+                                disabled="disabled">Upload</button>
+                        </div>
                     </div>
-                    <div class="modal-body d-grid gap-3">
-                        <h6>Bilder hochladen:</h6>
-                        <form action="/img/upload/{{m.idMaterial}}" enctype="multipart/form-data" method="POST" id="formImgUpload"> 
-                            <div class="row">
-                                    <div class="col-sm-8">
-                                        <input type="file" name="pic" class="form-control"/>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <button class="btn btn-success" type="submit">Upload</button>
-                                    </div>
-                                
+                </form>
+                {% if images[0] != None %}
+                <h6>Bilder durch Klicken löschen:</h6>
+                <ul class="list-group">
+                    {% for image in images %}
+                    <li class="list-group-item">
+                        <form action="/img/delete/{{image[0]}}/{{m.idMaterial}}" enctype="multipart/form-data"
+                            method="GET" id="formImgDelete">
+                            <div class="col" style="position:relative; width:100%; height: 100px !important;">
+                                <button type="submit"
+                                    style='height: 100%; width: 100%; object-fit: contain; background-color: transparent; border:0px'>
+                                    <img src="data:image/jpg;base64,{{ image[1] }}" class="img-fluid" alt=""
+                                        style='height: 100%; width: 100%; object-fit: contain'>
+                                </button>
                             </div>
                         </form>
-                        {% if images[0] != None %}
-                            <h6>Bilder durch Klicken löschen:</h6>
-                            <ul class="list-group">
-                                {% for image in images %}
-                                    <li class="list-group-item">
-                                        <form action="/img/delete/{{image[0]}}/{{m.idMaterial}}" enctype="multipart/form-data" method="GET" id="formImgDelete"> 
-                                            <div class="col" style="position:relative; width:100%; height: 100px !important;"> 
-                                                <button type="submit" style='height: 100%; width: 100%; object-fit: contain; background-color: transparent; border:0px'>
-                                                    <img src="data:image/jpg;base64,{{ image[1] }}"  class="img-fluid" alt="" style='height: 100%; width: 100%; object-fit: contain' >
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </li>
-                                {% endfor %} 
-                            </ul>
-                        {% endif %}
-                        </ul>   
-                    </div>
-                </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                </ul>
             </div>
         </div>
-    
-    {% endfor %}
+    </div>
+</div>
 
-    <script>
-        Reservierungsliste = []
-        function addtoList(clicked_id) {
-            if (document.getElementById(clicked_id).innerText === "Reservieren"){
-                Reservierungsliste.push(document.getElementById(clicked_id).value);
-            }
-            else if (document.getElementById(clicked_id).src === "{{url_for('static', filename='minus.svg')}}"){ //Hier noch überarbeiten. Vllt mit Vergleich zur ID ob in Liste
-                Reservierungsliste.pop(document.getElementById(clicked_id).value);
-                document.getElementById(clicked_id).src = "{{url_for('static', filename='add.svg')}}";
-            }else{
-                Reservierungsliste.push(document.getElementById(clicked_id).value);
-                document.getElementById(clicked_id).src = "{{url_for('static', filename='minus.svg')}}"
-            }
-            document.getElementById('lblListe').value = Reservierungsliste;
+{% endfor %}
+
+<script>
+    Reservierungsliste = []
+    function addtoList(clicked_id) {
+        if (document.getElementById(clicked_id).innerText === "Reservieren") {
+            Reservierungsliste.push(document.getElementById(clicked_id).value);
         }
-    </script>
+        else if (document.getElementById(clicked_id).src === "{{url_for('static', filename='minus.svg')}}") { //Hier noch überarbeiten. Vllt mit Vergleich zur ID ob in Liste
+            Reservierungsliste.pop(document.getElementById(clicked_id).value);
+            document.getElementById(clicked_id).src = "{{url_for('static', filename='add.svg')}}";
+        } else {
+            Reservierungsliste.push(document.getElementById(clicked_id).value);
+            document.getElementById(clicked_id).src = "{{url_for('static', filename='minus.svg')}}"
+        }
+        document.getElementById('lblListe').value = Reservierungsliste;
+    }
+    function fileuploadcheck() {
+        console.log("pic there")
+        if (document.getElementById("picupload").value != "") {
+            document.getElementById("imguploadbtn").disabled = ""
+        }
+        else {
+            document.getElementById("imguploadbtn").disabled = "disabled"
+        }
+
+    }
+</script>
 {% endblock%}

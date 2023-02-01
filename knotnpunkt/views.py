@@ -46,11 +46,11 @@ def login():
                 # TODO: Change login to hash-only by removing "or"-statement Update: could be relevant for #44
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
-            else: 
+            else:
                 error = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
         else:
             error = 'Ungültige Anmeldedaten. Bitte überprüfe Benutzername und Passwort.'
-    return render_template('login.html', error = error)
+    return render_template('login.html', error=error)
 
 
 @views.route('/logout', methods=['GET'])
@@ -167,11 +167,12 @@ def profil(benutzername):
 def material():
     if request.method == 'POST':
         eigenschaften = {"anzahl": int(request.form.get('anzahl'))}
-        if request.form.get('farbeCheckbox'):
-            eigenschaften['farbe'] = request.form.get('farbe')
+        if request.form.get('beschreibung'):
+            eigenschaften['beschreibung'] = request.form.get('beschreibung')
         if request.form.get('rhArtNummer'):
             eigenschaften['rhArtNummer'] = request.form.get('rhArtNummer')
-        debug(eigenschaften)
+        if request.form.get('verpackung'):
+            eigenschaften['verpackung'] = request.form.get('verpackung')
         if int(eigenschaften['anzahl']) > 1:
             eigenschaften['verfuegbar'] = 1
         eigenschaften['zuletztGescannt'] = dt.strftime(
@@ -236,11 +237,15 @@ def materialDetailsEdit(idMaterial):
     material_update = Material.query.filter_by(idMaterial=idMaterial).first()
     material_update.name = request.form.get('name')
     material_update.Kategorie_idKategorie = request.form.get('kategorie')
-    eigenschaften = material_update.Eigenschaften
-    if request.form.get('farbeCheckbox'):
-        eigenschaften['farbe'] = request.form.get('farbe')
+    eigenschaften = dict(material_update.Eigenschaften)
+    debug(eigenschaften)
+    debug(f"{request.form.get('beschreibung')},{request.form.get('rhArtNummer')},{request.form.get('verpackung')}")
+    if request.form.get('beschreibung'):
+        eigenschaften['beschreibung'] = request.form.get('beschreibung')
     if request.form.get('rhArtNummer'):
         eigenschaften['rhArtNummer'] = request.form.get('rhArtNummer')
+    if request.form.get('verpackung'):
+        eigenschaften['verpackung'] = request.form.get('verpackung')
     if request.form.get('anzahl'):
         if int(request.form.get('anzahl')) > 1:
             eigenschaften['anzahl'] = int(request.form.get('anzahl'))
@@ -248,6 +253,9 @@ def materialDetailsEdit(idMaterial):
         else:
             eigenschaften['zaehlbar'] = False
     material_update.Eigenschaften = eigenschaften
+    debug(eigenschaften)
+    debug(material_update.Eigenschaften)
+    db.session.commit()
     return redirect('/material/'+idMaterial)
 
 
