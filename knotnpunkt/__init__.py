@@ -23,13 +23,10 @@ app.secret_key = token_bytes(12)
 if environ.get('KP_DOCKER'):
     db_path = Path(environ.get("KP_DATABASE_PATH", "/data/database.db"))
     RUN_DB_SETUP = not path.isfile(db_path)
-    print(db_path)
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path.absolute()}'
 else:
     db_path = Path(getcwd()) / "database.db"
-    print(db_path.absolute())
     RUN_DB_SETUP = not path.isfile(db_path)
-    print(db_path)
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path.absolute()}'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
