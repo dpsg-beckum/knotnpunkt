@@ -94,15 +94,17 @@ class Benutzer(db.Model):
     Adresse = relationship('Adresse')
     Rolle = relationship('Rolle')
 
-    def __init__(self, benutzername, name, emailAdresse, passwort, idRolle) -> None:
+    def __init__(self, benutzername, name, emailAdresse, passwort, idRolle, hashPassword=False) -> None:
         super().__init__()
         self.benutzername = benutzername
         self.name = name
         self.emailAdresse = emailAdresse
-        self.passwort = generate_password_hash(passwort)
         self.adresseRef = 1
         self.rolleRef = idRolle
         self.eingeloggt = False
+        self.passwort = passwort
+        if hashPassword:
+            self.passwort = generate_password_hash(passwort)
 
     def check_passwort(self, pwd: str) -> bool:
         return check_password_hash(self.passwort, pwd)
