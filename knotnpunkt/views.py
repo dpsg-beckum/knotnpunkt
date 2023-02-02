@@ -98,7 +98,7 @@ def home():
             stats_dict1[m.name] = stats_dict.get(
                 str(m.idMaterial), 0) / len(stats_list)*100
         max_value = max(stats_dict1.values())
-    return render_template('home.html', apps=current_user.views(), ausleihen_zukunft=ausleihen_filtered_future[:3], ausleihen_alt=ausleihen_filtered_past[:3], stats=stats_dict1, max=max_value)
+    return render_template('home.html', ausleihen_zukunft=ausleihen_filtered_future[:3], ausleihen_alt=ausleihen_filtered_past[:3], stats=stats_dict1, max=max_value)
 
 
 @views.route("/benutzer", methods=['GET', 'POST'])
@@ -117,7 +117,8 @@ def benutzer():
             erlaubeBearbeiten = False
         liste = Benutzer.query.order_by(Benutzer.name).all()
         rollen = Rolle.query.all()
-        return render_template('benutzer.html', apps=current_user.views(), benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
+
+        return render_template('benutzer.html', benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
 
 
 @views.route('/profil/<benutzername>', methods=['GET', 'POST'])
@@ -166,7 +167,7 @@ def profil(benutzername):
             error_msg = "Vergib ein eigenes Passwort, um dein Konto zu aktivieren."
         elif request.args.get('missingPwdConfirm'):
             error_msg = "Bitte bestätige das neues Passwort."
-        return render_template('profil.html', apps=current_user.views(), user=user, roles=rollen, edit=edit_permission, error=error_msg)
+        return render_template('profil.html', user=user, roles=rollen, edit=edit_permission, error=error_msg)
 
 
 @views.route("/material", methods=['GET', 'POST'])
@@ -202,7 +203,7 @@ def material():
                     [material, base64.b64encode(image.img).decode('utf-8')])
             else:
                 material_list.append([material, None])
-        return render_template('material.html', apps=current_user.views(), materialListe=material_list, kategorienListe=kategorien, verfuegbarkeit=verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
+        return render_template('material.html', materialListe=material_list, kategorienListe=kategorien, verfuegbarkeit=verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
 
 
 @views.route('/material/<idMaterial>', methods=['GET'])
@@ -235,7 +236,7 @@ def materialDetails(idMaterial):
                 [image.img_id, base64.b64encode(image.img).decode('utf-8')])
     else:
         img_id_list.append(None)
-    return render_template('material_details.html', apps=current_user.views(), material_details=material_details, materialListe=materialien, kategorienListe=kategorien, ausleihListeZukunft=ausleihen_filtered_future, ausleihListeAlt=ausleihen_filtered_past, verfuegbarkeit=verfuegbarkeit, zuletzt_ausgeliehen_Tage=zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, images=img_id_list)
+    return render_template('material_details.html', material_details=material_details, materialListe=materialien, kategorienListe=kategorien, ausleihListeZukunft=ausleihen_filtered_future, ausleihListeAlt=ausleihen_filtered_past, verfuegbarkeit=verfuegbarkeit, zuletzt_ausgeliehen_Tage=zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, images=img_id_list)
 
 
 @views.route('/material/edit/<idMaterial>', methods=['POST'])
@@ -311,13 +312,13 @@ def delete_img(id, idMaterial):
 @views.route("/kalender")
 @login_required
 def kalender():
-    return render_template('kalender.html', apps=current_user.views())
+    return render_template('kalender.html')
 
 
 @views.route("/einstellungen")
 @login_required
 def einstellungen():
-    return render_template('server_einstellungen.html', apps=current_user.views())
+    return render_template('server_einstellungen.html')
 
 
 @views.route('/scanner')
@@ -331,7 +332,7 @@ def scanner():
 def qrcode_generator():
     materialien = Material.query.all()
     kategorien = Kategorie.query.all()
-    return render_template('qrgenerator.html', apps=current_user.views(), materialListe=materialien, kategorienListe=kategorien)
+    return render_template('qrgenerator.html', materialListe=materialien, kategorienListe=kategorien)
 
 
 # @views.route('/api/material')

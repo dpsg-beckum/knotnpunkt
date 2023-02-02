@@ -63,7 +63,7 @@
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
-        {%for a in apps%}
+        {%for a in current_user.views()%}
         <li class="nav-item">
               <a href="/{{a.lower()}}" class="nav-link text-truncate">
                   <i class="fs-5 bi-house">{{a}}</i>
