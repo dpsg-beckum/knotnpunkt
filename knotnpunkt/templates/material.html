@@ -21,11 +21,14 @@
                             <div class="col-auto">
                                 <!-- <img style="height: 4em;"
                                     src="{{url_for('static', filename='{}_icon.svg'.format(m[0].Kategorie.name))}}" alt=""> -->
-                                    {% if m[1] !=  None %}
-                                        <img src="data:image/jpg;base64,{{ m[1] }}"  class="img-fluid" alt="" style="height: 4em;">
-                                    {% else %}
-                                        <img style="height: 4em;" src="{{url_for('static', filename='{}_icon.svg'.format(m[0].Kategorie.name))}}" alt="">
-                                    {% endif %}
+                                {% if m[1] != None %}
+                                <img src="data:image/jpg;base64,{{ m[1] }}" class="img-fluid" alt=""
+                                    style="height: 4em;">
+                                {% else %}
+                                <img style="height: 4em;"
+                                    src="{{url_for('static', filename='{}_icon.svg'.format(m[0].Kategorie.name))}}"
+                                    alt="">
+                                {% endif %}
                             </div>
                             <div class="col">
                                 <h5>{{m[0].name}}</h5>
@@ -33,19 +36,19 @@
                             </div>
                             <div class="col">
                                 {% if m[0].Eigenschaften.get('zaehlbar',False) %}
-                                    {% if verfuegbarkeit[m[0].idMaterial]>0 %}
-                                        <div class="text-success">{{verfuegbarkeit[m[0].idMaterial]}} /
-                                        {{m[0].Eigenschaften.get('anzahl')}}</div>
-                                    {% else %}
-                                        <div class="text-danger">Nicht verfügbar</div>
-                                    {% endif %}
-            
+                                {% if verfuegbarkeit[m[0].idMaterial]>0 %}
+                                <div class="text-success">{{verfuegbarkeit[m[0].idMaterial]}} /
+                                    {{m[0].Eigenschaften.get('anzahl')}}</div>
                                 {% else %}
-                                    {% if verfuegbarkeit[m[0].idMaterial]==True %}
-                                        <div class="text-success">Verfügbar</div>
-                                    {% elif verfuegbarkeit[m[0].idMaterial]==False%}
-                                        <div class="text-danger">Nicht verfügbar</div>
-                                    {% endif %}
+                                <div class="text-danger">Nicht verfügbar</div>
+                                {% endif %}
+
+                                {% else %}
+                                {% if verfuegbarkeit[m[0].idMaterial]==True %}
+                                <div class="text-success">Verfügbar</div>
+                                {% elif verfuegbarkeit[m[0].idMaterial]==False%}
+                                <div class="text-danger">Nicht verfügbar</div>
+                                {% endif %}
                                 {% endif %}
                             </div>
                             <div class="col d-none d-sm-block">
@@ -126,33 +129,23 @@
                 <div>
 
                     <div class="nav nav-tabs mb-3 mt-1" id="nav-tab-details" role="tablist">
-
-                        <button class="nav-link active" id="nav-aussehen-tab" data-bs-toggle="tab"
-                            data-bs-target="#groesse-tab" type="button" role="tab">Größe & Aussehen</button>
+                        <button class="nav-link active" id="nav-beschreibung-tab" data-bs-toggle="tab"
+                            data-bs-target="#beschreibung-tab" type="button" role="tab">Beschreibung</button>
 
                         <button class="nav-link" id="nav-anschaffung-tab" data-bs-toggle="tab"
                             data-bs-target="#anschaffung-tab" type="button" role="tab">Anschaffung</button>
 
                         <button class="nav-link" id="nav-verpackung-tab" data-bs-toggle="tab"
-                            data-bs-target="#verpackung-tab" type="button" role="tab">Verpackung & Transport</button>
-
-                        <button class="nav-link" id="nav-verleih-tab" data-bs-toggle="tab" data-bs-target="#verleih-tab"
-                            type="button" role="tab">Verleih</button>
+                            data-bs-target="#verpackung-tab" type="button" role="tab">Verpackung</button>
 
                     </div>
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane active show" id="groesse-tab" role="tabpanel">
+                        <div class="tab-pane acive show" id="beschreibung-tab" role="tabpanel">
                             <div class="mb-3 row">
-                                <div class="col-2 mt-1 text-xl-end">Bild</div>
+                                <div class="col-2 mt-1 text-xl-end">Beschreibung</div>
                                 <div class="col-xl-3">
-                                    <input type="file" class="form-control" disabled>
-                                </div>
-                            </div>
-                            <div class="mb-3 row">
-                                <div class="col-2 text-xl-end"><input type="checkbox" name="farbeCheckbox"
-                                        id="farbeCheckbox" onclick="farbeCheckboxOnClick(this.checked)" checked> Farbe</div>
-                                <div class="col-xl-3">
-                                    <input type="color" class="form-control" id="farbauswahl" name="farbe">
+                                    <textarea class="form-control" id="textareabeschreibung" name="beschreibung"
+                                        rows="3"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -166,10 +159,13 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="verpackung-tab" role="tabpanel">
-                            Verpackung
-                        </div>
-                        <div class="tab-pane" id="verleih-tab" role="tabpanel">
-                            Verleih
+                            <div class="mb-3 row">
+                                <div class="col-2 mt-1 text-xl-end">Verpackung</div>
+                                <div class="col-xl-3">
+                                    <input type="text" class="form-control" id="floatingInput" placeholder=""
+                                        name="verpackung">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
