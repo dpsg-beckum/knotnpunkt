@@ -113,9 +113,11 @@
       </ul>
   </div>
 </div>
+
 <div class="container-fluid">
   <div class="row">
       <div class="col min-vh-100 py-3">
+        {%if not hide_menu%}
           <!-- toggler -->
           <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button" style="padding: 0.3em">
               <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
@@ -131,6 +133,7 @@
                 <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
                 <img src="{{url_for('static', filename='arrow_left.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
               </a>
+              {%endif%}
 
             <div class="mx-1" id="contentBlock" style="margin-top:2.7em">
                 {%block content%}{%endblock%}

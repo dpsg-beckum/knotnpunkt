@@ -163,11 +163,13 @@ def profil(benutzername):
             edit_permission = True
         else:
             edit_permission = False
+        hide_menu = False
         if request.args.get("initialLogin"):
             error_msg = "Vergib ein eigenes Passwort, um dein Konto zu aktivieren."
+            hide_menu = True
         elif request.args.get('missingPwdConfirm'):
             error_msg = "Bitte bestätige das neues Passwort."
-        return render_template('profil.html', user=user, roles=rollen, edit=edit_permission, error=error_msg)
+        return render_template('profil.html', user=user, roles=rollen, edit=edit_permission, hide_menu=hide_menu, error=error_msg)
 
 
 @views.route("/material", methods=['GET', 'POST'])
