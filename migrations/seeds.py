@@ -1,8 +1,22 @@
-from .db import (
+# This file should contain records you want created when you run flask db seed.
+#
+# Example:
+# from yourapp.models import User
+
+
+# initial_user = {
+#     'username': 'superadmin'
+# }
+# if User.find_by_username(initial_user['username']) is None:
+#     User(**initial_user).save()
+
+# from knotnpunkt import app
+from knotnpunkt.database.db import (
     Benutzer,
     Rolle,
     Label,
     Kategorie,
+    db,
 )
 
 initial_data = {
@@ -90,3 +104,20 @@ initial_data = {
         )
     ]
 }
+
+for i in initial_data.get('Rolle'):
+    if not Rolle.query.get(i.idRolle):
+        db.session.add(i)
+        db.session.commit()
+for i in initial_data.get('Label'):
+    if not Label.query.get(i.idLabel):
+        db.session.add(i)
+        db.session.commit()
+for i in initial_data.get('Kategorie'):
+    if not Kategorie.query.get(i.idKategorie):
+        db.session.add(i)
+        db.session.commit()
+for i in initial_data.get('Benutzer'):
+    if not Benutzer.query.get(i.benutzername):
+        db.session.add(i)
+        db.session.commit()
