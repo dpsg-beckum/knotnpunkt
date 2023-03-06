@@ -25,5 +25,6 @@
 **/values.dev.yaml
 LICENSE
 README.md
+**/instance/
 # cert.pem
 # key.pem
