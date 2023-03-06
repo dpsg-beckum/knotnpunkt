@@ -47,7 +47,7 @@ Passwort: `admin`
 
 ## [WIP] Contributing
 
-+ Um zu erfahren, wie du bei knotnpunkt mithelfen kannst, lies bitte in der Datei CONTRIBUTING.md nach 
++ Um zu erfahren, wie du bei knotnpunkt mithelfen kannst, lies bitte in der Datei [CONTRIBUTING.md](.github/CONTRIBUTING.md) nach 
 + Um die Entwicker*innenversion zu starten, befolge diese Schritte:
 
 ### Voraussetzungen:
