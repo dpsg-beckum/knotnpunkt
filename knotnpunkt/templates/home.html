@@ -95,6 +95,69 @@
                         {% endif %}
                     </div>
                 </div>
+                <!-- The Auslagen part of the accordion. Calls the API -->
+            <div class="accordion-item">
+                <h4 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        Deine eingereichten Auslagen
+                    </button>
+                </h4>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+                    data-bs-parent="#accordionExample">                    
+                    <div class="list-group" id="auslagen-list-group">
+                    </div>
+                    <div class="d-flex justify-content-center mt-2">
+                        <div class="spinner-border" role="status" id="ajax-loading"></div>
+                    </div>
+                    <div class="mt-3 flex-column align-items-center text-center" id="no-auslagen-alert">
+                        <h4 class="text-black-50 fst-italic">Du hast aktuell keine Auslagen zum anzeigen</h4>
+                    </div>
+                    <script>
+                        $('#no-auslagen-alert').hide();
+                        let username = {{ current_user.benutzername | tojson}};
+                        listgroup = $('#auslagen-list-group');
+                        $('#no-auslagen-alert').hide();
+                        function getNewData() {
+                            fetch(`/api/auslagen?onlyAuthored=true`, {})
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    if (data.response.length > 0) {
+                                        for (let i = 0; i < data.response.length; i++) {
+                                            let border, textColor;
+                                            console.log()
+                                            if (data.response[i].freigabe_zeit == null) {
+                                                border = "bg-danger-subtle border-dark"
+                                            } else {
+                                                border = "bg-success-subtle border-dark"
+                                            }
+                                            let html = `<div class="list-group-item list-group-item-action ${border}">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <a href="/auslagen" class="text-reset">
+                                                    <h5 class="d-none d-md-block mb-1 ${textColor}">${data.response[i].titel}</h5>
+                                                    <h6 class="d-md-none mb-1 text-truncate">${data.response[i].titel}</h6>
+                                                    </a>
+                                                    <small class="text-secondary">${data.response[i].erstellerBenutzername} | ${data.response[i].betrag} €</small>
+                                                </div>  
+                                                <div class="row">                                  
+                                                    <p class="col-5 mb-1 text-secondary text-truncate"><span style="font-family:monospace">#${data.response[i].idAuslage}</span> | ${data.response[i].grund}</p>
+                                                    
+                                                    </div>
+                                            </div>`
+                                            listgroup[0].insertAdjacentHTML('beforeend', html);
+                                        }
+                                    } else {
+                                        $('#no-auslagen-alert').show();
+                                    }
+                                    $('#ajax-loading').hide()
+                                });
+                        }
+                        getNewData()
+                    </script>
+
+                </div>
+            </div>
+
             </div>
         </div>
     </div>
