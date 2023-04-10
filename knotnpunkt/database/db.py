@@ -1,3 +1,4 @@
+import base64
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import DATETIME
@@ -86,6 +87,7 @@ class Benutzer(db.Model):
     name = db.Column(db.String(45), nullable=False)
     emailAdresse = db.Column(db.String(45), nullable=False, unique=True)
     passwort = db.Column(db.String(45), nullable=False)
+    iban = db.Column(db.String(25), nullable=True)
     adresseRef = db.Column(db.ForeignKey(
         'Adresse.idAdresse'), nullable=False, index=True)
     rolleRef = db.Column('RolleRef', db.ForeignKey(
@@ -231,6 +233,10 @@ class Rolle(db.Model):
         'schreibenEinstellungen', db.Boolean(), default=False)
     lesenEinstellungen = db.Column(
         'lesenEinstellungen', db.Boolean(), default=False)
+    lesenAlleAuslagen = db.Column(
+        'lesenAlleAuslagen', db.Boolean(), default=False)
+    freigebenAuslagen = db.Column(
+        'freigebenAuslagen', db.Boolean(), default=False)
 
     def __str__(self):
         return f"<Rolle {self.name}>"
@@ -257,3 +263,77 @@ class Img(db.Model):
         'Material.idMaterial'), nullable=False, index=True)
     img = db.Column(db.String(), nullable=False)
     mimetype = db.Column(db.String(), nullable=False)
+
+class AuslagenKategorie(db.Model):
+    __tablename__ = "AuslagenKategorie"
+    idAuslKateg = db.Column("idAuslKateg", db.Integer(), primary_key=True)
+    name = db.Column('name', db.String(45), nullable=False, unique=True)
+    anzeigeName = db.Column("anzeigeName", db.String(), nullable=False)
+
+
+class AuslagenBild(db.Model):
+    __tablename__ = "AuslagenBild"
+    img_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Auslage_id = db.Column(db.ForeignKey('Auslage.idAuslage'), nullable=False)
+    img = db.Column(db.String(), nullable=False)
+    mimetype = db.Column(db.String(), nullable=False)
+
+    Auslage = relationship('Auslage', back_populates="Bild")
+
+    @property
+    def img_base64(self):
+        """Embedding an image file into SVG needs the image base64 coded
+
+        Returns:
+            str: Base64 code of the img attribute
+        """
+        return base64.encodebytes(self.img).decode('utf-8')
+
+class Auslage(db.Model):
+    __tablename__ = "Auslage"
+    idAuslage = db.Column("idAuslage", db.Integer(), primary_key=True)
+    titel = db.Column("titel", db.String(45), nullable=False)
+    betrag = db.Column("betrag", db.Float(), nullable=False)
+    iban = db.Column("iban", db.String(22), nullable=False)
+    bic = db.Column("bic", db.String(11), nullable=False)
+    kontoinhaber = db.Column("kontoinhaber", db.String(45), nullable=False)
+    grund = db.Column("grund", db.String(), nullable=False)
+    eingereicht_zeit = db.Column("eingereicht_zeit", db.DateTime(), nullable=False)
+    freigabe_zeit = db.Column("freigabe_zeit", db.DateTime(), nullable=True)
+    erstellerBenutzername = db.Column('Ersteller_benutzername', db.String(
+        45), db.ForeignKey('Benutzer.benutzername'), nullable=False)
+    freigabeDurchBenutzername = db.Column('Freigabe_benutzername', db.String(
+        45), db.ForeignKey('Benutzer.benutzername'), nullable=True)
+    kategorieId = db.Column('AuslagenKategorie_idAuslKateg', db.Integer(), db.ForeignKey('AuslagenKategorie.idAuslKateg'))
+
+    Ersteller = relationship('Benutzer', foreign_keys=erstellerBenutzername, backref="Auslagen")
+    Freigebende = relationship('Benutzer', foreign_keys=freigabeDurchBenutzername)
+    Kategorie = relationship('AuslagenKategorie')
+    Bild = relationship('AuslagenBild', back_populates="Auslage")
+
+    def __init__(self, titel, betrag, iban, bic, kontoinhaber, grund, eingereicht_zeit, erstellerBenutzername, kategorieId):
+        self.titel = titel
+        self.betrag = betrag
+        self.iban = iban
+        self.bic = bic
+        self.kontoinhaber = kontoinhaber
+        self.grund = grund
+        self.eingereicht_zeit = eingereicht_zeit
+        self.erstellerBenutzername = erstellerBenutzername
+        self.kategorieId = kategorieId
+
+    def to_dict(self):
+        return {
+            "idAuslage": self.idAuslage,
+            "titel": self.titel,
+            "betrag": self.betrag,
+            "iban": self.iban,
+            "bic": self.bic,
+            "kontoinhaber": self.kontoinhaber,
+            "grund": self.grund,
+            "eingereicht_zeit": self.eingereicht_zeit,
+            "erstellerBenutzername": self.erstellerBenutzername,
+            "kategorieId": self.kategorieId,
+            "freigabe_zeit": self.freigabe_zeit,
+            "freigabeDurchBenutzername": self.freigabeDurchBenutzername
+        }

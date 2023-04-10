@@ -16,6 +16,7 @@ from knotnpunkt.database.db import (
     Rolle,
     Label,
     Kategorie,
+    AuslagenKategorie,
     db,
 )
 
@@ -40,7 +41,9 @@ initial_data = {
             schreibenBenutzer=1,
             schreibenEinstellungen=1,
             schreibenKalender=1,
-            schreibenMaterial=1
+            schreibenMaterial=1,
+            lesenAlleAuslagen=0,
+            freigebenAuslagen=0
         ),
         Rolle(
             idRolle=2,
@@ -52,7 +55,9 @@ initial_data = {
             schreibenBenutzer=1,
             schreibenEinstellungen=0,
             schreibenKalender=1,
-            schreibenMaterial=1
+            schreibenMaterial=1,
+            lesenAlleAuslagen=1,
+            freigebenAuslagen=1
         ),
         Rolle(
             idRolle=3,
@@ -64,7 +69,9 @@ initial_data = {
             schreibenBenutzer=0,
             schreibenEinstellungen=0,
             schreibenKalender=1,
-            schreibenMaterial=1
+            schreibenMaterial=1,
+            lesenAlleAuslagen=0,
+            freigebenAuslagen=0
         ),
         Rolle(
             idRolle=4,
@@ -76,7 +83,23 @@ initial_data = {
             schreibenBenutzer=0,
             schreibenEinstellungen=0,
             schreibenKalender=0,
-            schreibenMaterial=1
+            schreibenMaterial=1,
+            lesenAlleAuslagen=0,
+            freigebenAuslagen=0
+        ),
+        Rolle(
+            idRolle=5,
+            lesenBenutzer=1,
+            lesenEinstellungen=0,
+            lesenKalender=1,
+            lesenMaterial=1,
+            name="kassenwart",
+            schreibenBenutzer=0,
+            schreibenEinstellungen=0,
+            schreibenKalender=1,
+            schreibenMaterial=1,
+            lesenAlleAuslagen=1,
+            freigebenAuslagen=0
         )
     ],
     "Label": [
@@ -102,6 +125,23 @@ initial_data = {
             istZaehlbar=1,
             name="Werkzeug"
         )
+    ],
+    "AuslagenKategorie":[
+        AuslagenKategorie(
+            idAuslKateg=1,
+            name="gruppenstunden",
+            anzeigeName="Gruppenstunden"
+        ),
+        AuslagenKategorie(
+            idAuslKateg=2,
+            name="leiterrunde",
+            anzeigeName="Leiterrunde"
+        ),
+        AuslagenKategorie(
+            idAuslKateg=3,
+            name="sommerlager",
+            anzeigeName="Sommerlager"
+        )
     ]
 }
 
@@ -119,5 +159,9 @@ for i in initial_data.get('Kategorie'):
         db.session.commit()
 for i in initial_data.get('Benutzer'):
     if not Benutzer.query.get(i.benutzername):
+        db.session.add(i)
+        db.session.commit()
+for i in initial_data.get('AuslagenKategorie'):
+    if not AuslagenKategorie.query.get(i.idAuslKateg):
         db.session.add(i)
         db.session.commit()
