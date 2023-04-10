@@ -53,3 +53,17 @@ def get_ausleihen_fuer_material(materialien: list[Material] | str) -> list:
     result = {m.idMaterial: [a[0] for a in ausleihen if str(
         m.idMaterial) in a[1]] for m in materialien}
     return result
+
+
+def allowed_file(filename):
+    """Test if uploaded images have legit filenames, Used by Auslagen
+    image upload.
+
+    Args:
+        filename (str): Filename to be tested
+
+    Returns:
+        bool: True if filename is allowed
+    """
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ["png", "jpg", "jpeg", "gif"]

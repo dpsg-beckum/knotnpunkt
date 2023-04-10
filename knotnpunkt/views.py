@@ -22,7 +22,8 @@ from .database.db import (
     Ausleihe,
     Rolle,
     Adresse,
-    Img
+    Img,
+    AuslagenKategorie,
 )
 from .utils import checkverfuegbarkeit
 
@@ -335,6 +336,12 @@ def qrcode_generator():
     materialien = Material.query.all()
     kategorien = Kategorie.query.all()
     return render_template('qrgenerator.html', materialListe=materialien, kategorienListe=kategorien)
+
+@views.route("/auslagen")
+@login_required
+def auslagen_uebersicht():
+    kategorienListe = AuslagenKategorie.query.all()
+    return render_template("auslagen.html", kategorienListe=kategorienListe)
 
 
 # @views.route('/api/material')
