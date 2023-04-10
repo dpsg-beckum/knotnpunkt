@@ -35,8 +35,8 @@
                   <h6 class="mb-0">Name</h6>
                 </div>
                 <div class="col-sm-9 text-secondary">
-                  <input class="form-control" type="text" name="name" id="inputBenutzername" value="{{user.name}}" {%if not
-                    edit%}readonly{%endif%}>
+                  {#Damit der Kontoinhaber automatisch gesetzt werden kann, ist das Feld 'Name' editierbar#}
+                  <input class="form-control" type="text" name="name" id="inputBenutzername" value="{{user.name}}" {%if not current_user.benutzername == user.benutzername %}readonly{%endif%}>
                 </div>
               </div>
               <hr>
