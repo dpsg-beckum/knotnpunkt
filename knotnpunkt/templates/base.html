@@ -59,14 +59,14 @@
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
             <a href="/home" class="nav-link text-truncate">
-                <i class="fs-5 bi-house">Startseite</i>
+                <i class="fs-5">Startseite</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
         {%for a in current_user.views()%}
         <li class="nav-item">
               <a href="/{{a.lower()}}" class="nav-link text-truncate">
-                  <i class="fs-5 bi-house">{{a}}</i>
+                  <i class="fs-5">{{a}}</i>
                   <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
               </a>
           </li>
@@ -79,25 +79,25 @@
         </li>
           <li class="nav-item">
             <a href="/scanner" class="nav-link text-truncate">
-                <i class="fs-5 bi-house">Scanner</i>
+                <i class="fs-5">Scanner</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
         <li class="nav-item">
             <a href="/qrcode-generator" class="nav-link text-truncate">
-                <i class="fs-5 bi-house">QR code generator</i>
+                <i class="fs-5">QR code generator</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
           <li class="nav-item">
             <a href="/profil/{{current_user.benutzername}}" class="nav-link text-truncate">
-                <i class="fs-5 bi-house">Mein Konto</i>
+                <i class="fs-5">Mein Konto</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
         <li class="nav-item">
             <a href="/logout" class="nav-link text-truncate">
-                <i class="fs-5 bi-house text-danger">Abmelden</i>
+                <i class="fs-5 text-danger">Abmelden</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
