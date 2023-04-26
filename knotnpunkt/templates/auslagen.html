@@ -29,11 +29,14 @@
 <div class="collapse mt-2 border" id="collapseRechte">
     <div class="col mx-xl-2 p-2" id="rechteInfoDiv">
         <div class="border mt-4 mb-2 p-1">
-            <i class="bi bi-bookmark-check me-1"></i>: Auslage freigeben / Freigabe zurückzuziehen
+            <i class="bi bi-trash me-1"></i>: Eintrag löschen
             <br>
             <i class="bi bi-printer me-1"></i>: PDF-Datei herunterladen
             <br>
-            <i class="bi bi-trash me-1"></i>: Eintrag löschen
+            <i class="bi bi-bookmark-check me-1"></i>: Auslage freigeben / Freigabe zurückziehen
+            <br>
+            <i class="bi bi-envelope-check me-1"></i>: Auslage als erledigt markieren
+            <br>
         </div>
     <script>
         let lesenAlleAuslagen = {{current_user.Rolle.lesenAlleAuslagen | tojson}};
@@ -95,6 +98,21 @@
                     })
                 }
 
+                function check_auslage(id){
+                    fetch(
+                        `/api/auslagen/${id}?action=done`,
+                        {
+                            method: "PATCH"
+                        }
+                    ).then((response) => {
+                        if (response.status == 200) {
+                            getNewData();
+                        }else{
+                            alert("Auslage konnte nicht als erledigt markiert werden. Fehlercode " + response.status)
+                        }
+                    })
+                }
+
                 $('#no-routes-alert').hide();
                 let username = {{ current_user.benutzername | tojson}};
                 let listgroup = $('#auslagen-list-group');
@@ -108,29 +126,57 @@
                         .then((data) => {
                             if (data.response.length > 0) {
                                 for (let i = 0; i < data.response.length; i++) {
-                                    let border, textColor;
+                                    let bg = "";
                                     if (data.response[i].freigabe_zeit == null) {
-                                        border = "bg-danger-subtle border-dark"
-                                    } else {
-                                        border = "bg-success-subtle border-dark"
-                                    }
-                                    if (!freigebenAuslagen || data.response[i].erstellerBenutzername == username){
-                                        acceptButtonStatus = "disabled";
+                                        bg = "bg-danger-subtle"
+                                    } else if (data.response[i].erledigtZeit != null){
+                                        bg = "bg-info-subtle"
                                     }else{
-                                        acceptButtonStatus = "";
+                                        bg = "bg-success-subtle"
                                     }
-                                    let html = `<div class="list-group-item list-group-item-action ${border}">
+
+                                    let textStrike = "";
+                                    if (data.response[i].erledigtZeit != null){                                        
+                                        textStrike = "text-decoration-line-through";
+                                    }
+                                    let acceptButton = "disabled";
+                                    let acceptIcon = "bi-bookmark-check";
+                                    if (data.response[i].erledigtZeit == null
+                                    && freigebenAuslagen
+                                    && !(data.response[i].erstellerBenutzername == username)
+                                    ){
+                                        acceptButton = '';
+                                        acceptIcon += '-fill';
+                                    }
+
+                                    let delButton = "disabled";
+                                    let delIcon = "bi-trash";
+                                    if (data.response[i].erledigtZeit == null || lesenAlleAuslagen){
+                                        delButton = '';
+                                        delIcon += '-fill';
+                                    }
+
+                                    let checkButton = "disabled";
+                                    let checkIcon = "bi-envelope-check";
+                                    if (lesenAlleAuslagen
+                                    && data.response[i].erledigtZeit == null 
+                                    && data.response[i].freigabe_zeit != null){
+                                        checkButton = '';
+                                        checkIcon += '-fill';
+                                    }
+                                    let html = `<div class="list-group-item list-group-item-action border-dark ${bg}">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="d-none d-md-block mb-1 ${textColor}">${data.response[i].titel}</h5>
-                                        <h6 class="d-md-none mb-1 text-truncate">${data.response[i].titel}</h6>
+                                        <h5 class="d-none d-md-block mb-1 ${textStrike}">${data.response[i].titel}</h5>
+                                        <h6 class="d-md-none mb-1 text-truncate ${textStrike}">${data.response[i].titel}</h6>
                                         <small class="text-secondary">${data.response[i].erstellerBenutzername} | ${data.response[i].betrag} €</small>
                                     </div>  
                                     <div class="row">                                  
                                         <p class="col-5 mb-1 text-secondary text-truncate"><span style="font-family:monospace">#${data.response[i].idAuslage}</span> | ${data.response[i].grund}</p>
                                         <div class="col col-md-3 offset-3 offset-md-4 btn-group" role="group" aria-label="Basic example">
-                                            <button type="button" class="btn btn-outline-dark btn-sm" onclick="accept_auslage(${data.response[i].idAuslage})" ${acceptButtonStatus}><i class="bi bi-bookmark-check"></i></button>
-                                            <a class="btn btn-outline-dark btn-sm" href="/api/auslagen/export?id=${data.response[i].idAuslage}&type=pdf"><i class="bi bi-printer"></i></a>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="delete_auslage(${data.response[i].idAuslage})"><i class="bi bi-trash"></i></button>
+                                            <a class="btn btn-outline-dark btn-sm" href="/api/auslagen/export?id=${data.response[i].idAuslage}&type=pdf"><i class="bi bi-printer-fill"></i></a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="delete_auslage(${data.response[i].idAuslage})" ${delButton}><i class="bi bi-trash-fill"></i></button>
+                                            <button type="button" class="btn btn-outline-dark btn-sm" onclick="accept_auslage(${data.response[i].idAuslage})" ${acceptButton}><i class="bi ${acceptIcon}"></i></button>
+                                            <button type="button" class="btn btn-outline-dark btn-sm" onclick="check_auslage(${data.response[i].idAuslage})" ${checkButton}><i class="bi ${checkIcon}"></i></button>
                                           </div>
                                         </div>
                                 </div>`
@@ -178,7 +224,7 @@
                     <div class="col-xl-8 border mx-xl-2 py-2">
 
                         <div class="row">
-                            <div class="col-4 mt-1 text-xl-end">Belegbild</div>
+                            <div class="col-4 mt-1 text-xl-end">Belegbild *</div>
                             <div class="col-xl">
                                 <div class="input-group">
                                     <input class="form-control" type="file" id="belegbild" accept=".png, .jpg, .jpeg, image/jpeg, image/png" capture="environment" required>

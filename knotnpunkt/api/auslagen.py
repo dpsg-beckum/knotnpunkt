@@ -127,6 +127,15 @@ def patch_auslagen(id):
         db.session.add(auslage)
         db.session.commit()
         return auslage.to_dict()
+    elif action == "done":
+        if not current_user.Rolle.lesenAlleAuslagen:
+            abort(403)
+        if auslage.ErledigtDurch is None:
+            auslage.erledigtZeit = dt.now()
+            auslage.ErledigtDurch = current_user
+            db.session.add(auslage)
+            db.session.commit()
+        return auslage.to_dict()
     else:
         abort(501)
 
