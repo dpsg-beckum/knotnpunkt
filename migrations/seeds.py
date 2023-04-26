@@ -42,7 +42,7 @@ initial_data = {
             schreibenEinstellungen=1,
             schreibenKalender=1,
             schreibenMaterial=1,
-            lesenAlleAuslagen=0,
+            lesenAlleAuslagen=1,
             freigebenAuslagen=0
         ),
         Rolle(
@@ -141,6 +141,11 @@ initial_data = {
             idAuslKateg=3,
             name="sommerlager",
             anzeigeName="Sommerlager"
+        ),
+        AuslagenKategorie(
+            idAuslKateg=4,
+            name="sonstiges",
+            anzeigeName="Sonstiges"
         )
     ]
 }

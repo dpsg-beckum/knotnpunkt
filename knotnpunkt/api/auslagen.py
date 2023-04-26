@@ -40,9 +40,13 @@ def get_zahlungen():
     data = {"request": request.args, "response": []}
     data['user'] = json.dumps(current_user, cls=DatabaseEncoder)
     if current_user.Rolle.lesenAlleAuslagen is True and not request.args.get("onlyAuthored", False):
-        data['response'] = [ausl.to_dict() for ausl in Auslage.query.all()]
+        filtered_auslagen = []
+        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(Auslage.query.all()) if ausl.freigabe_zeit is None])
+        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(Auslage.query.all()) if ausl.freigabe_zeit is not None and ausl.erledigtZeit is None])
+        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(Auslage.query.all()) if ausl.freigabe_zeit is not None and ausl.erledigtZeit is not None])
+        data['response'] = sum([ausl_liste for ausl_liste in filtered_auslagen if ausl_liste is not []], [])
     else:
-        data['response'] = [ausl.to_dict() for ausl in current_user.Auslagen]
+        data['response'] = [ausl.to_dict() for ausl in reversed(current_user.Auslagen)]
     return data
 
 
