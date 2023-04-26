@@ -289,6 +289,7 @@ class AuslagenBild(db.Model):
         """
         return base64.encodebytes(self.img).decode('utf-8')
 
+
 class Auslage(db.Model):
     __tablename__ = "Auslage"
     idAuslage = db.Column("idAuslage", db.Integer(), primary_key=True)
@@ -304,10 +305,14 @@ class Auslage(db.Model):
         45), db.ForeignKey('Benutzer.benutzername'), nullable=False)
     freigabeDurchBenutzername = db.Column('Freigabe_benutzername', db.String(
         45), db.ForeignKey('Benutzer.benutzername'), nullable=True)
+    erledigtZeit = db.Column("erledigt_zeit", db.DateTime(), nullable=True)
+    erledigtDurchNutzer = db.Column('Erledigt_benutzername', db.String(
+        45), db.ForeignKey('Benutzer.benutzername'), nullable=True)
     kategorieId = db.Column('AuslagenKategorie_idAuslKateg', db.Integer(), db.ForeignKey('AuslagenKategorie.idAuslKateg'))
 
     Ersteller = relationship('Benutzer', foreign_keys=erstellerBenutzername, backref="Auslagen")
     Freigebende = relationship('Benutzer', foreign_keys=freigabeDurchBenutzername)
+    ErledigtDurch = relationship('Benutzer', foreign_keys=erledigtDurchNutzer)
     Kategorie = relationship('AuslagenKategorie')
     Bild = relationship('AuslagenBild', back_populates="Auslage")
 
@@ -335,5 +340,7 @@ class Auslage(db.Model):
             "erstellerBenutzername": self.erstellerBenutzername,
             "kategorieId": self.kategorieId,
             "freigabe_zeit": self.freigabe_zeit,
-            "freigabeDurchBenutzername": self.freigabeDurchBenutzername
+            "freigabeDurchBenutzername": self.freigabeDurchBenutzername,
+            "erledigtZeit": self.erledigtZeit,
+            "erledigtDurchNutzer": self.erledigtDurchNutzer
         }

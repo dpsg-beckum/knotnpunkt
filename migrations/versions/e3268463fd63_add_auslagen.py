@@ -36,10 +36,13 @@ def upgrade():
     sa.Column('freigabe_zeit', sa.DateTime(), nullable=True),
     sa.Column('Ersteller_benutzername', sa.String(length=45), nullable=False),
     sa.Column('Freigabe_benutzername', sa.String(length=45), nullable=True),
+    sa.Column('erledigt_zeit', sa.DateTime(), nullable=True),
+    sa.Column('Erledigt_benutzername', sa.String(length=45), nullable=True),
     sa.Column('AuslagenKategorie_idAuslKateg', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['AuslagenKategorie_idAuslKateg'], ['AuslagenKategorie.idAuslKateg'], ),
     sa.ForeignKeyConstraint(['Ersteller_benutzername'], ['Benutzer.benutzername'], ),
     sa.ForeignKeyConstraint(['Freigabe_benutzername'], ['Benutzer.benutzername'], ),
+    sa.ForeignKeyConstraint(['Erledigt_benutzername'], ['Benutzer.benutzername'], ),
     sa.PrimaryKeyConstraint('idAuslage')
     )
     op.create_table('AuslagenBild',
