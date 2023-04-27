@@ -1,33 +1,34 @@
 import json
 from datetime import datetime as dt
-from flask import Blueprint, request, abort, send_file
+from flask import (
+    Blueprint,
+    request,
+    abort,
+    send_file,
+)
 from flask_login import login_required, current_user
 import segno
-from .database.json_encoder import DatabaseEncoder
-from .database.db import (
-    Benutzer,
+from ..database import db
+from ..database.json_encoder import DatabaseEncoder
+from ..database.db import (
     Material,
-    Aktion,
-    Aktivitaet,
-    Kategorie,
-    Ausleihe,
-    Rolle,
-    Adresse
 )
-from .utils import get_ausleihen_fuer_material
-from ._version import __version__
-from .export.file_generators import (
+from ..utils import (
+    get_ausleihen_fuer_material,
+)
+from .._version import __version__
+from ..export.file_generators import (
     SVGGenerator,
     ExportError,
     PDFGenerator,
 )
 
 
-api = Blueprint("api", __name__, template_folder="templates",
-                url_prefix="/api")
+api_routes = Blueprint("api", __name__, template_folder="templates",
+                       url_prefix="")
 
 
-@api.route('/material')
+@api_routes.route('/material')
 @login_required
 def material_api():
     if request.args.get("id"):
@@ -50,7 +51,7 @@ def material_api():
     abort(501)
 
 
-@api.route('/qrcode/generator')
+@api_routes.route('/qrcode/generator')
 @login_required
 def qr_generator():
     print(request.date)
@@ -65,7 +66,7 @@ def qr_generator():
     return {"qrcode": qrcode.svg_inline(scale=5), "name": artikel.name}
 
 
-@api.route("/qrcode/decode", methods=['POST'])
+@api_routes.route("/qrcode/decode", methods=['POST'])
 @login_required
 def decode_qrcode():
     if not request.data:
@@ -79,11 +80,11 @@ def decode_qrcode():
     return {"success": True, "id": data[2]}
 
 
-@api.route("/material/export", methods=['POST'])
+@api_routes.route("/material/export", methods=['POST'])
 @login_required
 def test():
     if request.method != 'POST':
-        abort(405) # Method Not allowed
+        abort(405)  # Method Not allowed
     if not isinstance(request.json.get('artikel_ids'), list):
         abort(404)
     artikel_ids = request.json.get("artikel_ids")

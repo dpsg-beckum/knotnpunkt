@@ -7,7 +7,9 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="{{url_for('static', filename='knotnpunkt.webmanifest')}}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         const registerServiceWorker = async () => {
@@ -59,39 +61,45 @@
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
             <a href="/home" class="nav-link text-truncate">
-                <i class="fs-5 bi-house">Startseite</i>
+                <i class="fs-5">Startseite</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
         {%for a in current_user.views()%}
         <li class="nav-item">
               <a href="/{{a.lower()}}" class="nav-link text-truncate">
-                  <i class="fs-5 bi-house">{{a}}</i>
+                  <i class="fs-5">{{a}}</i>
                   <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
               </a>
           </li>
           {%endfor%}
           <li class="nav-item">
+            <a href="/auslagen" class="nav-link text-truncate">
+                <i class="fs-5">Auslagen</i>
+                <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+            </a>
+        </li>
+          <li class="nav-item">
             <a href="/scanner" class="nav-link text-truncate">
-                <i class="fs-5 bi-house">Scanner</i>
+                <i class="fs-5">Scanner</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
         <li class="nav-item">
             <a href="/qrcode-generator" class="nav-link text-truncate">
-                <i class="fs-5 bi-house">QR code generator</i>
+                <i class="fs-5">QR code generator</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
           <li class="nav-item">
             <a href="/profil/{{current_user.benutzername}}" class="nav-link text-truncate">
-                <i class="fs-5 bi-house">Mein Konto</i>
+                <i class="fs-5">Mein Konto</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
         <li class="nav-item">
             <a href="/logout" class="nav-link text-truncate">
-                <i class="fs-5 bi-house text-danger">Abmelden</i>
+                <i class="fs-5 text-danger">Abmelden</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
         </li>
@@ -146,6 +154,7 @@
     <div id="footerBlock">
     {%block footer%}{%endblock%}
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+{%block afterBootstrap%}{%endblock%}
 </body>
 </html>

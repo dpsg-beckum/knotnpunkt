@@ -57,7 +57,9 @@ def create_app(prevent_context_recursion: bool = False):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['FLASK_DB_SEEDS_PATH'] = (
         Path(app.root_path) / "../migrations/seeds.py").absolute()
-
+    # Load config concerning transaction-QR-Codes on Auslagen export
+    app.config['KP_GIROCODE'] = environ.get('KP_GIROCODE', "true") == "true"
+    app.logger.info(f"KP_GIROCODE={app.config['KP_GIROCODE']}")
     # Initializing alembic config needed for  migration-related commands
     alembic_cfg = Config(Path(app.root_path) / ".." / "alembic.ini")
 

@@ -1,0 +1,412 @@
+{%extends "base.html"%}
+
+{% block additionalHeader%}
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
+{%endblock%}
+
+
+{% block content%}
+<div class="col-md-7 mx-auto">
+    <nav>
+        <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+            <button class="nav-link active" id="nav-liste-tab" data-bs-toggle="tab" data-bs-target="#liste-tab"
+                type="button" role="tab">Übersicht</button>
+            <button class="nav-link" id="nav-hinzufuegen-tab" data-bs-toggle="tab" data-bs-target="#hinzufuegen-tab"
+                type="button" role="tab">Einreichen...</button>
+        </div>
+    </nav>
+
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane active show" id="liste-tab" role="tabpanel" aria-labelledby="nav-home-tab">
+
+<button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRechte"
+    aria-expanded="false" aria-controls="collapseRechte">
+    <i class="bi bi-question-circle"></i>
+</button>
+<div class="collapse mt-2 border" id="collapseRechte">
+    <div class="col mx-xl-2 p-2" id="rechteInfoDiv">
+        <div class="border mt-4 mb-2 p-1">
+            <i class="bi bi-trash me-1"></i>: Eintrag löschen
+            <br>
+            <i class="bi bi-printer me-1"></i>: PDF-Datei herunterladen
+            <br>
+            <i class="bi bi-bookmark-check me-1"></i>: Auslage freigeben / Freigabe zurückziehen
+            <br>
+            <i class="bi bi-envelope-check me-1"></i>: Auslage als erledigt markieren
+            <br>
+        </div>
+    <script>
+        let lesenAlleAuslagen = {{current_user.Rolle.lesenAlleAuslagen | tojson}};
+        let freigebenAuslagen = {{current_user.Rolle.freigebenAuslagen | tojson}};
+        let rechteInfo = document.getElementById("rechteInfoDiv");
+        if (lesenAlleAuslagen && freigebenAuslagen){
+            rechteInfo.insertAdjacentHTML("afterbegin", "Aufgrund deiner Berechtigungen kannst du alle Auslagen sehen und alle fremden Auslagen freigeben.");
+        }else{
+            if(lesenAlleAuslagen){
+                //rechteInfo.insertAdjacentHTML("afterbegin", "<p>Aufgrund deiner Berechtigungen kannst du alle Auslagen sehen, diese aber nicht freigeben.</p>");
+            }else{
+                //rechteInfo.innerText = "Aufgrund deiner Berechtigungen kannst du hier nur deine eigenen Auslagen sehen. Bitte einen StaVo, deine Auslage freizugeben.";
+            }
+        }
+    </script>
+    </div>
+</div>
+
+            <div class="list-group mt-2" id="auslagen-list-group">
+            </div>
+            <div class="d-flex justify-content-center mt-2">
+
+                <div class="spinner-border" role="status" id="ajax-loading">
+                </div>
+            </div>
+            <div class="mt-3 flex-column align-items-center text-center" id="no-auslagen-alert">
+                <h3 class="text-black-50 fst-italic">Du hast aktuell keine Auslagen zum anzeigen</h3>
+            </div>
+            <script>
+                function delete_auslage(id){
+                    fetch(
+                        `/api/auslagen/${id}`,
+                        {
+                            method: "DELETE"
+                        }
+                    ).then((response) =>{
+                        if (response.status == 200) {
+                            //window.location.reload();
+                            getNewData();
+                        }else{
+                            alert("Auslage konnte nicht gelöscht werden. Fehlercode " + response.status)
+                        }
+                    })
+                }
+
+                function accept_auslage(id){
+                    fetch(
+                        `/api/auslagen/${id}?action=freigabe`,
+                        {
+                            method: "PATCH"
+                        }
+                    ).then((response) => {
+                        if (response.status == 200) {
+                            //window.location.reload();
+                            getNewData();
+                        }else{
+                            alert("Auslage konnte nicht freigegeben werden. Fehlercode " + response.status)
+                        }
+                    })
+                }
+
+                function check_auslage(id){
+                    fetch(
+                        `/api/auslagen/${id}?action=done`,
+                        {
+                            method: "PATCH"
+                        }
+                    ).then((response) => {
+                        if (response.status == 200) {
+                            getNewData();
+                        }else{
+                            alert("Auslage konnte nicht als erledigt markiert werden. Fehlercode " + response.status)
+                        }
+                    })
+                }
+
+                $('#no-routes-alert').hide();
+                let username = {{ current_user.benutzername | tojson}};
+                let listgroup = $('#auslagen-list-group');
+                let acceptButtonStatus = "";
+                $('#no-auslagen-alert').hide();
+                function getNewData() {
+                    listgroup[0].innerHTML = "";
+                    $('#ajax-loading').show();
+                    fetch(`/api/auslagen`, {})
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.response.length > 0) {
+                                for (let i = 0; i < data.response.length; i++) {
+                                    let bg = "";
+                                    if (data.response[i].freigabe_zeit == null) {
+                                        bg = "bg-danger-subtle"
+                                    } else if (data.response[i].erledigtZeit != null){
+                                        bg = "bg-info-subtle"
+                                    }else{
+                                        bg = "bg-success-subtle"
+                                    }
+
+                                    let textStrike = "";
+                                    if (data.response[i].erledigtZeit != null){                                        
+                                        textStrike = "text-decoration-line-through";
+                                    }
+                                    let acceptButton = "disabled";
+                                    let acceptIcon = "bi-bookmark-check";
+                                    if (data.response[i].erledigtZeit == null
+                                    && freigebenAuslagen
+                                    && !(data.response[i].erstellerBenutzername == username)
+                                    ){
+                                        acceptButton = '';
+                                        acceptIcon += '-fill';
+                                    }
+
+                                    let delButton = "disabled";
+                                    let delIcon = "bi-trash";
+                                    if (data.response[i].erledigtZeit == null || lesenAlleAuslagen){
+                                        delButton = '';
+                                        delIcon += '-fill';
+                                    }
+
+                                    let checkButton = "disabled";
+                                    let checkIcon = "bi-envelope-check";
+                                    if (lesenAlleAuslagen
+                                    && data.response[i].erledigtZeit == null 
+                                    && data.response[i].freigabe_zeit != null){
+                                        checkButton = '';
+                                        checkIcon += '-fill';
+                                    }
+                                    let html = `<div class="list-group-item list-group-item-action border-dark ${bg}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="d-none d-md-block mb-1 ${textStrike}">${data.response[i].titel}</h5>
+                                        <h6 class="d-md-none mb-1 text-truncate ${textStrike}">${data.response[i].titel}</h6>
+                                        <small class="text-secondary">${data.response[i].erstellerBenutzername} | ${data.response[i].betrag} €</small>
+                                    </div>  
+                                    <div class="row">                                  
+                                        <p class="col-5 mb-1 text-secondary text-truncate"><span style="font-family:monospace">#${data.response[i].idAuslage}</span> | ${data.response[i].grund}</p>
+                                        <div class="col col-md-3 offset-3 offset-md-4 btn-group" role="group" aria-label="Basic example">
+                                            <a class="btn btn-outline-dark btn-sm" href="/api/auslagen/export?id=${data.response[i].idAuslage}&type=pdf"><i class="bi bi-printer-fill"></i></a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="delete_auslage(${data.response[i].idAuslage})" ${delButton}><i class="bi bi-trash-fill"></i></button>
+                                            <button type="button" class="btn btn-outline-dark btn-sm" onclick="accept_auslage(${data.response[i].idAuslage})" ${acceptButton}><i class="bi ${acceptIcon}"></i></button>
+                                            <button type="button" class="btn btn-outline-dark btn-sm" onclick="check_auslage(${data.response[i].idAuslage})" ${checkButton}><i class="bi ${checkIcon}"></i></button>
+                                          </div>
+                                        </div>
+                                </div>`
+                                    listgroup[0].insertAdjacentHTML('beforeend', html);
+                                }
+                            } else {
+                                $('#no-auslagen-alert').show();
+                            }
+                            $('#ajax-loading').hide()
+                        });
+                }
+                getNewData()
+            </script>
+        </div>
+
+        <div class="tab-pane" id="hinzufuegen-tab" role="tabpanel" aria-labelledby="nav-profile-tab">
+
+            <form action="" id="formMaterialHinzufuegen" enctype=multipart/form-data class="needs-validation" autocomplete="off" novalidate>
+                <div class="row mb-3">
+                    <div class="col">
+                        <button class="btn btn-success" type="submit">Einreichen</button>
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseAnleitung" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="bi bi-question-circle"></i>
+                        </button>
+                        <div class="collapse row mt-2" id="collapseAnleitung">
+                            <div class="col-xl-8 border mx-xl-2 py-2">
+                                <ol type="1">
+                                    <li><strong>Lade dein Belegbild hoch</strong>. Achte auf eine gute Bildqualität und
+                                        fotografiere ggf. mit Blitz. Hast du eine PDF-Datei, lade einen Screenshot hoch und versende das Original manuell.</li>
+                                    <li>Fülle den Rest des Formulars mit deinen <strong>Kontodaten</strong> aus. Die IBAN wird von deiner letzen Auslage übrenommen.</li>
+                                    <li><strong>Klicke auf Absenden</strong> um deine Auslage einzureichen. Dein StaVo
+                                        und deine Kassenwartenden sehen deine Auslage nun in ihrer Übersicht.</li>
+                                    <li>Beschrifte deinen Beleg mit der <strong>Auslagen-ID</strong> oder notiere dir
+                                        diese. Die Auslagen-ID wird dir nach dem Sendevorgang angezeigt.</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-xl-8 border mx-xl-2 py-2">
+
+                        <div class="row">
+                            <div class="col-4 mt-1 text-xl-end">Belegbild *</div>
+                            <div class="col-xl">
+                                <div class="input-group">
+                                    <input class="form-control" type="file" id="belegbild" accept=".png, .jpg, .jpeg, image/jpeg, image/png" capture="environment" required>
+                                    <div class="invalid-feedback">
+                                        Lade z. B. ein Bild deines Kassenbons hoch.
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-4 d-none d-xl-block"></div>
+                            <div class="col align-text-top font-text fst-italic" style="font-size: 0.8em;">Erlaubte Formate: jpg, png, gif</div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-4 mt-1 text-xl-end">Titel *</div>
+                            <div class="col-xl">
+                                <div class="input-group">
+                                    <input id="titelInput" type="text" class="form-control" id="titelInput"
+                                        placeholder="" name="titel" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-4 mt-1 text-xl-end">Kategorie *</div>
+                            <div class="col-xl">
+                                <select class="form-select" aria-label=".form-select-lg example" id="kategorieIdInput" required>
+                                    <option value="">Bitte wählen...</option>
+                                        {%for k in kategorienListe%}
+                                    <option value="{{k.idAuslKateg}}">{{k.anzeigeName}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-xl4 mt-1 text-xl-start">Begründung / Anmerkungen (200 Zeichen)</div>
+                            <div class="col-xl">
+                                <textarea class="form-control" id="grundInput" maxlength="200" placeholder=""></textarea>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-4 mt-1 text-xl-end">Betrag(€) *</div>
+                            <div class="col-xl">
+                                <div class="input-group">
+                                    <input id="betragInput" min=0.00 max=1000.00 value="0.00" step="0.01" type="number"
+                                        class="form-control">
+                                    <span class="input-group-text">€</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-xl-4 mt-1 text-xl-end">Kontoinhaber_in *</div>
+                            <div class="col-xl">
+                                <input type="text" class="form-control" id="kontoInhabInput" placeholder=""
+                                    name="kontoinhab" autocomplete="on" required>
+                            </div>
+                        </div>
+
+
+                        <div class="mb-3 row">
+                            <div class="col-4 mt-1 text-xl-end">IBAN *</div>
+                            <div class="col-xl">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="ibanInput" placeholder="" autocomplete="on"
+                                        pattern="[Dd][Ee]\d{2} ?\d{4} ?\d{4} ?\d{4} ?\d{4} ?\d{2}" required>
+                                    <div class="invalid-feedback">
+                                        z. B. "DE91100000000123456789" oder "DE91 1000 0000 0123 4567 89"
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-4 mt-1 text-xl-end">BIC</div>
+                            <div class="col-xl">
+                                <input type="text" class="form-control" id="bicInput" placeholder="" autocomplete="on" name="name">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="d-none d-xl-block col-xl-3 mx-xl-1 p-2 my-2 my-xl-0">
+
+                    </div>
+                    <div class="">
+
+                    </div>
+                </div>
+                <div class="text-danger">* Pflichtfeld</div>
+        </div>
+    </div>
+
+    <div>
+
+
+    </div>
+
+    </form>
+
+    <div class="modal fade" id="newAuslageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header" id="newAuslageModalHead">
+              <!-- <h1 class="modal-title fs-5" id="exampleModalLabel">Auslage wurde eingesendet</h1> -->
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="getNewData();"></button>
+            </div>
+            <div class="modal-body" id="newAuslageModalBody">
+              Bitte notiere dir die <strong>Auslagen-ID</strong>:  
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="getNewData()">Schließen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+</div>
+</div>
+</div>
+{% endblock%}
+
+{%block afterBootstrap%}
+    <script>
+        addForm = document.getElementById("formMaterialHinzufuegen");
+        const newAuslageModal = new bootstrap.Modal(document.getElementById('newAuslageModal'));
+        let user_clearname = {{current_user.name | tojson}}
+        let user_latestIban = {{current_user.iban | tojson}}
+
+
+        let belegbild = document.getElementById("belegbild");
+        let titel = document.getElementById("titelInput");
+        let betrag = document.getElementById("betragInput");
+        let iban = document.getElementById("ibanInput");
+        let bic = document.getElementById("bicInput");
+        let grund = document.getElementById("grundInput");
+        let kategorieId = document.getElementById("kategorieIdInput");
+        let kontoInhab = document.getElementById("kontoInhabInput");
+        let formData = new FormData();
+
+        kontoInhab.value = user_clearname;
+        iban.value = user_latestIban;
+
+        addForm.addEventListener("submit", (e) => {
+            if (!addForm.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                addForm.classList.add('was-validated');
+                return
+            }
+            addForm.classList.add('was-validated');
+            formData.append("titel", titel.value)
+            formData.append("betrag", betrag.value)
+            formData.append("iban", iban.value)
+            formData.append("bic", bic.value)
+            formData.append("grund", grund.value)
+            formData.append("kategorieId", kategorieId.value)
+            formData.append("kontoinhaber", kontoInhab.value)
+            formData.append("belegbild", belegbild.files[0])
+            fetch(`/api/auslagen/`, {
+                method: "POST",
+                body: formData
+            })
+                .then((response) => {
+                if (response.status == 200) {
+                    return response.json();
+                }else{
+                    alert("Auslage konnte nicht hinzugefügt werden. Fehlercode " + response.status);
+                }})
+                .then((data) => {
+                    document.getElementById("newAuslageModalHead").innerHTML = '"' + data.auslage.titel + '" erfolgreich eingereicht'; 
+                    document.getElementById("newAuslageModalBody").innerHTML = "Bitte notiere dir die <strong>Auslagen-ID</strong>:<br> " + '<span class="font-monospace fs-1 user-select-all">#' + data.auslage.idAuslage + '</span>'; 
+                    newAuslageModal.show();
+                })
+            event.preventDefault()
+            event.stopPropagation()
+        })
+
+    </script>
+
+{%endblock%}
