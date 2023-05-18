@@ -1,9 +1,11 @@
 import json
 from datetime import datetime as dt
+from datetime import timedelta
 from flask import (
+    abort,
     Blueprint,
     request,
-    abort,
+    Response,
     send_file,
 )
 from flask_login import login_required, current_user
@@ -12,6 +14,7 @@ from ..database import db
 from ..database.json_encoder import DatabaseEncoder
 from ..database.db import (
     Material,
+    Ausleihe,
 )
 from ..utils import (
     get_ausleihen_fuer_material,
@@ -32,8 +35,9 @@ api_routes = Blueprint("api", __name__, template_folder="templates",
 @login_required
 def material_api():
     if request.args.get("id"):
-        abort(501)
-    material = Material.query.all()
+        material = [Material.query.get(request.args.get("id"))]
+    else:
+        material = Material.query.all()
     data = []
     for m in material:
         data.append(DatabaseEncoder.default(m))
@@ -98,3 +102,24 @@ def test():
             return generator.generate_svg(Material.query.filter(Material.idMaterial.in_(artikel_ids)).all())
     except ExportError as e:
         return {"success": False, "msg": e.args[0]}
+
+@api_routes.route('/material/checkout', methods=['POST'])
+@login_required
+def checkout():
+    print(request.json)
+    if not request.json.get('id'):
+        abort(403)
+    material: Material = Material.query.get(request.json.get('id'))
+    if not material:
+        abort(403)
+    neue_ausleihe =Ausleihe(
+        ersteller_benutzername=current_user.benutzername,
+        ts_erstellt=dt.now(),
+        ts_von=dt.now(),
+        ts_bis=(dt.now() + timedelta(days=1)),
+        materialien=material.idMaterial,
+        empfaenger=current_user.benutzername,
+        beschreibung=f"Per QR-Code")
+    db.session.add(neue_ausleihe)
+    db.session.commit()
+    return Response(status=200)
