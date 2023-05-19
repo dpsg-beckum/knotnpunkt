@@ -28,4 +28,4 @@ svglib==1.4.1
 tinycss2==1.2.1
 tomli==2.0.1
 webencodings==0.5.1
-Werkzeug==2.2.3
+Werkzeug>=2.2.3
