@@ -220,7 +220,7 @@ def materialDetails(idMaterial):
     ausleihen_filtered_past = []
     verfuegbarkeit = checkverfuegbarkeit(material_details)
     for a in ausleihen:
-        if int(idMaterial) in [int(x) for x in a.materialien.split(",")]:
+        if int(idMaterial) in [int(x) for x in a.materialien.split(",") if x.isdigit()]:
             if a.ts_von > date.today():
                 ausleihen_filtered_future.append(a)
             else:
@@ -358,14 +358,6 @@ def auslagen_uebersicht():
 #     return jsonify(antwort)
 
 
-# @views.route('/api/material/checkout', methods=['POST'])
-# @login_required
-# def checkout():
-#     debug(request.form['id'])
-#     neue_aktivitaet = Aktivitaet(int(request.form.get('id')), dt.utcfromtimestamp(int(request.form.get('timestamp')[:-3])), int(request.form.get('menge')), current_user.benutzername, request.form.get('bemerkung'))
-#     db.session.add(neue_aktivitaet)
-#     db.session.commit()
-#     return Response(status=200)
 
 
 # if __name__ == '__main__':

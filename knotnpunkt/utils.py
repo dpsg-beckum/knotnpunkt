@@ -23,7 +23,7 @@ def checkverfuegbarkeit(materialien):
         else:
             dict_verfuegbar[m.idMaterial] = True
         for a in ausleihen:
-            if int(m.idMaterial) in [int(x) for x in a.materialien.split(",")]:
+            if int(m.idMaterial) in [int(x) for x in a.materialien.split(",") if x.isdigit()]:
                 if a.ts_von <= date.today() <= a.ts_bis:
                     if m.Eigenschaften.get('zaehlbar', False) == False:
                         dict_verfuegbar[m.idMaterial] = False

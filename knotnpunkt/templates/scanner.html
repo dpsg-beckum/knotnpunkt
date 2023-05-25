@@ -17,7 +17,7 @@
 </div>
 <script src="{{url_for('static', filename='html5-qrcode.min.js')}}" type="text/javascript"></script>
 
-<!-- Fenster, daas nach dem Scannen eingeblendet wird -->
+<!-- Fenster, das nach dem Scannen eingeblendet wird -->
 <div class="modal fade" id="scannerSuccessModal" tabindex="-1" aria-labelledby="exampleModalFullscreenLabel"
     style="display: none;" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-fullscreen">
@@ -60,10 +60,26 @@
 
     function checkout() {        // Funktion des "Jetzt Mitnehmen"-Buttons
         console.log('Material wird ausgecheckt: ' + gescannte_id);
-        $.post("/api/material/checkout", { id: gescannte_id, timestamp: Date.now(), benutzername: "{{current_user.benutzername}}", menge: 1 }, function () {
-            $('#scannerSuccessModal').modal('hide');
-            $('#checkoutErfolgreich').show();
-        });
+        fetch("/api/material/checkout", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: gescannte_id,
+                timestamp: Date.now(),
+                benutzername: {{current_user.benutzername | tojson}},
+                menge: 1
+            })
+        })
+        .then((response) => {
+            if (response.status == 200){
+                $('#scannerSuccessModal').modal('hide');
+                $('#checkoutErfolgreich').show();
+            }
+            return response.json()
+        })
+        .then((data) =>{});
     }
 
     Html5Qrcode.getCameras().then(devices => { //GetCameras schaut ob Nutzer erlaubnis gegeben hat
@@ -86,10 +102,15 @@
                             if (data.success == true) {
                                 $('#checkoutErfolgreich').hide();
                                 $('#scannerSuccessModal').modal('show');    //Zeige Dialogfenster
+                                gescannte_id = data.id;
                                 $.ajax({
                                     url: '/material/' + data.id,   //holt sich die Material-Detail-Seite und bindet sie in das modal ein
                                     success: function (result) {
-                                        $('#contentScreen').html(jQuery.parseHTML(result)[18].children[0].children[0].children.contentBlock.children[0]);
+                                        console.log(result);
+                                        var parser = new DOMParser();
+                                        var doc = parser.parseFromString(result, "text/html");
+                                        console.log(doc.querySelector("#contentBlock"));
+                                        $('#contentScreen').html(doc.querySelector('#contentBlock'));
                                         $('#editButton').hide();
                                         $('#reservierenButton').hide();
                                         $('#materialInfoCardBody').append('<a class="btn btn-warning" href="/material/' + data.id + '">Mehr Details</a>')
@@ -98,8 +119,9 @@
                                 $.ajax({            //holt sich den Namen des Materials für die alert-Box
                                     url: '/api/material?id=' + data.id,
                                     success: function (result) {
+                                        result = JSON.parse(result);
                                         console.log(result);
-                                        $('#nameDesGescannten').html(result.name)
+                                        $('#nameDesGescannten').html(result.data.name)
                                     }
                                 })
                             } else {
@@ -107,8 +129,8 @@
                             }
                         })
                 },
-                (errorMessage) => { console.log('Ein Fehler ist aufgetreten:', errorMessage) })
-                .catch((err) => { console.log('Ein Fehler ist aufgetreten:', err) });
+                (errorMessage) => { })//console.log('Ein Fehler ist aufgetreten:', errorMessage) })
+                // .catch((err) => { console.log('Ein Fehler ist aufgetreten:', err) });
         }
     }).catch(err => { console.log('Ein Fehler ist aufgetreten:', err) });
 
