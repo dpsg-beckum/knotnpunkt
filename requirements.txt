@@ -8,7 +8,7 @@ cssselect2==0.7.0
 defusedxml==0.7.1
 Flask==2.3.2
 Flask-DB==0.3.2
-Flask-Login==0.6.2
+Flask-Login==0.6.3
 Flask-SQLAlchemy==3.0.2
 greenlet==2.0.1
 humanize==4.4.0

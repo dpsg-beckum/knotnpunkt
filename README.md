@@ -9,7 +9,7 @@ Eine Webapp die zur Verwaltung von Stammesmaterial verwendet werden kann. Entwic
 ## Installation mit Docker
 
 ### 1. Repository klonen
-```bash 
+```bash
 git clone https://github.com/dpsg-beckum/knotnpunkt.git
 cd knotnpunkt
 ```
@@ -47,7 +47,7 @@ Passwort: `admin`
 
 ## [WIP] Contributing
 
-+ Um zu erfahren, wie du bei knotnpunkt mithelfen kannst, lies bitte in der Datei [CONTRIBUTING.md](.github/CONTRIBUTING.md) nach 
++ Um zu erfahren, wie du bei knotnpunkt mithelfen kannst, lies bitte in der Datei [CONTRIBUTING.md](.github/CONTRIBUTING.md) nach
 + Um die Entwicker*innenversion zu starten, befolge diese Schritte:
 
 ### Voraussetzungen:
@@ -61,16 +61,23 @@ git clone https://github.com/dpsg-beckum/knotnpunkt.git
 cd knotnpunkt
 ```
 
-### 2. Python-Umgebung vorbereiten
+### 2. Python-Umgebung vorbereiten (Windows)
 ```PowerShell
 python -m venv .venv
 .venv/Scripts/activate
-pip install -r reqirements.txt
+pip install -r requirements.txt
+```
+
+### 2. Python-Umgebung vorbereiten (Linux)
+```PowerShell
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ### 3. JavaScript-Bibliotheken installieren
 ```PowerShell
-yarn install 
+yarn install
 ```
 
 ### 5. Flask-Server starten
