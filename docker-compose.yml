@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   knotnpunkt:
-    image: knotnpunkt
+    image: dpsgbeckum/knotnpunkt
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -10,6 +10,8 @@ services:
       - 8080:8080
     volumes:
       - knotnpunkt_data:/data
+    environment:
+      - "KP_INSTANCE_PATH=/data"
 
 volumes:
   knotnpunkt_data:

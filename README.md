@@ -8,6 +8,19 @@ Eine Webapp die zur Verwaltung von Stammesmaterial verwendet werden kann. Entwic
 
 ## Installation mit Docker
 
+```bash
+docker run -p 8080:8080 dpsgbeckum/knotnpunkt
+```
+### Optional: HTTPS aktivieren
+```bash
+docker run --rm -it -p 8080:8080 dpsgbeckum/knotnpunkt --certfile /path/to/cert.pem --keyfile /path/to/key.pem
+```
+### Optional: Speichern der Datenbankdatei in einem Volume
+```bash
+docker run --rm -it -p 8080:8080 -v knotnpunkt_data:/data knotnpunkt
+```
+### Docker-Image lokal erstellen:
+
 ### 1. Repository klonen
 ```bash 
 git clone https://github.com/dpsg-beckum/knotnpunkt.git
@@ -15,21 +28,12 @@ cd knotnpunkt
 ```
 ### 2. Docker-Image erzeugen:
 ```bash
-docker build --tag knotnpunkt .
+docker build --tag local-knotnpunkt .
 ```
 #### 3. Docker-Container starten
 ```bash
-docker run -p 8080:8080 knotnpunkt
+docker run -p 8080:8080 local-knotnpunkt
 ```
-### Optional: HTTPS aktivieren
-```bash
-docker run --rm -it -p 8080:8080 knotnpunkt --certfile /path/to/cert.pem --keyfile /path/to/key.pem
-```
-### Optional: Speichern der Datenbankdatei in einem Volume
-```bash
-docker run --rm -it -p 8080:8080 -v knotnpunkt_data:/data knotnpunkt
-```
-
 ### Standardbenutzername und Passwort:
 
 Benutzername: `admin`
@@ -41,7 +45,7 @@ Passwort: `admin`
 - [x] Anlegen von Material mit Kategorie, Bild, etc.
 - [x] Ausleihen/Auschecken von Material
 - [x] Identifikation von Material durch integrierten QR-Code-Scanner
-- [ ] Einreichen von Kostenbelegen
+- [x] Einreichen von Kostenbelegen
 
 
 
