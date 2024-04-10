@@ -1,29 +1,22 @@
 from datetime import datetime as dt
 from datetime import date
-from flask import request, Response, jsonify, Blueprint
+from flask import request, Blueprint
 from flask.helpers import url_for
 from flask.templating import render_template
 from flask_login import current_user
-from flask_login.utils import login_required, login_user, logout_user
+from flask_login.utils import login_required
 from sqlalchemy import desc
 from werkzeug.utils import redirect
 from logging import debug
-# from .. import logger
 import json
 import base64
 import humanize as hu
 from ..database import db
 from ..database.db import (
-    Benutzer,
     Material,
-    Aktion,
-    Aktivitaet,
     Kategorie,
     Ausleihe,
-    Rolle,
-    Adresse,
     Img,
-    AuslagenKategorie,
 )
 from ..utils import checkverfuegbarkeit
 
