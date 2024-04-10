@@ -111,7 +111,7 @@ def benutzer():
             'email'), f"{request.form.get('benutzername')}", Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle)
         db.session.add(neuerBenutzer)
         db.session.commit()
-        return redirect("/benutzer")
+        return redirect(url_for(".benutzer"))
     else:
         if current_user.Rolle.schreibenBenutzer:
             erlaubeBearbeiten = True
@@ -135,7 +135,7 @@ def profil(benutzername):
                 # User deletes own profile
                 db.session.delete(user)
                 db.session.commit()
-                return redirect('/benutzer')
+                return redirect(url_for(".benutzer"))
             else:
                 user.benutzername = request.form['benutzername']
                 user.name = request.form['name']
@@ -155,7 +155,7 @@ def profil(benutzername):
                         return redirect(url_for("views.profil", benutzername=benutzername, missingPwdConfirm=True))
                 db.session.add(user)
                 db.session.commit()
-                return redirect('/benutzer')
+                return redirect(url_for(".benutzer"))
     elif request.method == 'GET':
         if current_user.Rolle.lesenBenutzer is False and current_user.benutzername is not benutzername:
             return Response(f'Du hast keinen Zugriff auf das Profil von {benutzername}.', 401)
@@ -193,7 +193,7 @@ def material():
             'name'), request.form.get('kategorie'), eigenschaften)
         db.session.add(neuesMaterial)
         db.session.commit()
-        return redirect('/material')
+        return redirect(url_for(".material"))
     else:
         materialien = Material.query.all()
         verfuegbarkeit = checkverfuegbarkeit(materialien)
@@ -268,7 +268,7 @@ def materialDetailsEdit(idMaterial):
     debug(eigenschaften)
     debug(material_update.Eigenschaften)
     db.session.commit()
-    return redirect('/material/'+idMaterial)
+    return redirect(url_for(".materialDetails", idMaterial=idMaterial))
 
 
 @site.route('/reservieren/<idMaterial>', methods=['POST'])
@@ -286,7 +286,7 @@ def materialReservieren(idMaterial):
         beschreibung=request.form.get('beschreibung'))
     db.session.add(neueReservierung)
     db.session.commit()
-    return redirect('/material')
+    return redirect(url_for(".material"))
 
 
 @site.route('/img/upload/<idMaterial>', methods=['POST'])
@@ -302,7 +302,7 @@ def upload_img(idMaterial):
     img = Img(img=pic.read(), Material_idMaterial=material_id, mimetype=mimetype)
     db.session.add(img)
     db.session.commit()
-    return redirect('/material/'+idMaterial)
+    return redirect(url_for(".materialDetails", idMaterial=idMaterial))
 
 
 @site.route('/img/delete/<id>/<idMaterial>')  # , methods=['POST']
@@ -310,7 +310,7 @@ def upload_img(idMaterial):
 def delete_img(id, idMaterial):
     Img.query.filter_by(img_id=id).delete()
     db.session.commit()
-    return redirect('/material/'+idMaterial)
+    return redirect(url_for(".materialDetails", idMaterial=idMaterial))
 
 
 @site.route("/kalender")
@@ -343,23 +343,3 @@ def qrcode_generator():
 def auslagen_uebersicht():
     kategorienListe = AuslagenKategorie.query.all()
     return render_template("auslagen.html", kategorienListe=kategorienListe)
-
-
-# @views.route('/api/material')
-# @login_required
-# def material_api():
-#     #sleep(1)  # Verzögerung um UI zu testen. VORSICHT: sleep verzögert Sekunden, nicht Millisekunden
-#     material = Material.query.filter_by(idMaterial = request.args.get('id')).first()
-#     verfuegbarkeit = checkverfuegbarkeit([material])
-#     if verfuegbarkeit.get(material.idMaterial):     # Hier die Abfrage nach dem Ende der Reservierung...
-#         ...
-#     else:                                           # ...oder nach dem Beginn der Nächsten
-#         ...
-#     antwort = {'verfuegbarkeit': verfuegbarkeit,'id': material.idMaterial, 'name': material.name, 'kategorie': {'id': material.Kategorie.idKategorie, 'name':material.Kategorie.name}, 'eigenschaften': json.loads(material.Eigenschaften)}
-#     return jsonify(antwort)
-
-
-
-
-# if __name__ == '__main__':
-#     app.run(debug = True, host="0.0.0.0", ssl_context='adhoc')
