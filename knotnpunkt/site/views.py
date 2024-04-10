@@ -12,8 +12,8 @@ from logging import debug
 import json
 import base64
 import humanize as hu
-from .database import db
-from .database.db import (
+from ..database import db
+from ..database.db import (
     Benutzer,
     Material,
     Aktion,
@@ -25,7 +25,7 @@ from .database.db import (
     Img,
     AuslagenKategorie,
 )
-from .utils import checkverfuegbarkeit
+from ..utils import checkverfuegbarkeit
 
 views = Blueprint("views", __name__, template_folder="templates")
 

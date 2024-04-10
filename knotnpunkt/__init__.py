@@ -13,7 +13,7 @@ from sqlalchemy import engine
 from .database.db import (
     Benutzer,
 )
-from . views import views
+from .site.views import views
 from .api import api
 from .utils import convertTime
 from ._version import __version__
