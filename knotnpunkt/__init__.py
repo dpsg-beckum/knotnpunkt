@@ -13,7 +13,7 @@ from sqlalchemy import engine
 from .database.db import (
     Benutzer,
 )
-from .site.views import views
+from .site import site
 from .api import api
 from .utils import convertTime
 from ._version import __version__
@@ -99,7 +99,7 @@ def create_app(prevent_context_recursion: bool = False):
     app.jinja_env.globals.update(naturaltime=convertTime)
 
     # Register Blueprints
-    app.register_blueprint(views)
+    app.register_blueprint(site)
     app.register_blueprint(api)
 
     # Initializing flask-login extension

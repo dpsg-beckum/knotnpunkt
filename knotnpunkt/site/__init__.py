@@ -27,15 +27,16 @@ from ..database.db import (
 )
 from ..utils import checkverfuegbarkeit
 
-views = Blueprint("views", __name__, template_folder="templates")
+site = Blueprint("views", __name__, template_folder="templates")
 
+#testtestets
 
-@views.route('/')
+@site.route('/')
 def redirectToLogin():
     return redirect(url_for('views.login'))
 
 
-@views.route("/login", methods=['GET', 'POST'])
+@site.route("/login", methods=['GET', 'POST'])
 def login():
     error_msg = ""
     if current_user.is_authenticated:
@@ -58,7 +59,7 @@ def login():
     return render_template('login.html', error=error_msg)
 
 
-@views.route('/logout', methods=['GET'])
+@site.route('/logout', methods=['GET'])
 @login_required
 def logout():
     user = current_user
@@ -69,7 +70,7 @@ def logout():
     return redirect(url_for('views.login'))
 
 
-@views.route('/home')
+@site.route('/home')
 @login_required
 def home():
     ausleihen = Ausleihe.query.filter_by(
@@ -102,7 +103,7 @@ def home():
     return render_template('home.html', ausleihen_zukunft=ausleihen_filtered_future[:3], ausleihen_alt=ausleihen_filtered_past[:3], stats=stats_dict1, max=max_value)
 
 
-@views.route("/benutzer", methods=['GET', 'POST'])
+@site.route("/benutzer", methods=['GET', 'POST'])
 @login_required
 def benutzer():
     if request.method == 'POST':
@@ -122,7 +123,7 @@ def benutzer():
         return render_template('benutzer.html', benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
 
 
-@views.route('/profil/<benutzername>', methods=['GET', 'POST'])
+@site.route('/profil/<benutzername>', methods=['GET', 'POST'])
 @login_required
 def profil(benutzername):
     error_msg = ""
@@ -173,7 +174,7 @@ def profil(benutzername):
         return render_template('profil.html', user=user, roles=rollen, edit=edit_permission, hide_menu=hide_menu, error=error_msg)
 
 
-@views.route("/material", methods=['GET', 'POST'])
+@site.route("/material", methods=['GET', 'POST'])
 @login_required
 def material():
     if request.method == 'POST':
@@ -209,7 +210,7 @@ def material():
         return render_template('material.html', materialListe=material_list, kategorienListe=kategorien, verfuegbarkeit=verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
 
 
-@views.route('/material/<idMaterial>', methods=['GET'])
+@site.route('/material/<idMaterial>', methods=['GET'])
 @login_required
 def materialDetails(idMaterial):
     material_details = Material.query.filter_by(idMaterial=idMaterial).all()
@@ -242,7 +243,7 @@ def materialDetails(idMaterial):
     return render_template('material_details.html', material_details=material_details, materialListe=materialien, kategorienListe=kategorien, ausleihListeZukunft=ausleihen_filtered_future, ausleihListeAlt=ausleihen_filtered_past, verfuegbarkeit=verfuegbarkeit, zuletzt_ausgeliehen_Tage=zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, images=img_id_list)
 
 
-@views.route('/material/edit/<idMaterial>', methods=['POST'])
+@site.route('/material/edit/<idMaterial>', methods=['POST'])
 @login_required
 def materialDetailsEdit(idMaterial):
     material_update = Material.query.filter_by(idMaterial=idMaterial).first()
@@ -270,7 +271,7 @@ def materialDetailsEdit(idMaterial):
     return redirect('/material/'+idMaterial)
 
 
-@views.route('/reservieren/<idMaterial>', methods=['POST'])
+@site.route('/reservieren/<idMaterial>', methods=['POST'])
 @login_required
 def materialReservieren(idMaterial):
     debug(request.form.get('reservierte_Materialien'))
@@ -288,7 +289,7 @@ def materialReservieren(idMaterial):
     return redirect('/material')
 
 
-@views.route('/img/upload/<idMaterial>', methods=['POST'])
+@site.route('/img/upload/<idMaterial>', methods=['POST'])
 @login_required
 def upload_img(idMaterial):
     pic = request.files['pic']
@@ -304,7 +305,7 @@ def upload_img(idMaterial):
     return redirect('/material/'+idMaterial)
 
 
-@views.route('/img/delete/<id>/<idMaterial>')  # , methods=['POST']
+@site.route('/img/delete/<id>/<idMaterial>')  # , methods=['POST']
 @login_required
 def delete_img(id, idMaterial):
     Img.query.filter_by(img_id=id).delete()
@@ -312,32 +313,32 @@ def delete_img(id, idMaterial):
     return redirect('/material/'+idMaterial)
 
 
-@views.route("/kalender")
+@site.route("/kalender")
 @login_required
 def kalender():
     return render_template('kalender.html')
 
 
-@views.route("/einstellungen")
+@site.route("/einstellungen")
 @login_required
 def einstellungen():
     return render_template('server_einstellungen.html')
 
 
-@views.route('/scanner')
+@site.route('/scanner')
 @login_required
 def scanner():
     return render_template('scanner.html')
 
 
-@views.route('/qrcode-generator', methods=['GET'])
+@site.route('/qrcode-generator', methods=['GET'])
 @login_required
 def qrcode_generator():
     materialien = Material.query.all()
     kategorien = Kategorie.query.all()
     return render_template('qrgenerator.html', materialListe=materialien, kategorienListe=kategorien)
 
-@views.route("/auslagen")
+@site.route("/auslagen")
 @login_required
 def auslagen_uebersicht():
     kategorienListe = AuslagenKategorie.query.all()
