@@ -17,7 +17,7 @@
     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
         <ul class="row list-group">
             {% for u in benutzer_liste %}
-            <a href="/profil/{{u.benutzername}}" class="text-decoration-none">
+            <a href="{{ url_for('site.user_site.profil', benutzername=u.benutzername) }}" class="text-decoration-none">
                 <li class="list-group-item bg-light">
                     <div class="row">
                         <div class="col">
@@ -43,7 +43,7 @@
 
 
     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="add-tab">
-        <form action="benutzer" method="post">
+        <form action="{{ url_for('site.user_site.benutzer') }}" method="post">
         <div class="row mt-2">
 
             <div class="row">

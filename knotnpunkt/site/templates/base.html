@@ -47,7 +47,7 @@
       <div class="offcanvas-title d-sm-block" id="offcanvas">
       <h6>Herzlich Willkommen,</h6><h5 class="dropdown" style="font-weight: bold;"><a href="#" style="color:black" class="nav-link dropdown-toggle p-0" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
         {{current_user.name}}</a><ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown">
-          <li><a class="dropdown-item" href="/profil/{{current_user.benutzername}}">Profil</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('site.user_site.profil', benutzername=current_user.benutzername) }}">Profil</a></li>
           
           <li>
               <hr class="dropdown-divider">
@@ -92,7 +92,7 @@
             </a>
         </li>
           <li class="nav-item">
-            <a href="/profil/{{current_user.benutzername}}" class="nav-link text-truncate">
+            <a href="{{ url_for('site.user_site.profil', benutzername=current_user.benutzername) }}" class="nav-link text-truncate">
                 <i class="fs-5">Mein Konto</i>
                 <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
             </a>
