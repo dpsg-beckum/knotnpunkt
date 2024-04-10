@@ -118,7 +118,7 @@
             </div>
 
             <div class="modal-body">
-                <form action="/material/edit/{{m.idMaterial}}" enctype="multipart/form-data" method="POST"
+                <form action="{{ url_for('site.material_site.materialDetailsEdit', idMaterial=m.idMaterial) }}" enctype="multipart/form-data" method="POST"
                     id="formMaterialBearbeiten">
                     <div class="row">
                         <div class="col-xl-6 border mx-xl-2 py-2">
@@ -221,7 +221,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body d-grid gap-3">
-                <form action="/reservieren/{{m.idMaterial}}" method="POST" id="formMaterialBearbeiten">
+                <form action="{{ url_for('site.material_site.materialReservieren', idMaterial=m.idMaterial ) }}" method="POST" id="formMaterialBearbeiten">
                     <div class="row p-2">
                         <div class="col-xl-11 border mx-xl-2 py-2">
                             <div class="mb-3 row">
@@ -316,7 +316,7 @@
             </div>
             <div class="modal-body d-grid gap-3">
                 <h6>Bilder hochladen:</h6>
-                <form action="/img/upload/{{m.idMaterial}}" enctype="multipart/form-data" method="POST"
+                <form action="{{ url_for('site.material_site.upload_img', idMaterial=m.idMaterial) }}" enctype="multipart/form-data" method="POST"
                     id="formImgUpload">
                     <div class="row">
                         <div class="col-sm-8">
@@ -334,7 +334,7 @@
                 <ul class="list-group">
                     {% for image in images %}
                     <li class="list-group-item">
-                        <form action="/img/delete/{{image[0]}}/{{m.idMaterial}}" enctype="multipart/form-data"
+                        <form action="{{ url_for('site.material_site.delete_img', id=image[0], idMaterial=m.idMaterial) }}" enctype="multipart/form-data"
                             method="GET" id="formImgDelete">
                             <div class="col" style="position:relative; width:100%; height: 100px !important;">
                                 <button type="submit"

@@ -106,7 +106,7 @@ def create_app(prevent_context_recursion: bool = False):
     login_manager = LoginManager()
     login_manager.init_app(app)
     # Define Login page to redirect Unauthorized requests
-    login_manager.login_view = "views.login"
+    login_manager.login_view = "site.login"
 
     # Flask-login needs the user loader to get the users from the database
     @login_manager.user_loader
