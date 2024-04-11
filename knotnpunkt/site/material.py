@@ -55,7 +55,7 @@ def material():
                     [material, base64.b64encode(image.img).decode('utf-8')])
             else:
                 material_list.append([material, None])
-        return render_template('material.html', materialListe=material_list, kategorienListe=kategorien, verfuegbarkeit=verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
+        return render_template('material/material.html', materialListe=material_list, kategorienListe=kategorien, verfuegbarkeit=verfuegbarkeit,  jsonRef=json, huRef=hu, dtRef=dt)
 
 
 @material_site.route('/<idMaterial>', methods=['GET'])
@@ -88,7 +88,7 @@ def materialDetails(idMaterial):
                 [image.img_id, base64.b64encode(image.img).decode('utf-8')])
     else:
         img_id_list.append(None)
-    return render_template('material_details.html', material_details=material_details, materialListe=materialien, kategorienListe=kategorien, ausleihListeZukunft=ausleihen_filtered_future, ausleihListeAlt=ausleihen_filtered_past, verfuegbarkeit=verfuegbarkeit, zuletzt_ausgeliehen_Tage=zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, images=img_id_list)
+    return render_template('material/material_details.html', material_details=material_details, materialListe=materialien, kategorienListe=kategorien, ausleihListeZukunft=ausleihen_filtered_future, ausleihListeAlt=ausleihen_filtered_past, verfuegbarkeit=verfuegbarkeit, zuletzt_ausgeliehen_Tage=zuletzt_ausgeliehen_Tage, jsonRef=json, huRef=hu, dtRef=dt, images=img_id_list)
 
 
 @material_site.route('/edit/<idMaterial>', methods=['POST'])

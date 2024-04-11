@@ -31,7 +31,7 @@ def benutzer():
         liste = Benutzer.query.order_by(Benutzer.name).all()
         rollen = Rolle.query.all()
 
-        return render_template('benutzer.html', benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
+        return render_template('user/benutzer.html', benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
 
 
 @user_site.route('/<benutzername>', methods=['GET', 'POST'])
@@ -82,4 +82,4 @@ def profil(benutzername):
             hide_menu = True
         elif request.args.get('missingPwdConfirm'):
             error_msg = "Bitte bestätige das neues Passwort."
-        return render_template('profil.html', user=user, roles=rollen, edit=edit_permission, hide_menu=hide_menu, error=error_msg)
+        return render_template('user/profil.html', user=user, roles=rollen, edit=edit_permission, hide_menu=hide_menu, error=error_msg)
