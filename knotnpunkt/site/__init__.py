@@ -39,7 +39,7 @@ def login():
         if user:
             if user.passwort == request.form.get('passwort'):
                 login_user(user, remember=True)
-                return redirect(url_for(".profil", benutzername=user.benutzername, initialLogin=True))
+                return redirect(url_for("site.user_site.profil", benutzername=user.benutzername, initialLogin=True))
             elif user.check_passwort(request.form['passwort']):
                 login_user(user, remember=True)
                 return redirect(url_for('site.home'))

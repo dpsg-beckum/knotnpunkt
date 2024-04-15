@@ -63,7 +63,7 @@ def profil(benutzername):
                         return redirect(url_for("site.login", newPassword=True))
                     else:
                         error_msg = "Änderung fehlgeschlagen. Bitte bestätige dein Passwort."
-                        return redirect(url_for("site.profil", benutzername=benutzername, missingPwdConfirm=True))
+                        return redirect(url_for(".profil", benutzername=benutzername, missingPwdConfirm=True))
                 db.session.add(user)
                 db.session.commit()
                 return redirect(url_for(".benutzer"))
