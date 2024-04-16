@@ -22,6 +22,7 @@ from ..utils import checkverfuegbarkeit
 
 material_site = Blueprint("material_site", __name__, url_prefix="/material")
 
+
 @material_site.route("/", methods=['GET', 'POST'])
 @login_required
 def material():
@@ -159,3 +160,17 @@ def delete_img(id, idMaterial):
     Img.query.filter_by(img_id=id).delete()
     db.session.commit()
     return redirect(url_for(".materialDetails", idMaterial=idMaterial))
+
+
+@material_site.route('/scanner')
+@login_required
+def scanner():
+    return render_template('scanner.html')
+
+
+@material_site.route('/qrcode-generator', methods=['GET'])
+@login_required
+def qrcode_generator():
+    materialien = Material.query.all()
+    kategorien = Kategorie.query.all()
+    return render_template('qrgenerator.html', materialListe=materialien, kategorienListe=kategorien)

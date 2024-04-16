@@ -106,20 +106,6 @@ def einstellungen():
     return render_template('server_einstellungen.html')
 
 
-@site.route('/scanner')
-@login_required
-def scanner():
-    return render_template('scanner.html')
-
-
-@site.route('/qrcode-generator', methods=['GET'])
-@login_required
-def qrcode_generator():
-    materialien = Material.query.all()
-    kategorien = Kategorie.query.all()
-    return render_template('qrgenerator.html', materialListe=materialien, kategorienListe=kategorien)
-
-
 @site.route("/auslagen")
 @login_required
 def auslagen_uebersicht():
