@@ -16,7 +16,7 @@
             <ul class="row list-group">
                 {% for m in materialListe %}
                 <li class="list-group-item bg-light">
-                    <a href="/material/{{m[0].idMaterial}}" class="text-decoration-none text-dark">
+                    <a href="{{ url_for('site.material_site.materialDetails', idMaterial=m[0].idMaterial) }}" class="text-decoration-none text-dark">
                         <div class="row">
                             <div class="col-auto">
                                 <!-- <img style="height: 4em;"
@@ -76,7 +76,7 @@
 
         <div class="tab-pane" id="hinzufuegen-tab" role="tabpanel" aria-labelledby="nav-profile-tab">
 
-            <form action="material" method="post" id="formMaterialHinzufuegen">
+            <form action="{{url_for('site.material_site.material')}}" method="post" id="formMaterialHinzufuegen">
                 <div class="row mb-3">
                     <div class="col-2">
                         <button class="btn btn-success" type="submit">Hinzufügen</button>
