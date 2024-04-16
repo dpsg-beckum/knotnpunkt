@@ -165,7 +165,7 @@ def delete_img(id, idMaterial):
 @material_site.route('/scanner')
 @login_required
 def scanner():
-    return render_template('scanner.html')
+    return render_template('material/scanner.html')
 
 
 @material_site.route('/qrcode-generator', methods=['GET'])
@@ -173,4 +173,4 @@ def scanner():
 def qrcode_generator():
     materialien = Material.query.all()
     kategorien = Kategorie.query.all()
-    return render_template('qrgenerator.html', materialListe=materialien, kategorienListe=kategorien)
+    return render_template('material/qrgenerator.html', materialListe=materialien, kategorienListe=kategorien)
