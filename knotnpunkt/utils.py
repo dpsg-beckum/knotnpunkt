@@ -22,14 +22,14 @@ def checkverfuegbarkeit(materialien: list[Material]) -> dict:
 
     # ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_von)).all()
     for m in materialien:
-        if m.Eigenschaften.get('zaehlbar', False):
-            dict_verfuegbar[m.id] = m.Eigenschaften.get('anzahl', 1)
+        if m.eigenschaften.get('zaehlbar', False):
+            dict_verfuegbar[m.id] = m.eigenschaften.get('anzahl', 1)
         else:
             dict_verfuegbar[m.id] = True
         for a in ausleihen:
             if int(m.id) in [int(x) for x in a.materialien.split(",") if x.isdigit()]:
                 if a.ts_von <= date.today() <= a.ts_bis:
-                    if m.Eigenschaften.get('zaehlbar', False) == False:
+                    if m.eigenschaften.get('zaehlbar', False) == False:
                         dict_verfuegbar[m.id] = False
                     else:
                         dict_verfuegbar[m.id] = dict_verfuegbar[m.id] - 1
