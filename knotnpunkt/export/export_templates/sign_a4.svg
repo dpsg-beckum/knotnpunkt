@@ -271,7 +271,7 @@
            id="tspan1121"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.35px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:3.046"
            x="105.34261"
-           y="226.08658">id:{{&quot;%04d&quot;|format(m.idMaterial)}}</tspan></text>
+           y="226.08658">id:{{&quot;%04d&quot;|format(m.id)}}</tspan></text>
     </g>
     <g
        id="g1179">
@@ -467,7 +467,7 @@
            id="tspan1524"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.35px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:3.046"
            x="105.34261"
-           y="226.08658">id:{{&quot;%04d&quot;|format(m.idMaterial)}}</tspan></text>
+           y="226.08658">id:{{&quot;%04d&quot;|format(m.id)}}</tspan></text>
     </g>
     <g
        id="g1570">
