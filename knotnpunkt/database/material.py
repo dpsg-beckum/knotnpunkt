@@ -103,6 +103,8 @@ class SetTypes(BaseTable):
     kuerzel: Mapped[str] = mapped_column(String(45), nullable=False)
     name: Mapped[str] = mapped_column(String(45), nullable=False)
 
+    sets: Mapped[List[Set]] = relationship('Set', back_populates="setType")
+
     @staticmethod
     def create_new(kuerzel: str, name: str) -> SetTypes:
         new_set_types = SetTypes(
@@ -174,7 +176,11 @@ class KategorieTypen(BaseTable):
         "KategorieSpezifisch", back_populates="kategorie_typen")
 
     @staticmethod
-    def create_new(kuerzel: str, name: str, spezifizierer: str) -> KategorieTypen:
+    def create_new(kuerzel: str, name: str, spezifizierer: str = "") -> KategorieTypen:
+        if db.session.query(KategorieTypen).filter_by(kuerzel=kuerzel).first():
+            raise ElementAlreadyExists(
+                f"KategorieTypen mit kuerzel \"{kuerzel}\" existiert bereits")
+
         new_kategorie_typen = KategorieTypen(
             kuerzel=kuerzel,
             name=name,
@@ -188,6 +194,7 @@ class KategorieTypen(BaseTable):
 class KategorieSpezifisch(BaseTable):
     """
     Kategorisiert die spezifischen Kategorien
+    e.g. *-Einzel, *-Doppel, *-Kurz ...
     """
 
     __tablename__ = 'kategoriespezifisch'
@@ -206,6 +213,13 @@ class KategorieSpezifisch(BaseTable):
 
     @staticmethod
     def create_new(kuerzel: str, name: str, typ: KategorieTypen) -> KategorieSpezifisch:
+        if not isinstance(typ, KategorieTypen):
+            raise TypeError("typ muss ein KategorieTypen Objekt sein")
+        if db.session.query(KategorieSpezifisch).filter_by(
+                kuerzel=kuerzel, kategorie_typen_id=typ.id).first():
+            raise ElementAlreadyExists(
+                f"KategorieSpezifisch mit kuerzel \"{kuerzel}\" existiert bereits")
+
         new_kategorie_spezifisch = KategorieSpezifisch(
             kuerzel=kuerzel,
             name=name,
