@@ -12,8 +12,9 @@
 
 # from knotnpunkt import app
 from knotnpunkt.database.auslagen import AuslagenKategorie
-# from knotnpunkt.database.material import
-from knotnpunkt.database.db import Benutzer, Rolle, db
+from knotnpunkt.database.db import Benutzer, Rolle
+from knotnpunkt.database.material import (KategorieSpezifisch, KategorieTypen,
+                                          Set, SetTypes)
 
 a = Rolle.create_new(
     id=1,
@@ -116,3 +117,8 @@ AuslagenKategorie.create_new(
     name="sonstiges",
     anzeigeName="Sonstiges"
 )
+
+
+Set.create_new(0, SetTypes.create_new("0", "Kein Set"))
+KategorieSpezifisch.create_new(
+    "0", "Keine Kategorie", KategorieTypen.create_new("0", "Keine Kategorie"))

@@ -1,6 +1,6 @@
 from datetime import date
 
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, abort, current_app, request
 from flask.helpers import url_for
 from flask.templating import render_template
 from flask_login import current_user
@@ -11,7 +11,7 @@ from werkzeug.utils import redirect
 from ..database import db
 from ..database.auslagen import AuslagenKategorie
 from ..database.db import Benutzer
-from ..database.exceptions import ElementDoesNotExsist
+from ..database.exceptions import ElementAlreadyExists, ElementDoesNotExsist
 from ..database.material import Ausleihe, Material
 from .material import material_site
 from .user import user_site
@@ -110,3 +110,17 @@ def einstellungen():
 def auslagen_uebersicht():
     kategorienListe = AuslagenKategorie.get_all()
     return render_template("auslagen.html", kategorienListe=kategorienListe)
+
+
+@site.get("/-demo")
+def seed_demo_data():
+    if not current_user.is_authenticated or not current_app.config.get("DEBUG"):
+        abort(404)
+
+    from ..database.demo_data import seed_demo_data
+
+    try:
+        seed_demo_data()
+    except ElementAlreadyExists:
+        return "Demo data already seeded", 409
+    return "OK", 200
