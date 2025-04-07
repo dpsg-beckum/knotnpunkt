@@ -11,7 +11,7 @@ from sqlalchemy import engine
 
 from ._update import apply_upgrade, check_current_head
 from ._version import __version__
-from .api import api
+from .apiv1 import apiv1
 from .database.db import Benutzer
 from .site import site
 from .utils import convertTime
@@ -94,12 +94,17 @@ def create_app(prevent_context_recursion: bool = False):
             else:
                 app.logger.info("Not database schema updates found")
 
+            if app.config.get('TESTING'):
+                from .database.demo_data import seed_demo_data
+                app.logger.info("Seeding demo data")
+                seed_demo_data()
+
     # Make convertTime available for all jinja templates
     app.jinja_env.globals.update(naturaltime=convertTime)
 
     # Register Blueprints
     app.register_blueprint(site)
-    app.register_blueprint(api)
+    app.register_blueprint(apiv1)
 
     # Initializing flask-login extension
     login_manager = LoginManager()

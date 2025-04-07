@@ -3,13 +3,14 @@
 import json
 import logging
 from datetime import datetime as dt
+from os import environ
 
 from flask import Blueprint, abort, request, send_file
 from flask_login import current_user, login_required
 
 from .._version import __version__
-from ..database import db
 from ..database.auslagen import Auslage, AuslagenBild
+from ..database.db import Benutzer, db
 from ..database.json_encoder import DatabaseEncoder
 from ..export.file_generators import (AuslagenPDFGenerator,
                                       AuslagenSVGGenerator, ExportError)
@@ -17,8 +18,15 @@ from ..utils import allowed_file
 
 logger = logging.getLogger("knotnpunkt")
 
-auslagen_routes = Blueprint("auslagen_routes", __name__, template_folder="templates",
+auslagen_routes = Blueprint("auslagen", __name__, template_folder="templates",
                             url_prefix="/auslagen")
+
+
+@auslagen_routes.before_request
+@login_required
+def auth():
+    if not environ.get("KP_AUSLAGEN_AKTIV", False):
+        abort(404)
 
 
 @auslagen_routes.get("/")
@@ -111,16 +119,17 @@ def patch_auslagen(id):
     """
     action: str = request.args.get("action")
     auslage: Auslage = Auslage.get_via_id(id)
+    usr: Benutzer = current_user
     if not auslage or not action:
         abort(404)
     elif action == "freigabe":
         # User needs respective permission and mustn't accept his own Auslagen
-        if not current_user.Rolle.freigebenAuslagen or current_user == auslage.ersteller:
+        if not usr.Rolle.freigebenAuslagen or usr == auslage.ersteller:
             abort(403)
         # In the end a PATCH-call toggles from unaccepted to accepted and vice versa
         if auslage.Freigebende is None:
             auslage.freigabe_zeit = dt.now()
-            auslage.Freigebende = current_user
+            auslage.Freigebende = usr
         else:
             auslage.freigabe_zeit = None
             auslage.Freigebende = None
@@ -128,11 +137,11 @@ def patch_auslagen(id):
         db.session.commit()
         return auslage.to_dict()
     elif action == "done":
-        if not current_user.Rolle.lesenAlleAuslagen:
+        if not usr.Rolle.lesenAlleAuslagen:
             abort(403)
         if auslage.ErledigtDurch is None:
             auslage.erledigtZeit = dt.now()
-            auslage.ErledigtDurch = current_user
+            auslage.ErledigtDurch = usr
             db.session.add(auslage)
             db.session.commit()
         return auslage.to_dict()

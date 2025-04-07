@@ -13,13 +13,13 @@ from ..database.material import Ausleihe, Material
 from ..export.file_generators import ExportError, PDFGenerator, SVGGenerator
 from ..utils import get_ausleihen_fuer_material
 
-api_routes = Blueprint("api", __name__, template_folder="templates",
-                       url_prefix="")
+materialBlueprint = Blueprint("material", __name__, template_folder="templates",
+                              url_prefix="/material")
 
 
-@api_routes.route('/material')
+@materialBlueprint.route('/')
 @login_required
-def material_api():
+def material():
     if request.args.get("id"):
         material = [Material.get_via_id(request.args.get("id"))]
     else:
@@ -41,36 +41,40 @@ def material_api():
     abort(501)
 
 
-@api_routes.route('/qrcode/generator')
+@materialBlueprint.route('/qrcode/generator')
 @login_required
-def qr_generator():
+def qrcode_generator():
     print(request.date)
     if not request.args.get("id"):
         abort(404)
     id = request.args.get('id')
-    artikel: Material = Material.get_via_id(id)
+    artikel = Material.get_via_id(id)
+
     if artikel is None:
         abort(404)
-    code_string = f"knotnpunkt{__version__}:/{artikel.Kategorie.name}/{id}/\nName: {artikel.name}\nQR-Code erstellt: {dt.now():%d.%m.%Y %R}\nVon {current_user.name} ({current_user.benutzername})"
+    artikel = artikel[0]
+
+    code_string = f"lagerregal{__version__}:/{artikel.Kategorie.name}/{id}/\nName: \
+        {artikel.name}\nQR-Code erstellt: {dt.now():%d.%m.%Y %R}\nVon {current_user.name} ({current_user.benutzername})"
     qrcode = segno.make(content=code_string, micro=False)
     return {"qrcode": qrcode.svg_inline(scale=5), "name": artikel.name}
 
 
-@api_routes.route("/qrcode/decode", methods=['POST'])
+@materialBlueprint.route("/qrcode/decode", methods=['POST'])
 @login_required
 def decode_qrcode():
     if not request.data:
         return {"success": False}
     code_string = request.data.decode("utf-8")
     print(code_string)
-    if not code_string.startswith('knotnpunkt'):
+    if not code_string.startswith('lagerregal'):
         print("Falsch")
         return {"success": False}
     data = code_string.replace("\n", "").split("/")
     return {"success": True, "id": data[2]}
 
 
-@api_routes.route("/material/export", methods=['POST'])
+@materialBlueprint.route("/export", methods=['POST'])
 @login_required
 def test():
     if request.method != 'POST':
@@ -81,7 +85,7 @@ def test():
     try:
         if request.args.get("type") == "pdf":
             generator = PDFGenerator()
-            pdf = generator.generate_pdf(Material.query.filter(
+            pdf = generator.generate_pdf(Material.filter_by(
                 Material.id.in_(artikel_ids)).all())
             return send_file(pdf, mimetype="application/pdf")
         else:
@@ -91,7 +95,7 @@ def test():
         return {"success": False, "msg": e.args[0]}
 
 
-@api_routes.route('/material/checkout', methods=['POST'])
+@materialBlueprint.route('/checkout', methods=['POST'])
 @login_required
 def checkout():
     print(request.json)
