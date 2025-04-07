@@ -18,9 +18,13 @@ from werkzeug.utils import redirect
 from ...database.material import (Ausleihe, Img, KategorieSpezifisch, Material,
                                   Set)
 from ...utils import checkverfuegbarkeit
+from .kategorien import kategorie_site
 from .materialforms import EditMaterialForm, NewMaterialForm
+from .sets import sets_site
 
 material_site = Blueprint("material", __name__, url_prefix="/material")
+material_site.register_blueprint(kategorie_site)
+material_site.register_blueprint(sets_site)
 
 
 @material_site.before_request

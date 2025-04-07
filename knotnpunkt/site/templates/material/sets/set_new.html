@@ -1,0 +1,21 @@
+{%extends "material/sets/base.html"%}
+
+{% block content%}
+
+<h2> Neues Set für: {{ set.kuerzel }} - {{ set.name }}</h2>
+
+
+<form method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.number.label(class="form-label") }}
+        {{ form.number(class="form-control") }}
+        {% for error in form.number.errors %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    {{ form.submit() }}
+</form>
+
+{% endblock %}

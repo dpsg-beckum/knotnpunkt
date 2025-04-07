@@ -1,0 +1,37 @@
+{%extends "material/sets/base.html"%}
+
+{% block content%}
+<div class="container">
+    <h1>Set Typen</h1>
+
+    <a href="{{ url_for('.setType_new')}}" class="btn btn-success"> Neu </a>
+
+    <hr>
+    {% for st in sets %}
+    <div class="row row-cols-1 row-cols-md-3 mb-3">
+        <div class="col-6 col-md-1 border">
+            <p>{{ st.kuerzel }}</p>
+        </div>
+        <div class="col-6 col-md-2 border">
+            <p>{{ st.name }}</p>
+        </div>
+        <div class="col border">
+            <div class="row row-cols-1 g-0 row-cols-md-6">
+
+                {%for s in st.sets %}
+                <p>{{s.number}}</p>
+                {% endfor %}
+
+
+            </div>
+        </div>
+        <div class="col border">
+            <a href="{{url_for('.setType_show', id=st.id)}}" class="btn btn-success">look</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+
+{% endblock %}

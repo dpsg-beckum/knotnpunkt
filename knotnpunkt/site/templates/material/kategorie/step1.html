@@ -1,0 +1,37 @@
+{%extends "material/kategorie/base.html"%}
+
+{% block content%}
+<div class="container">
+    <h1>Step1</h1>
+
+    <a href="{{ url_for('.step1_new')}}" class="btn btn-success"> Neu </a>
+
+    <hr>
+    {% for k in kategorien %}
+    <div class="row row-cols-1 row-cols-md-3 mb-3">
+        <div class="col-6 col-md-1 border">
+            <p>{{ k.kuerzel }}</p>
+        </div>
+        <div class="col-6 col-md-2 border">
+            <p>{{ k.name }}</p>
+        </div>
+        <div class="col border">
+            <div class="row row-cols-1 g-0 row-cols-md-2">
+                <ul class="list-group">
+                    {%for s in k.spezifisch %}
+                    <li class="list-group-item">{{ s.kuerzel }} - {{ s.name }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <div class="col border">
+            <a href="{{url_for('.step1_show', id=k.id)}}" class="btn btn-success">look</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+
+{% endblock %}

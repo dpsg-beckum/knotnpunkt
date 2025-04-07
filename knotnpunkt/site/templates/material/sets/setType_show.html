@@ -1,0 +1,37 @@
+{%extends "material/sets/base.html"%}
+
+{% block content%}
+<div class="container">
+    <h2>{{ sets.name }} ({{ sets.kuerzel }})</h2>
+
+    <a href="{{url_for('.set_new', id=sets.id)}}" class="btn btn-success">Neue Subkategorie</a>
+
+
+    {% for s in sets.sets %}
+    <div>
+        <h3>{{ s.number }}.{{ sets.kuerzel }}</h3>
+        {% for m in s.materials %}
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{ m.name }}</h4>
+                <a href="{{url_for('site.material.show', id=m.id)}}" class="btn btn-info">Look</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% if not s.materials %}
+        <div class="alert alert-warning" role="alert">
+            <p class="alert-heading">Keine Materialien vorhanden</p>
+            <!-- <p class="mb-0">Sie können Materialien hinzufügen, indem Sie auf den Button "Material hinzufügen" klicken.</p>
+        <a href="{{url_for('.set_new', id=s.id)}}" class="btn btn-success">Material hinzufügen</a> -->
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% if not sets.sets %}
+    <div class="alert alert-warning" role="alert">
+        <p class="alert-heading">Keine Sets für diesen Typen vorhanden</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

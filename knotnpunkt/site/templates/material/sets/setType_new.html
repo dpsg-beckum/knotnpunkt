@@ -1,0 +1,32 @@
+{%extends "material/sets/base.html"%}
+
+{% block content%}
+
+<p>Hier können Sie die Kategorie anlegen.</p>
+
+<form method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control") }}
+        {% for error in form.name.errors %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+
+    <div class="form-group">
+        {{ form.kuerzel.label(class="form-label") }}
+        {{ form.kuerzel(class="form-control") }}
+        {% for error in form.kuerzel.errors %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    {{ form.submit() }}
+
+
+
+</form>
+
+{% endblock %}

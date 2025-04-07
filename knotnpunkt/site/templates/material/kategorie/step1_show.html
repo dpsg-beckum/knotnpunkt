@@ -1,0 +1,25 @@
+{%extends "material/kategorie/base.html"%}
+
+{% block content%}
+<div class="container">
+    <h2>{{ kategorie.name }}</h2>
+
+    <a href="{{url_for('.step2_new', id=kategorie.id)}}" class="btn btn-success">Neue Subkategorie</a>
+
+
+    {% for s in kategorie.spezifisch %}
+    <h3>{{ kategorie.kuerzel}}-{{ s.kuerzel }} ({{ s.name }})</h3>
+    {% for m in s.material %}
+    <div class="card">
+        <div class="card-body">
+            <!-- {{ m }} -->
+            <h4 class="card-title">{{ m.name }}</h4>
+            <p class="card-text">Set: {{ m.set.number }}-{{ m.set.setType.kuerzel }} ({{ m.set.setType.name }}) </p>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% endfor %}
+</div>
+
+{% endblock %}
