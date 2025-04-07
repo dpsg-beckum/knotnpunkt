@@ -1,35 +1,25 @@
 """This contains the API.ROutes for the Auslagen feature.
 """
-import logging
 import json
+import logging
 from datetime import datetime as dt
-from flask import (
-    Blueprint,
-    request,
-    abort,
-    send_file,
-)
-from flask_login import login_required, current_user
-from ..database import db
-from ..database.json_encoder import DatabaseEncoder
-from ..database.db import (
-    Auslage,
-    AuslagenBild,
-)
-from ..utils import (
-    allowed_file,
-)
+
+from flask import Blueprint, abort, request, send_file
+from flask_login import current_user, login_required
+
 from .._version import __version__
-from ..export.file_generators import (
-    ExportError,
-    AuslagenSVGGenerator,
-    AuslagenPDFGenerator,
-)
+from ..database import db
+from ..database.auslagen import Auslage, AuslagenBild
+from ..database.json_encoder import DatabaseEncoder
+from ..export.file_generators import (AuslagenPDFGenerator,
+                                      AuslagenSVGGenerator, ExportError)
+from ..utils import allowed_file
 
 logger = logging.getLogger("knotnpunkt")
 
 auslagen_routes = Blueprint("auslagen_routes", __name__, template_folder="templates",
-                url_prefix="/auslagen")
+                            url_prefix="/auslagen")
+
 
 @auslagen_routes.get("/")
 @login_required
@@ -41,12 +31,17 @@ def get_zahlungen():
     data['user'] = json.dumps(current_user, cls=DatabaseEncoder)
     if current_user.Rolle.lesenAlleAuslagen is True and not request.args.get("onlyAuthored", False):
         filtered_auslagen = []
-        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(Auslage.query.all()) if ausl.freigabe_zeit is None])
-        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(Auslage.query.all()) if ausl.freigabe_zeit is not None and ausl.erledigtZeit is None])
-        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(Auslage.query.all()) if ausl.freigabe_zeit is not None and ausl.erledigtZeit is not None])
-        data['response'] = sum([ausl_liste for ausl_liste in filtered_auslagen if ausl_liste is not []], [])
+        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(
+            Auslage.get_all()) if ausl.freigabe_zeit is None])
+        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(
+            Auslage.get_all()) if ausl.freigabe_zeit is not None and ausl.erledigtZeit is None])
+        filtered_auslagen.append([ausl.to_dict() for ausl in reversed(Auslage.get_all(
+        )) if ausl.freigabe_zeit is not None and ausl.erledigtZeit is not None])
+        data['response'] = sum(
+            [ausl_liste for ausl_liste in filtered_auslagen if ausl_liste is not []], [])
     else:
-        data['response'] = [ausl.to_dict() for ausl in reversed(current_user.Auslagen)]
+        data['response'] = [ausl.to_dict()
+                            for ausl in reversed(current_user.Auslagen)]
     return data
 
 
@@ -81,7 +76,8 @@ def post_zahlungen():
     db.session.add(new_auslage)
     db.session.commit()
     # Sore IMage in Database - TODO: File compression?
-    new_AulsImg = AuslagenBild(img=file.read(), Auslage_id=new_auslage.idAuslage, mimetype=file.mimetype)
+    new_AulsImg = AuslagenBild(
+        img=file.read(), Auslage_id=new_auslage.id, mimetype=file.mimetype)
     db.session.add(new_AulsImg)
     db.session.commit()
     return {"success": True, "auslage": new_auslage.to_dict()}
@@ -95,7 +91,7 @@ def delete_auslage(id):
     Args:
         id (int): Primary key of the Auslage
     """
-    auslage: Auslage = Auslage.query.get(id)
+    auslage: Auslage = Auslage.get_via_id(id)
     if not auslage:
         abort(404)
     if auslage.Bild is not []:
@@ -114,12 +110,12 @@ def patch_auslagen(id):
         id (int): Primary Key fo the Auslage
     """
     action: str = request.args.get("action")
-    auslage: Auslage = Auslage.query.get(id)
+    auslage: Auslage = Auslage.get_via_id(id)
     if not auslage or not action:
         abort(404)
     elif action == "freigabe":
         # User needs respective permission and mustn't accept his own Auslagen
-        if not current_user.Rolle.freigebenAuslagen or current_user == auslage.Ersteller:
+        if not current_user.Rolle.freigebenAuslagen or current_user == auslage.ersteller:
             abort(403)
         # In the end a PATCH-call toggles from unaccepted to accepted and vice versa
         if auslage.Freigebende is None:
@@ -149,14 +145,14 @@ def export_auslage():
     """Returns SVG code or a PDF file with the rendered template. Called by
     clicking the printer Symbol
     """
-    auslage: Auslage = Auslage.query.get(request.args.get('id'))
+    auslage: Auslage = Auslage.get_via_id(request.args.get('id'))
     if not auslage:
         abort(404)
     try:
         if request.args.get("type") == "pdf":
             generator = AuslagenPDFGenerator()
             pdf = generator.generate_pdf(auslage, 2)
-            return send_file(pdf, mimetype="application/pdf", as_attachment=False,  download_name=f"auslage_{auslage.idAuslage}_{auslage.kontoinhaber.replace(' ', '_')}")
+            return send_file(pdf, mimetype="application/pdf", as_attachment=False,  download_name=f"auslage_{auslage.id}_{auslage.kontoinhaber.replace(' ', '_')}")
         else:
             generator = AuslagenSVGGenerator()
             return generator.generate_svg(auslage, 2)

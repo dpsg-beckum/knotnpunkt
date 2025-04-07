@@ -1,110 +1,122 @@
 <!doctype html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>knotnpunkt</title>
-    <!-- <link rel="stylesheet" type='text/css' href="{{url_for('static', filename='styles.css')}}"> -->
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="manifest" href="{{url_for('static', filename='knotnpunkt.webmanifest')}}">
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        const registerServiceWorker = async () => {
-            if ('serviceWorker' in navigator) {
-              try {
-                const registration = await navigator.serviceWorker.register(
-                  '{{url_for("static", filename="js/sw.js")}}',
-                  {
-                    scope: '/',
-                  }
-                );
-                if (registration.installing) {
-                  console.log('Service worker installing');
-                } else if (registration.waiting) {
-                  console.log('Service worker installed');
-                } else if (registration.active) {
-                  console.log('Service worker active');
-                }
-              } catch (error) {
-                console.error(`Registration failed with ${error}`);
-                <!-- alert(`Registration failed with ${error}`); -->
-              }
+<head>
+  <meta charset="UTF-8">
+  <title>knotnpunkt</title>
+  <!-- <link rel="stylesheet" type='text/css' href="{{url_for('static', filename='styles.css')}}"> -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="{{url_for('static', filename='knotnpunkt.webmanifest')}}">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+    const registerServiceWorker = async () => {
+      if ('serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.register(
+            '{{url_for("static", filename="js/sw.js")}}',
+            {
+              scope: '/',
             }
-          };
-          
-          registerServiceWorker();
-          
-    </script>
-    {%block additionalHeader%}{%endblock%}
+          );
+          if (registration.installing) {
+            console.log('Service worker installing');
+          } else if (registration.waiting) {
+            console.log('Service worker installed');
+          } else if (registration.active) {
+            console.log('Service worker active');
+          }
+        } catch (error) {
+          console.error(`Registration failed with ${error}`);
+          <!-- alert(`Registration failed with ${error}`); -->
+        }
+      }
+    };
+
+    registerServiceWorker();
+
+  </script>
+  {%block additionalHeader%}{%endblock%}
 </head>
+
 <body>
   <!-- Sidebar -->
-  <div class="offcanvas offcanvas-start w-75" style="max-width: 17em;" id="offcanvas" data-bs-keyboard="false" data-bs-backdrop="false">
-  <div class="offcanvas-header">
+  <div class="offcanvas offcanvas-start w-75" style="max-width: 17em;" id="offcanvas" data-bs-keyboard="false"
+    data-bs-backdrop="false">
+    <div class="offcanvas-header">
       <div class="offcanvas-title d-sm-block" id="offcanvas">
-      <h6>Herzlich Willkommen,</h6><h5 class="dropdown" style="font-weight: bold;"><a href="#" style="color:black" class="nav-link dropdown-toggle p-0" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        {{current_user.name}}</a><ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown">
-          <li><a class="dropdown-item" href="{{ url_for('site.user_site.profil', benutzername=current_user.benutzername) }}">Profil</a></li>
-          
-          <li>
+        <h6>Herzlich Willkommen,</h6>
+        <h5 class="dropdown" style="font-weight: bold;"><a href="#" style="color:black"
+            class="nav-link dropdown-toggle p-0" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            {{current_user.name}}</a>
+          <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown">
+            <li><a class="dropdown-item"
+                href="{{ url_for('site.user_site.profil', benutzername=current_user.benutzername) }}">Profil</a></li>
+
+            <li>
               <hr class="dropdown-divider">
-          </li>
-          <li><a class="dropdown-item" href="/logout">Abmelden</a></li>
-      </ul></h5><h6 style="color: grey;">{{current_user.Rolle.name}}</h6>
+            </li>
+            <li><a class="dropdown-item" href="/logout">Abmelden</a></li>
+          </ul>
+        </h5>
+        <h6 style="color: grey;">{{current_user.Rolle.name}}</h6>
       </div>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body px-0">
+    </div>
+    <div class="offcanvas-body px-0">
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
-            <a href="/home" class="nav-link text-truncate">
-                <i class="fs-5">Startseite</i>
-                <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-            </a>
+          <a href="/home" class="nav-link text-truncate">
+            <i class="fs-5">Startseite</i>
+            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+          </a>
         </li>
         {%for a in current_user.views()%}
         <li class="nav-item">
-              <a href="/{{a.lower()}}" class="nav-link text-truncate">
-                  <i class="fs-5">{{a}}</i>
-                  <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-              </a>
-          </li>
-          {%endfor%}
-          <li class="nav-item">
-            <a href="/auslagen" class="nav-link text-truncate">
-                <i class="fs-5">Auslagen</i>
-                <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-            </a>
+          <a href="/{{a.lower()}}" class="nav-link text-truncate">
+            <i class="fs-5">{{a}}</i>
+            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+          </a>
         </li>
-          <li class="nav-item">
-            <a href="{{ url_for('site.material_site.scanner')}}" class="nav-link text-truncate">
-                <i class="fs-5">Scanner</i>
-                <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-            </a>
+        {%endfor%}
+        <li class="nav-item">
+          <a href="/auslagen" class="nav-link text-truncate">
+            <i class="fs-5">Auslagen</i>
+            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+          </a>
         </li>
         <li class="nav-item">
-            <a href="{{ url_for('site.material_site.qrcode_generator') }}" class="nav-link text-truncate">
-                <i class="fs-5">QR code generator</i>
-                <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-            </a>
-        </li>
-          <li class="nav-item">
-            <a href="{{ url_for('site.user_site.profil', benutzername=current_user.benutzername) }}" class="nav-link text-truncate">
-                <i class="fs-5">Mein Konto</i>
-                <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-            </a>
+          <a href="{{ url_for('site.material.scanner')}}" class="nav-link text-truncate">
+            <i class="fs-5">Scanner</i>
+            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+          </a>
         </li>
         <li class="nav-item">
-            <a href="/logout" class="nav-link text-truncate">
-                <i class="fs-5 text-danger">Abmelden</i>
-                <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-            </a>
+          <!-- TODO -->
+          <a href="{{ url_for('site.material.material') }}" class="nav-link text-truncate">
+            <i class="fs-5">QR code generator</i>
+            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+          </a>
         </li>
-          <!-- Dropdown Prototyp -->
-          <!-- <li class="dropdown">
+        <li class="nav-item">
+          <a href="{{ url_for('site.user_site.profil', benutzername=current_user.benutzername) }}"
+            class="nav-link text-truncate">
+            <i class="fs-5">Mein Konto</i>
+            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/logout" class="nav-link text-truncate">
+            <i class="fs-5 text-danger">Abmelden</i>
+            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+          </a>
+        </li>
+        <!-- Dropdown Prototyp -->
+        <!-- <li class="dropdown">
               <a href="#" class="nav-link dropdown-toggle  text-truncate" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">Bootstrap</span>
               </a>
@@ -119,42 +131,46 @@
               </ul>
           </li> -->
       </ul>
+    </div>
   </div>
-</div>
 
-<div class="container-fluid">
-  <div class="row">
+  <div class="container-fluid">
+    <div class="row">
       <div class="col min-vh-100 py-3">
         {%if not hide_menu%}
-          <!-- toggler -->
-          <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button" style="padding: 0.3em">
-              <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-              <img src="{{url_for('static', filename='menu.svg')}}">
-            </button>
-            
-            <a class="btn float-start" href="/home" role="button" style="padding:0.3">
-              <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-              <img src="{{url_for('static', filename='house.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
-            </a>
+        <!-- toggler -->
+        <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button"
+          style="padding: 0.3em">
+          <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
+          <img src="{{url_for('static', filename='menu.svg')}}">
+        </button>
 
-            <a class="btn float-start" onclick="window.history.back()" role="button" style="padding:0.3">
-                <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-                <img src="{{url_for('static', filename='arrow_left.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
-              </a>
-              {%endif%}
+        <a class="btn float-start" href="/home" role="button" style="padding:0.3">
+          <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
+          <img src="{{url_for('static', filename='house.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+        </a>
 
-            <div class="mx-1" id="contentBlock" style="margin-top:2.7em">
-                {%block content%}{%endblock%}
-            </div>
+        <a class="btn float-start" onclick="window.history.back()" role="button" style="padding:0.3">
+          <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
+          <img src="{{url_for('static', filename='arrow_left.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+        </a>
+        {%endif%}
+
+        <div class="mx-1" id="contentBlock" style="margin-top:2.7em">
+          {%block content%}{%endblock%}
         </div>
-  </div>
-
-  
-</div>
-    <div id="footerBlock">
-    {%block footer%}{%endblock%}
+      </div>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
-{%block afterBootstrap%}{%endblock%}
+
+
+  </div>
+  <div id="footerBlock">
+    {%block footer%}{%endblock%}
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+    crossorigin="anonymous"></script>
+  {%block afterBootstrap%}{%endblock%}
 </body>
+
 </html>

@@ -1,23 +1,20 @@
 import logging
-from os import (
-    environ,
-    path,
-)
+from os import environ, path
 from pathlib import Path
 from secrets import token_bytes
-from alembic.config import Config
+
 from alembic import command
+from alembic.config import Config
 from flask import Flask
 from flask_login import LoginManager
 from sqlalchemy import engine
-from .database.db import (
-    Benutzer,
-)
-from .site import site
-from .api import api
-from .utils import convertTime
+
+from ._update import apply_upgrade, check_current_head
 from ._version import __version__
-from ._update import check_current_head, apply_upgrade
+from .api import api
+from .database.db import Benutzer
+from .site import site
+from .utils import convertTime
 
 
 def create_app(prevent_context_recursion: bool = False):
@@ -46,7 +43,8 @@ def create_app(prevent_context_recursion: bool = False):
         app.logger.info("knotnpunkt running containerized")
     else:
         app = Flask(__name__)
-        logging.basicConfig(level=logging.DEBUG, format='%(levelname)-5.5s [%(name)s] %(message)s')
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(levelname)-5.5s [%(name)s] %(message)s')
         app.logger.debug("knotnpunkt is running in debug mode")
     db_path = Path(app.instance_path) / "knotnpunkt.db"
 
@@ -111,6 +109,6 @@ def create_app(prevent_context_recursion: bool = False):
     # Flask-login needs the user loader to get the users from the database
     @login_manager.user_loader
     def user_loader(user_id):
-        return Benutzer.query.get(user_id)
+        return db.session.query(Benutzer).get(user_id)
 
     return app

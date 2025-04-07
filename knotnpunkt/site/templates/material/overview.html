@@ -1,0 +1,58 @@
+{%extends "material/base.html"%}
+
+
+
+{% block tab %}
+<ul class="list-group">
+    {% if not materialien %}
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col">
+                <h5>Keine Materialien vorhanden</h5>
+            </div>
+        </div>
+    </li>
+    {% endif %}
+
+    {% for m in materialien %}
+
+    <a href="{{url_for('site.material.show', id=m.id)}}"
+        class="list-group-item list-group-item-action text-decoration-none text-reset">
+        <div class="row">
+            <div class="col-auto">
+                {% if m != None %}
+                <img src="data:image/jpg;base64,{{ m }}" class="img-fluid" alt="" style="height: 4em;">
+                {% else %}
+                <img style="height: 4em;" src="" alt="">
+                {% endif %}
+            </div>
+            <div class="col">
+                <h5>{{m.name}}</h5>
+                <div>{{m.spezifisch.name}}</div>
+            </div>
+            <div class="col">
+                {% if m.eigenschaften.get('zaehlbar',False) %}
+                {% if verfuegbarkeit[m.id]>0 %}
+                <div class="text-success">{{verfuegbarkeit[m.id]}} /
+                    {{m.eigenschaften.get('anzahl')}}</div>
+                {% else %}
+                <div class="text-danger">Nicht verfügbar</div>
+                {% endif %}
+
+                {% else %}
+                {% if verfuegbarkeit[m.id]==True %}
+                <div class="text-success">Verfügbar</div>
+                {% elif verfuegbarkeit[m.id]==False%}
+                <div class="text-danger">Nicht verfügbar</div>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="col d-none d-sm-block">
+                <div style="font-size: 0.8em;">Zuletzt Geändert</div>
+            </div>
+        </div>
+    </a>
+
+    {% endfor %}
+</ul>
+{% endblock%}

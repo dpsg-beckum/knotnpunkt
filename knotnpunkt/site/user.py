@@ -1,35 +1,36 @@
 from datetime import date
-from flask import request, Response, Blueprint
+
+from flask import Blueprint, Response, request
 from flask.helpers import url_for
 from flask.templating import render_template
 from flask_login import current_user
 from flask_login.utils import login_required, login_user, logout_user
 from sqlalchemy import desc
 from werkzeug.utils import redirect
+
 from ..database import db
-from ..database.db import (
-    Benutzer,
-    Rolle,
-)
+from ..database.db import Benutzer, Rolle
 
 user_site = Blueprint("user_site", __name__, url_prefix="/benutzer")
+
 
 @user_site.route("/", methods=['GET', 'POST'])
 @login_required
 def benutzer():
+    usr: Benutzer = current_user
     if request.method == 'POST':
         neuerBenutzer = Benutzer(request.form.get('benutzername'), request.form.get('name'), request.form.get(
-            'email'), f"{request.form.get('benutzername')}", Rolle.query.filter_by(name=request.form.get('rolle')).first().idRolle)
+            'email'), f"{request.form.get('benutzername')}", Rolle.get_via_name(name=request.form.get('rolle')).id)
         db.session.add(neuerBenutzer)
         db.session.commit()
         return redirect(url_for(".benutzer"))
     else:
-        if current_user.Rolle.schreibenBenutzer:
+        if usr.Rolle.schreibenBenutzer:
             erlaubeBearbeiten = True
         else:
             erlaubeBearbeiten = False
-        liste = Benutzer.query.order_by(Benutzer.name).all()
-        rollen = Rolle.query.all()
+        liste = Benutzer.get_all()
+        rollen = Rolle.get_all()
 
         return render_template('user/benutzer.html', benutzer_liste=liste, roles=rollen, edit=erlaubeBearbeiten)
 
@@ -37,11 +38,12 @@ def benutzer():
 @user_site.route('/<benutzername>', methods=['GET', 'POST'])
 @login_required
 def profil(benutzername):
+    usr: Benutzer = current_user
     error_msg = ""
     if request.method == 'POST':
-        if current_user.benutzername == benutzername or current_user.Rolle.schreibenBenutzer:
+        if usr.benutzername == benutzername or usr.Rolle.schreibenBenutzer:
             # User edits own profile
-            user = Benutzer.query.get(benutzername)
+            user = Benutzer.get_via_id(benutzername)
             if request.form.get("delete", "off") == 'on':
                 # User deletes own profile
                 db.session.delete(user)
@@ -50,10 +52,10 @@ def profil(benutzername):
             else:
                 user.benutzername = request.form['benutzername']
                 user.name = request.form['name']
-                user.email = request.form['email']
+                user.emailAdresse = request.form['email']
                 if request.form.get('rolle'):
-                    user.rolleRef = Rolle.query.filter_by(
-                        name=request.form.get('rolle')).first().idRolle
+                    user.rolle_id = Rolle.get_via_name(
+                        request.form.get('rolle')).id
                 if request.form.get('passwort'):
                     if request.form.get('passwort') == request.form.get('passwortBestaetigung'):
                         user.set_passwort(request.form.get('passwort'))
@@ -68,11 +70,11 @@ def profil(benutzername):
                 db.session.commit()
                 return redirect(url_for(".benutzer"))
     elif request.method == 'GET':
-        if current_user.Rolle.lesenBenutzer is False and current_user.benutzername is not benutzername:
+        if usr.Rolle.lesenBenutzer is False and usr.benutzername is not benutzername:
             return Response(f'Du hast keinen Zugriff auf das Profil von {benutzername}.', 401)
-        user = Benutzer.query.get(benutzername)
-        rollen = Rolle.query.all()
-        if current_user.Rolle.schreibenBenutzer:
+        user = Benutzer.get_via_id(benutzername)
+        rollen = Rolle.get_all()
+        if usr.Rolle.schreibenBenutzer:
             edit_permission = True
         else:
             edit_permission = False

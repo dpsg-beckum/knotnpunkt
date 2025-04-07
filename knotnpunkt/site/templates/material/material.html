@@ -16,7 +16,8 @@
             <ul class="row list-group">
                 {% for m in materialListe %}
                 <li class="list-group-item bg-light">
-                    <a href="{{ url_for('site.material_site.materialDetails', idMaterial=m[0].idMaterial) }}" class="text-decoration-none text-dark">
+                    <a href="{{ url_for('site.material_site.materialDetails', idMaterial=m[0].id) }}"
+                        class="text-decoration-none text-dark">
                         <div class="row">
                             <div class="col-auto">
                                 <!-- <img style="height: 4em;"
@@ -36,17 +37,17 @@
                             </div>
                             <div class="col">
                                 {% if m[0].Eigenschaften.get('zaehlbar',False) %}
-                                {% if verfuegbarkeit[m[0].idMaterial]>0 %}
-                                <div class="text-success">{{verfuegbarkeit[m[0].idMaterial]}} /
+                                {% if verfuegbarkeit[m[0].id]>0 %}
+                                <div class="text-success">{{verfuegbarkeit[m[0].id]}} /
                                     {{m[0].Eigenschaften.get('anzahl')}}</div>
                                 {% else %}
                                 <div class="text-danger">Nicht verfügbar</div>
                                 {% endif %}
 
                                 {% else %}
-                                {% if verfuegbarkeit[m[0].idMaterial]==True %}
+                                {% if verfuegbarkeit[m[0].id]==True %}
                                 <div class="text-success">Verfügbar</div>
-                                {% elif verfuegbarkeit[m[0].idMaterial]==False%}
+                                {% elif verfuegbarkeit[m[0].id]==False%}
                                 <div class="text-danger">Nicht verfügbar</div>
                                 {% endif %}
                                 {% endif %}

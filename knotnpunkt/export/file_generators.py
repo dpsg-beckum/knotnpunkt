@@ -1,23 +1,19 @@
 import base64
 import json
 from datetime import datetime as dt
-from pathlib import Path
 from io import BytesIO
+from pathlib import Path
+
 import cairosvg
+import segno
 from flask import current_app
 from flask_login import current_user
-from jinja2 import (
-    Environment,
-    FileSystemLoader,
-)
-import segno
+from jinja2 import Environment, FileSystemLoader
 from segno.helpers import make_epc_qr
+
 from .._version import __version__
-from ..database.db import (
-    Material,
-    Auslage,
-    AuslagenKategorie,
-)
+from ..database.auslagen import Auslage
+from ..database.material import Material
 
 
 class ExportError(Exception):
@@ -30,10 +26,13 @@ class SVGGenerator():
 
     def __init__(self):
         try:
-            self.config = json.load(open(Path(current_app.root_path)/"export/export_templates.json"))
+            self.config = json.load(
+                open(Path(current_app.root_path)/"export/export_templates.json"))
         except FileNotFoundError:
-            raise ExportError("Konfigurationsdatei konnte nicht geladen werden.")
-        self.jenv = Environment(loader=FileSystemLoader(Path(current_app.root_path)/"export/export_templates"))
+            raise ExportError(
+                "Konfigurationsdatei konnte nicht geladen werden.")
+        self.jenv = Environment(loader=FileSystemLoader(
+            Path(current_app.root_path)/"export/export_templates"))
         self.jenv.filters['b64encode'] = base64.b64encode
 
     def generate_svg(self, artikel: list[Material] = None, template_id: int = None) -> str:
@@ -58,9 +57,10 @@ class SVGGenerator():
             msg = f"Auf die angegeben Vorlage passen nur {self.max_n_artikel(template_id)} der {len(artikel)} Einträge."
             raise ExportError(msg)
         for m in artikel:
-            code_string = f"knotnpunkt{__version__}:/{m.Kategorie.name}/{m.idMaterial}/\nName: {m.name}\nQR-Code erstellt: {dt.now():%d.%m.%Y %R}\nVon {current_user.name} ({current_user.benutzername})"
+            code_string = f"knotnpunkt{__version__}:/{m.Kategorie.name}/{m.id}/\nName: {m.name}\nQR-Code erstellt: {dt.now():%d.%m.%Y %R}\nVon {current_user.name} ({current_user.benutzername})"
             code_string = code_string + " " * (130 - len(code_string))
-            m.qrcode = segno.make(content=code_string, micro=False).svg_inline(scale=3.2)
+            m.qrcode = segno.make(content=code_string,
+                                  micro=False).svg_inline(scale=3.2)
         template_info = self.all_templates.get(template_id)
         template = self.jenv.get_template(template_info.get("dateiname"))
         return template.render(username=current_user.name, dt=dt, material_liste=artikel, org_name="DPSG Beckum", host_info=f"knotnpunkt version {__version__}")

@@ -19,7 +19,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('kalendar');
-        fetch("/api/material?includeAvailability=true", {
+        fetch("{{ url_for('apiv1.material.material', includeAvailability=True) }}", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })

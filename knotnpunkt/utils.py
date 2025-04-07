@@ -1,12 +1,11 @@
+import json
+from datetime import date
+from datetime import datetime as dt
+
 import humanize as hu
 from sqlalchemy import desc
-import json
-from datetime import datetime as dt
-from datetime import date
-from .database.db import (
-    Ausleihe,
-    Material,
-)
+
+from .database.material import Ausleihe, Material
 
 
 def convertTime(datetime):
@@ -14,21 +13,26 @@ def convertTime(datetime):
     return hu.naturaltime(dt.now()-dt.strptime(datetime.get('zuletztGescannt'), '%Y-%m-%d %H:%M'))
 
 
-def checkverfuegbarkeit(materialien):
+def checkverfuegbarkeit(materialien: list[Material]) -> dict:
     dict_verfuegbar = {}
-    ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_von)).all()
+    ausleihen = Ausleihe.get_all()
+    # Sort ausleihen by ts_von
+    ausleihen = sorted(
+        ausleihen, key=lambda x: x.ts_von, reverse=True)
+
+    # ausleihen = Ausleihe.query.order_by(desc(Ausleihe.ts_von)).all()
     for m in materialien:
         if m.Eigenschaften.get('zaehlbar', False):
-            dict_verfuegbar[m.idMaterial] = m.Eigenschaften.get('anzahl', 1)
+            dict_verfuegbar[m.id] = m.Eigenschaften.get('anzahl', 1)
         else:
-            dict_verfuegbar[m.idMaterial] = True
+            dict_verfuegbar[m.id] = True
         for a in ausleihen:
-            if int(m.idMaterial) in [int(x) for x in a.materialien.split(",") if x.isdigit()]:
+            if int(m.id) in [int(x) for x in a.materialien.split(",") if x.isdigit()]:
                 if a.ts_von <= date.today() <= a.ts_bis:
                     if m.Eigenschaften.get('zaehlbar', False) == False:
-                        dict_verfuegbar[m.idMaterial] = False
+                        dict_verfuegbar[m.id] = False
                     else:
-                        dict_verfuegbar[m.idMaterial] = dict_verfuegbar[m.idMaterial] - 1
+                        dict_verfuegbar[m.id] = dict_verfuegbar[m.id] - 1
     return dict_verfuegbar
 
 
@@ -44,14 +48,14 @@ def get_ausleihen_fuer_material(materialien: list[Material] | str) -> list:
         [(<Material 1>, [<Ausleihe 1>, <Ausleihe 2>]), (<Material 2>, [<Ausleihe 1>]),
     """
     if isinstance(materialien, str):
-        materialien = Material.query.filter_by(idMaterial=material).all()
+        materialien = Material.filter_by(id=materialien)
     elif not isinstance(materialien, list):
         return None
-    ausleihen = [(a, a.materialien.split(",")) for a in Ausleihe.query.all()]
+    ausleihen = [(a, a.materialien.split(",")) for a in Ausleihe.get_all()]
     if ausleihen == []:
         return None
-    result = {m.idMaterial: [a[0] for a in ausleihen if str(
-        m.idMaterial) in a[1]] for m in materialien}
+    result = {m.id: [a[0] for a in ausleihen if str(
+        m.id) in a[1]] for m in materialien}
     return result
 
 

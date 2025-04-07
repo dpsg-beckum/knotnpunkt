@@ -21,8 +21,7 @@
                             {%for m2 in materialListe%}
                             {% if m2.Kategorie_idKategorie == k.idKategorie%}
                             <li class="list-group-item bg-light">
-                                <div class="row" id="{{m2.idMaterial}}" value="{{m2.idMaterial}}"
-                                    onclick="changeqrvalue(this.id)">
+                                <div class="row" id="{{m2.id}}" value="{{m2.id}}" onclick="changeqrvalue(this.id)">
                                     <div class="col-auto">
                                         <img style="height: 4em;"
                                             src="{{url_for('static', filename='{}_icon.svg'.format(m2.Kategorie.name))}}"

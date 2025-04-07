@@ -1,0 +1,100 @@
+{%extends "base.html"%}
+
+{% block content %}
+
+<style>
+    /* CSS */
+    .img-label {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+    }
+
+    .img-label img {
+        transition: filter 0.3s ease;
+        width: 150px;
+        /* Adjust the size as needed */
+        height: auto;
+    }
+
+    /* When the checkbox is checked, apply a darkening filter to the image */
+    input[type="checkbox"]:checked+.img-label img {
+        filter: brightness(50%);
+    }
+</style>
+
+<form method="post" enctype="multipart/form-data">
+    {{ materialForm.hidden_tag() }}
+
+
+    <div class="row mb-3">
+        <div class="col-2">
+            {{ materialForm.submit(class="btn btn-success") }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-4 border mx-xl-2 py-2">
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ materialForm.title.label.text }}</div>
+                <div class="col-8">
+                    {{ materialForm.title(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ materialForm.category.label.text }}</div>
+                <div class="col-8">
+                    {{ materialForm.category(class="form-select") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ materialForm.description.label.text }}</div>
+                <div class="col-8">
+                    {{ materialForm.description(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ materialForm.artNr.label.text }}</div>
+                <div class="col-8">
+                    {{ materialForm.artNr(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ materialForm.images.label.text }}</div>
+                <div class="col-8">
+                    {{ materialForm.images(class="form-control") }}
+                </div>
+            </div>
+
+
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ materialForm.set.label.text }}</div>
+                <div class="col-8">
+                    {{ materialForm.set(class="form-select") }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        {% for image in materialForm.delete_images %}
+        <div class="row mb-3">
+            <div class="col-8">
+                {{ image(class="d-none") }}
+            </div>
+            <p> {{ image.label }} </p>
+            <label for="delete_images-0" class="img-label">
+                <img src="{{ url_for('apiv1.img.get_img', id=image.label.text) }}" class="img-fluid" alt=""
+                    style='height: 100%; width: 100%; object-fit: contain'>
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+</form>
+{% endblock%}

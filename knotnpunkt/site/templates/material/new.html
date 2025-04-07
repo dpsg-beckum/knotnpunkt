@@ -1,0 +1,54 @@
+{%extends "material/base.html"%}
+
+{% block tab%}
+<form method="post">
+    {{ form.hidden_tag() }}
+
+
+    <div class="row mb-3">
+        <div class="col-2">
+            {{ form.submit(class="btn btn-success") }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-4 border mx-xl-2 py-2">
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ form.title.label.text }}</div>
+                <div class="col-8">
+                    {{ form.title(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ form.category.label.text }}</div>
+                <div class="col-8">
+                    {{ form.category(class="form-select") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ form.description.label.text }}</div>
+                <div class="col-8">
+                    {{ form.description(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ form.set.label.text }}</div>
+                <div class="col-8">
+                    {{ form.set(class="form-select") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4 text-end align-middle">{{ form.artNr.label.text }}</div>
+                <div class="col-8">
+                    {{ form.artNr(class="form-control") }}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock%}
