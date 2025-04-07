@@ -66,6 +66,26 @@ class Ausleihe(BaseTable):
 
     Ersteller: Mapped[Benutzer] = relationship('Benutzer')
 
+    @staticmethod
+    def create_new(ersteller: Benutzer,
+                   empfaenger: str,
+                   ts_von: dt,
+                   ts_bis: dt,
+                   beschreibung: str,
+                   materialien: str) -> Ausleihe:
+        new_ausleihe = Ausleihe(
+            ersteller_benutzername=ersteller.benutzername,
+            empfaenger=empfaenger,
+            ts_erstellt=dt.now(),
+            ts_von=ts_von,
+            ts_bis=ts_bis,
+            beschreibung=beschreibung,
+            materialien=materialien
+        )
+        db.session.add(new_ausleihe)
+        db.session.commit()
+        return new_ausleihe
+
     def __repr__(self) -> str:
         props = {k: v for k, v in self.__dict__.items(
         ) if k in self.__table__.columns.keys()}
