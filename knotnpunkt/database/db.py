@@ -81,26 +81,20 @@ class BaseTable(Base):
                 f"{str(cls.__name__).replace('Table', '')} mit der ID \"{id}\" existiert nicht")
         return item
 
-    def to_dict(self, depth: int = 1, _visited: set[int] | None = None) -> dict:
-        """
-        Recursively serializes the model instance into a dictionary.
-        :param depth: how deep to serialize relationships (0 = no relationships) (1 = only direct relationships) (2 = direct and indirect relationships)
-        :param _visited: a set of visited object IDs to avoid infinite recursion.
-        """
+    def to_dict(self, depth: int = 2, _visited: set[int] | None = None) -> dict:
         if _visited is None:
             _visited = set()
 
-        # Prevent infinite recursion by checking if we've seen this instance already.
+        # Only check for cycles in the current recursion path.
         if id(self) in _visited:
-            return {}
-        _visited.add(id(self))
+            # Instead of returning an empty dict, you might return a minimal representation.
+            return {"id": getattr(self, "id", None)}
 
+        _visited.add(id(self))
         data = {}
 
-        # Use the instance’s mapper instead of inspect(self)
-        mapper = self.__mapper__
-
         # Serialize columns
+        mapper = self.__mapper__
         for column in mapper.columns:
             data[column.key] = getattr(self, column.key)
 
@@ -112,12 +106,14 @@ class BaseTable(Base):
                     data[rel.key] = None
                 elif isinstance(rel_val, list):
                     data[rel.key] = [
-                        item.to_dict(depth=depth - 1, _visited=_visited)
+                        item.to_dict(depth=depth - 1, _visited=_visited.copy())
                         for item in rel_val
                     ]
                 else:
                     data[rel.key] = rel_val.to_dict(
-                        depth=depth - 1, _visited=_visited)
+                        depth=depth - 1, _visited=_visited.copy())
+
+        _visited.remove(id(self))
         return data
 
 
