@@ -41,15 +41,16 @@ def create_app(prevent_context_recursion: bool = False):
         except:
             pass
         app.logger.info("knotnpunkt running containerized")
+        app.secret_key = token_bytes(12)
     else:
         app = Flask(__name__)
         logging.basicConfig(level=logging.DEBUG,
                             format='%(levelname)-5.5s [%(name)s] %(message)s')
         app.logger.debug("knotnpunkt is running in debug mode")
+        app.secret_key = "dev"
     db_path = Path(app.instance_path) / "knotnpunkt.db"
 
     # Set secret key for signing
-    app.secret_key = token_bytes(12)
     app.logger.info(f"Database file can be found at {db_path.absolute()}")
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path.absolute()}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
