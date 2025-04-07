@@ -15,9 +15,9 @@ from sqlalchemy import desc
 from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.utils import redirect
 
-from ..database.material import (Ausleihe, Img, KategorieSpezifisch, Material,
-                                 Set)
-from ..utils import checkverfuegbarkeit
+from ...database.material import (Ausleihe, Img, KategorieSpezifisch, Material,
+                                  Set)
+from ...utils import checkverfuegbarkeit
 from .materialforms import EditMaterialForm, NewMaterialForm
 
 material_site = Blueprint("material", __name__, url_prefix="/material")
@@ -199,17 +199,18 @@ def edit(id):
 @material_site.route('/reservieren/<idMaterial>', methods=['POST'])
 def materialReservieren(idMaterial):
     debug(request.form.get('reservierte_Materialien'))
-    neueReservierung = Ausleihe(
-        ersteller_benutzername=current_user.benutzername,
-        ts_erstellt=dt.now(),
-        ts_von=dt.strptime(request.form.get('reservieren_von'), "%Y-%m-%d"),
-        ts_bis=dt.strptime(request.form.get('reservieren_bis'), "%Y-%m-%d"),
-        materialien=request.form.get('reservierte_Materialien'),
-        empfaenger=request.form.get('empfaenger') if request.form.get(
-            'empfaenger') else current_user.benutzername,
-        beschreibung=request.form.get('beschreibung'))
-    db.session.add(neueReservierung)
-    db.session.commit()
+
+    Ausleihe.create_new(ersteller=current_user,
+                        empfaenger=request.form.get('empfaenger') if request.form.get(
+                            'empfaenger') else current_user.benutzername,
+                        ts_von=dt.strptime(request.form.get(
+                            'reservieren_von'), "%Y-%m-%d"),
+                        ts_bis=dt.strptime(request.form.get(
+                            'reservieren_bis'), "%Y-%m-%d"),
+                        beschreibung=request.form.get('beschreibung'),
+                        materialien=request.form.get('reservierte_Materialien')
+                        )
+
     return redirect(url_for(".material"))
 
 
@@ -218,20 +219,22 @@ def upload_img(idMaterial):
     pic = request.files['pic']
     if not pic:
         return 'No pic uploaded!', 400
-    material_id = idMaterial
+
+    material = Material.get_via_id(idMaterial)
     mimetype = pic.mimetype
-    if not material_id or not mimetype:
+    if not mimetype:
         return 'Bad upload!', 400
-    img = Img(img=pic.read(), Material_idMaterial=material_id, mimetype=mimetype)
-    db.session.add(img)
-    db.session.commit()
+    Img.create_new(
+        material=material,
+        img=pic.read(),
+        mimetype=mimetype
+    )
     return redirect(url_for(".show", idMaterial=idMaterial))
 
 
 @material_site.route('/img/delete/<id>/<idMaterial>')  # , methods=['POST']
 def delete_img(id, idMaterial):
     Img.get_via_id(id)  # TODO Delete Image from Database
-    db.session.commit()
     return redirect(url_for(".show", idMaterial=idMaterial))
 
 
