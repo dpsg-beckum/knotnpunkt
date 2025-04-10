@@ -1,11 +1,12 @@
 """This contains the API.ROutes for the Auslagen feature.
 """
+import base64
 import json
 import logging
 from datetime import datetime as dt
 from os import environ
 
-from flask import Blueprint, abort, request, send_file
+from flask import Blueprint, Response, abort, request, send_file
 from flask_login import current_user, login_required
 
 from .._version import __version__
@@ -167,3 +168,9 @@ def export_auslage():
             return generator.generate_svg(auslage, 2)
     except ExportError as e:
         return {"success": False, "msg": e.args[0]}
+
+
+@auslagen_routes.route('/img/<int:id>')
+def get_img(id: int):
+    img = AuslagenBild.get_via_id(id)
+    return Response(base64.b64decode(img.img), mimetype=img.mimetype)
