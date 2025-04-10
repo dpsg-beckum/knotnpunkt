@@ -64,7 +64,7 @@ class AuslagenBild(BaseTable):
     @staticmethod
     def create_new(auslage: Auslage, img: str, mimetype: str) -> AuslagenBild:
         new_img = AuslagenBild(
-            Auslage_id=auslage.id,
+            auslage_id=auslage.id,
             img=img,
             mimetype=mimetype
         )
@@ -113,31 +113,69 @@ class Auslage(BaseTable):
     Kategorie: Mapped[AuslagenKategorie] = relationship(
         'AuslagenKategorie', foreign_keys=kategorie_id)
 
-    def __init__(self, titel, betrag, iban, bic, kontoinhaber, grund, eingereicht_zeit, erstellerBenutzername, kategorieId):
-        self.titel = titel
-        self.betrag = betrag
-        self.iban = iban
-        self.bic = bic
-        self.kontoinhaber = kontoinhaber
-        self.grund = grund
-        self.eingereicht_zeit = eingereicht_zeit
-        self.ersteller_id = erstellerBenutzername
-        self.kategorie_id = kategorieId
+    def is_deletable(self):
+        if self.erledigtDurch_benutzername or \
+                self.freigabeDurch_benutzername or \
+                self.erledigtZeit or \
+                self.freigabe_zeit:
+            return False
+        return True
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "titel": self.titel,
-            "betrag": self.betrag,
-            "iban": self.iban,
-            "bic": self.bic,
-            "kontoinhaber": self.kontoinhaber,
-            "grund": self.grund,
-            "eingereicht_zeit": self.eingereicht_zeit,
-            "erstellerBenutzername": self.ersteller_id,
-            "kategorieId": self.kategorie_id,
-            "freigabe_zeit": self.freigabe_zeit,
-            "freigabeDurchBenutzername": self.freigabeDurch_benutzername,
-            "erledigtZeit": self.erledigtZeit,
-            "erledigtDurchNutzer": self.erledigtDurch_benutzername
-        }
+    def is_editable(self):
+        return self.is_deletable()
+
+    def freigeben(self, benutzer: Benutzer):
+        if self.freigabeDurch_benutzername or self.freigabe_zeit:
+            raise ValueError(
+                f"Auslage \"{self.id}\" wurde bereits freigegeben")
+        self.freigabeDurch_benutzername = benutzer.benutzername
+        self.freigabe_zeit = dt.now()
+        db.session.commit()
+        return self
+
+    def erledigen(self, benutzer: Benutzer):
+        if self.erledigtDurch_benutzername or self.erledigtZeit:
+            raise ValueError(
+                f"Auslage \"{self.id}\" wurde bereits erledigt")
+        self.erledigtDurch_benutzername = benutzer.benutzername
+        self.erledigtZeit = dt.now()
+        db.session.commit()
+        return self
+
+    @staticmethod
+    def create_new(titel: str, betrag: float, iban: str, bic: str, kontoinhaber: str,
+                   grund: str, eingereicht_zeit: dt, erstellerBenutzername: str,
+                   kategorie: AuslagenKategorie) -> Auslage:
+
+        new_auslage = Auslage(
+            titel=titel,
+            betrag=betrag,
+            iban=iban,
+            bic=bic,
+            kontoinhaber=kontoinhaber,
+            grund=grund,
+            eingereicht_zeit=eingereicht_zeit,
+            ersteller_id=erstellerBenutzername,
+            kategorie_id=kategorie.id
+        )
+        db.session.add(new_auslage)
+        db.session.commit()
+        return new_auslage
+
+    # def to_dict(self):
+    #     return {
+    #         "id": self.id,
+    #         "titel": self.titel,
+    #         "betrag": self.betrag,
+    #         "iban": self.iban,
+    #         "bic": self.bic,
+    #         "kontoinhaber": self.kontoinhaber,
+    #         "grund": self.grund,
+    #         "eingereicht_zeit": self.eingereicht_zeit,
+    #         "erstellerBenutzername": self.ersteller_id,
+    #         "kategorieId": self.kategorie_id,
+    #         "freigabe_zeit": self.freigabe_zeit,
+    #         "freigabeDurchBenutzername": self.freigabeDurch_benutzername,
+    #         "erledigtZeit": self.erledigtZeit,
+    #         "erledigtDurchNutzer": self.erledigtDurch_benutzername
+    #     }
