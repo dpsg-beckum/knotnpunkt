@@ -37,13 +37,18 @@ class BaseTable(Base):
         try:
             if not self.is_editable():
                 raise ElementNotEditable(
-                    f"{self.__class__.__name__} is not editable")
+                    f"{self.__class__.__name__} kann nicht bearbeitet werden")
         except NotImplementedError:
             raise ElementNotEditable(
                 f"{self.__class__.__name__} is not editable (is_editable not implemented)")
 
         # Get the SQLAlchemy mapper to inspect columns
         mapper = self.__mapper__
+
+        for key, value in kwargs.items():
+            if not hasattr(self, key):
+                raise AttributeError(
+                    f"{self.__class__.__name__} has no attribute '{key}'")
 
         # Iterate over provided key/value pairs
         for key, value in kwargs.items():
@@ -64,6 +69,19 @@ class BaseTable(Base):
 
         db.session.commit()
         return self
+
+    def is_deletable(self) -> bool:
+        """
+        Returns if the element can be deleted
+        """
+        raise NotImplementedError("is_deletable() must be implemented")
+
+    def delete(self):
+        if not self.is_deletable():
+            raise ValueError(
+                f"{str(self.__class__.__name__).replace('Table', '')} \"{self.id}\" is not deletable")
+        db.session.delete(self)
+        db.session.commit()
 
     @classmethod
     def filter_by(cls: Type[T], **kwargs) -> List[T]:
