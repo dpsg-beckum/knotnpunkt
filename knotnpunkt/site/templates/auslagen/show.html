@@ -1,0 +1,152 @@
+{%extends "auslagen/base.html"%}
+
+{% block content%}
+
+<form action="" method="post">
+    <div class="container">
+        {{ form.hidden_tag() }}
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <div id="carouselExample" class="carousel slide">
+                        <div class="carousel-inner">
+                            {% for image in auslage.Bild %}
+                            <div class="carousel-item active">
+                                <img src="{{ url_for('apiv1.auslagen.get_img', id=image.id)}}" class="d-block w-100"
+                                    alt="...">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h1>Auslage #{{ auslage.id }}</h1>
+                        </div>
+                        <hr>
+                        <div class="d-flex flex-column gap-3">
+                            <div class="form-floating">
+                                {{ form.title(class="form-control") }}
+                                <label for="title">{{form.title.label}}</label>
+                            </div>
+                            <div class="form-floating">
+                                {{ form.category(class="form-control") }}
+                                <label for="title">{{form.category.label}}</label>
+                            </div>
+                            <div class="form-floating">
+                                {{ form.comment(class="form-control") }}
+                                <label for="title">{{form.comment.label}}</label>
+                            </div>
+                            <div>
+                                <p>
+                                    {{ auslage.betrag }} €
+                                    <br>
+                                    {{ auslage.kontoinhaber }}
+                                    <br>
+                                    {{ auslage.eingereicht_zeit.strftime('%d.%m.%Y %H:%M') }}
+                                    <br>
+                                    {{ auslage.ersteller.name }} | {{ auslage.ersteller.benutzername }}
+                                    <br>
+                                    {{ auslage.ersteller.Rolle.name }}
+                                    <br>
+                                    {{ auslage.iban }}
+                                    <br>
+                                    {{ auslage.bic }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p>Freigegeben:
+                                    <br>
+                                    {% if auslage.freigabeDurch_benutzername %}
+                                    {{ auslage.Freigebende.name }} ({{ auslage.Freigebende.Rolle.name }})
+                                    <br>
+                                    {{ auslage.freigabe_zeit.strftime('%d.%m.%Y %H:%M') }}
+                                    {% else %}
+                                    Nein
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p>Erledigt:
+                                    <br>
+                                    {% if auslage.erledigtDurch_benutzername %}
+                                    {{ auslage.ErledigtDurch.name }} ({{ auslage.ErledigtDurch.Rolle.name }})
+                                    <br>
+                                    {{ auslage.erledigtZeit.strftime('%d.%m.%Y %H:%M') }}
+                                    {% else %}
+                                    Nein
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <!-- Default Hidden Submit -->
+                            <input type="submit" value="" class="d-none">
+
+                            <div class="btn-group">
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+
+                                <a href="{{ url_for('.print', id=auslage.id)}}" target="_blank"
+                                    rel="noopener noreferrer" class="btn btn-outline-dark">
+                                    <i class="bi bi-printer-fill"></i>
+                                </a>
+                                <button type="submit" id="{{ form.approve.id }}" name="{{ form.approve.name }}"
+                                    title="{{ form.approve.label.text }}" class="btn btn-outline-dark"
+                                    value="{{ form.approve.label.text }}">
+                                    <i class="bi bi-bookmark-check"></i>
+                                </button>
+                                <button type="submit" id="{{ form.done.id }}" name="{{ form.done.name }}"
+                                    title="{{ form.done.label.text }}" class="btn btn-outline-dark"
+                                    value="{{ form.done.label.text }}">
+                                    <i class="bi bi-envelope-check-fill"></i>
+                                </button>
+                                <button type="submit" id="{{ form.submit.id }}" name="{{ form.submit.name }}"
+                                    title="{{ form.submit.label.text }}" class="btn btn-success"
+                                    value="{{ form.submit.label.text }}">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="deleteModalLabel">Auslage Löschen?</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" id="{{ form.delete.id }}" name="{{ form.delete.name }}"
+                            title="{{ form.delete.label.text }}" class="btn btn-danger"
+                            value="{{ form.delete.label.text }}">
+                            Löschen <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+{% endblock %}

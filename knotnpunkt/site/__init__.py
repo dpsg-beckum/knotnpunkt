@@ -13,12 +13,24 @@ from ..database.auslagen import AuslagenKategorie
 from ..database.db import Benutzer
 from ..database.exceptions import ElementAlreadyExists, ElementDoesNotExsist
 from ..database.material import Ausleihe, Material
+from .auslagen import auslagen_site
 from .material import material_site
 from .user import user_site
 
 site = Blueprint("site", __name__, template_folder="templates")
 site.register_blueprint(material_site)
 site.register_blueprint(user_site)
+site.register_blueprint(auslagen_site)
+
+
+# insert current user for all templates
+@site.context_processor
+def inject_user():
+    if not current_user.is_authenticated:
+        return {}
+
+    usr: Benutzer = current_user
+    return dict(cuser=usr.to_dict(1))
 
 
 @site.route('/')
@@ -103,13 +115,6 @@ def kalender():
 @login_required
 def einstellungen():
     return render_template('server_einstellungen.html')
-
-
-@site.route("/auslagen")
-@login_required
-def auslagen_uebersicht():
-    kategorienListe = AuslagenKategorie.get_all()
-    return render_template("auslagen.html", kategorienListe=kategorienListe)
 
 
 @site.get("/-demo")

@@ -1,0 +1,126 @@
+{%extends "auslagen/base.html"%}
+
+{% block content%}
+
+<form method="post" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="row mb-3">
+        <div class="col">
+            {{ form.submit(class="btn btn-success") }}
+            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseAnleitung" aria-expanded="false" aria-controls="collapseExample">
+                <i class="bi bi-question-circle"></i>
+            </button>
+            <div class="collapse row mt-2" id="collapseAnleitung">
+                <div class="col-xl-8 border mx-xl-2 py-2">
+                    <ol type="1">
+                        <li><strong>Lade dein Belegbild hoch</strong>. Achte auf eine gute Bildqualität und
+                            fotografiere ggf. mit Blitz. Hast du eine PDF-Datei, lade einen Screenshot hoch und versende
+                            das Original manuell.</li>
+                        <li>Fülle den Rest des Formulars mit deinen <strong>Kontodaten</strong> aus. Die IBAN wird von
+                            deiner letzen Auslage übrenommen.</li>
+                        <li><strong>Klicke auf Absenden</strong> um deine Auslage einzureichen. Dein StaVo
+                            und deine Kassenwartenden sehen deine Auslage nun in ihrer Übersicht.</li>
+                        <li>Beschrifte deinen Beleg mit der <strong>Auslagen-ID</strong> oder notiere dir
+                            diese. Die Auslagen-ID wird dir nach dem Sendevorgang angezeigt.</li>
+                    </ol>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-xl-8 border mx-xl-2 py-2">
+
+            <div class="row">
+                <div class="col-4 mt-1 text-xl-end">Belegbild *</div>
+                <div class="col-xl">
+                    <div class="input-group">
+                        {{ form.image(class="form-control") }}
+
+                        <div class="invalid-feedback">
+                            Lade z. B. ein Bild deines Kassenbons hoch.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row mb-3">
+                <div class="col-4 d-none d-xl-block"></div>
+                <div class="col align-text-top font-text fst-italic" style="font-size: 0.8em;">Erlaubte Formate: jpg,
+                    png, gif</div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-4 mt-1 text-xl-end">Titel *</div>
+                <div class="col-xl">
+                    <div class="input-group">
+                        {{ form.title(class="form-control") }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-4 mt-1 text-xl-end">Kategorie *</div>
+                <div class="col-xl">
+                    {{ form.category(class="form-select") }}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-xl4 mt-1 text-xl-start">Begründung / Anmerkungen (200 Zeichen)</div>
+                <div class="col-xl">
+                    {{ form.comment(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-4 mt-1 text-xl-end">Betrag(€) *</div>
+                <div class="col-xl">
+                    <div class="input-group">
+                        {{ form.betrag(class="form-control") }}
+
+                        <span class="input-group-text">€</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-xl-4 mt-1 text-xl-end">Kontoinhaber_in *</div>
+                <div class="col-xl">
+                    {{ form.kontoinhaber(class="form-control") }}
+                </div>
+            </div>
+
+
+            <div class="mb-3 row">
+                <div class="col-4 mt-1 text-xl-end">IBAN *</div>
+                <div class="col-xl">
+                    <div class="input-group">
+                        {{ form.iban(class="form-control") }}
+                        <div class="invalid-feedback">
+                            z. B. "DE91100000000123456789" oder "DE91 1000 0000 0123 4567 89"
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-4 mt-1 text-xl-end">BIC</div>
+                <div class="col-xl">
+                    {{ form.bic(class="form-control") }}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="text-danger">* Pflichtfeld</div>
+
+
+
+</form>
+
+{% endblock %}
