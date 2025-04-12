@@ -3,6 +3,7 @@ import json
 from datetime import date
 from datetime import datetime as dt
 from logging import debug
+from os import environ
 from pprint import pprint
 
 import humanize as hu
@@ -28,7 +29,8 @@ auslagen_site = Blueprint("auslagen", __name__, url_prefix="/auslagen")
 @auslagen_site.before_request
 @login_required
 def auth():
-    pass
+    if not environ.get("KP_AUSLAGEN_AKTIV", False):
+        abort(404)
 
 
 @auslagen_site.get("/")
@@ -50,7 +52,7 @@ def deine():
 @auslagen_site.route("/<int:id>",  methods=["GET", "POST"])
 def show(id):
     usr: Benutzer = current_user
-    auslage = Auslage.get_via_id(id)
+    auslage = Auslage.get_via_id(int(id))
 
     form = EditAuslagenForm()
 
@@ -100,11 +102,18 @@ def show(id):
     form.comment.data = auslage.grund
 
     form.update_form()
-    return render_template("auslagen/show.html", auslage=auslage.to_dict(), user=usr.to_dict(), form=form)
+
+    iim = auslage.bilder[0].img
+
+    iim = bytes(iim).decode("utf-8")
+
+    print(iim)
+
+    return render_template("auslagen/show.html", auslage=auslage.to_dict(), user=usr.to_dict(), form=form, iim=iim)
 
 
-@auslagen_site.get("/<int:id>/print")
-def print(id):
+@auslagen_site.get("/<int:id>/export")
+def export(id):
     auslage: Auslage = Auslage.get_via_id(id)
     if not auslage:
         abort(404)

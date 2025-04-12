@@ -92,11 +92,11 @@ class BaseTable(Base):
         return db.session.query(cls).all()
 
     @classmethod
-    def get_via_id(cls: Type[T], id: int) -> T:
-        item = db.session.query(cls).get({"id": id})
+    def get_via_id(cls: Type[T], id_value: int) -> T:
+        item = db.session.get(cls, id_value)
         if not item:
             raise ElementDoesNotExsist(
-                f"{str(cls.__name__).replace('Table', '')} mit der ID \"{id}\" existiert nicht")
+                f"{str(cls.__name__).replace('Table', '')} mit der ID \"{id_value}\" existiert nicht")
         return item
 
     def to_dict(self, depth: int = 2, _visited: set[int] | None = None) -> dict:

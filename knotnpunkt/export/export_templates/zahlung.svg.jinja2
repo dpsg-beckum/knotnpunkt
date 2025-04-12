@@ -67,7 +67,7 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.1"
          x="42.960835"
          y="94.749374"
-         id="tspan2727">von {{item.Ersteller.benutzername}} ({{item.Ersteller.Rolle.name}})</tspan></text><text
+         id="tspan2727">von {{item.ersteller.benutzername}} ({{item.ersteller.Rolle.name}})</tspan></text><text
        xml:space="preserve"
        style="font-weight:bold;font-size:3.175px;font-family:Arial;-inkscape-font-specification:'Arial, Bold';text-align:end;text-anchor:end;fill:#000000;stroke:none;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none"
        x="95.024673"
@@ -113,12 +113,12 @@
          x="159.95215"
          y="94.749374"
          id="tspan2741">von {{current_benutzername}}</tspan></text>
-         {%if (item.Bild | length) >= 1 %}
+         {%if (item.bilder | length) >= 1 %}
          <image
        width="188.14992"
        height="188.14992"
        preserveAspectRatio="meet"
-       xlink:href="data:{{item.Bild[0].mimetype}};base64,{{item.Bild[0].img_base64 | safe}}"
+       xlink:href="data:{{item.bilder[0].mimetype}};base64,{{item.bilder[0].img_base64 | safe}}"
        id="image2871"
        x="10.925041"
        y="102.22954"

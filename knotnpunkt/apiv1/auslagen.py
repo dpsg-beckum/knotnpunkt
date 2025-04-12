@@ -103,8 +103,8 @@ def delete_auslage(id):
     auslage: Auslage = Auslage.get_via_id(id)
     if not auslage:
         abort(404)
-    if auslage.Bild is not []:
-        db.session.delete(auslage.Bild[0])
+    if auslage.bilder is not []:
+        db.session.delete(auslage.bilder[0])
     db.session.delete(auslage)
     db.session.commit()
     return auslage.to_dict()

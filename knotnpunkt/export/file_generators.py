@@ -136,7 +136,7 @@ class AuslagenSVGGenerator(SVGGenerator):
             auslage.qrcode = make_epc_qr(name=auslage.kontoinhaber,
                                          iban=auslage.iban,
                                          amount=auslage.betrag,
-                                         text=f'Rückerstattung: "{auslage.titel}" automatisch generiert von Auslagen-ID #{auslage.idAuslage}').svg_inline(scale=0.6)
+                                         text=f'Rückerstattung: "{auslage.titel}" automatisch generiert von Auslagen-ID #{auslage.id}').svg_inline(scale=0.6)
         template_info = self.all_templates.get(template_id)
         template = self.jenv.get_template(template_info.get("dateiname"))
         return template.render(item=auslage, org_name="DPSG Beckum", host_info="", version=__version__, dt=dt, current_benutzername=current_user.benutzername)

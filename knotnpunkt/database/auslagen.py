@@ -50,7 +50,7 @@ class AuslagenBild(BaseTable):
         ForeignKey('Auslage.id'), nullable=False)
 
     auslage: Mapped[Auslage] = relationship(
-        'Auslage', back_populates="Bild", foreign_keys=auslage_id)
+        'Auslage', back_populates="bilder", foreign_keys=auslage_id)
 
     @property
     def img_base64(self):
@@ -59,7 +59,7 @@ class AuslagenBild(BaseTable):
         Returns:
             str: Base64 code of the img attribute
         """
-        return base64.encodebytes(self.img).decode('utf-8')
+        return bytes(self.img).decode("utf-8")
 
     @staticmethod
     def create_new(auslage: Auslage, img: str, mimetype: str) -> AuslagenBild:
@@ -90,7 +90,7 @@ class Auslage(BaseTable):
     erledigtZeit: Mapped[Optional[dt]] = mapped_column(
         DateTime(), nullable=True)
 
-    Bild: Mapped[List[AuslagenBild]] = relationship(
+    bilder: Mapped[List[AuslagenBild]] = relationship(
         'AuslagenBild', back_populates="auslage", cascade="all, delete-orphan")
 
     ersteller_id: Mapped[str] = mapped_column(

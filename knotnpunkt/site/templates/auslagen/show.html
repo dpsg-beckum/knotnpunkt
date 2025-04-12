@@ -10,7 +10,7 @@
                 <div class="col-md-4">
                     <div id="carouselExample" class="carousel slide">
                         <div class="carousel-inner">
-                            {% for image in auslage.Bild %}
+                            {% for image in auslage.bilder %}
                             <div class="carousel-item active">
                                 <img src="{{ url_for('apiv1.auslagen.get_img', id=image.id)}}" class="d-block w-100"
                                     alt="...">
@@ -102,7 +102,7 @@
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
 
-                                <a href="{{ url_for('.print', id=auslage.id)}}" target="_blank"
+                                <a href="{{ url_for('.export', id=auslage.id)}}" target="_blank"
                                     rel="noopener noreferrer" class="btn btn-outline-dark">
                                     <i class="bi bi-printer-fill"></i>
                                 </a>
