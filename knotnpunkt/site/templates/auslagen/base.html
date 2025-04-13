@@ -1,1 +1,21 @@
 {%extends "base.html"%}
+
+{% block content%}
+
+<div class="container">
+    <nav>
+        <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+            <a class="nav-link {% if 'deine' in request.path %} active {% endif %}"
+                href="{{ url_for('.deine') }}">Übersicht</a>
+
+            <a class="nav-link {% if 'neu' in request.path %} active {% endif %}"
+                href="{{ url_for('.new') }}">Hinzufügen...</a>
+        </div>
+    </nav>
+
+    {% block tab %}
+    {% endblock %}
+
+</div>
+
+{% endblock %}
