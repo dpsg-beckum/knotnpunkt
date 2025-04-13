@@ -65,8 +65,7 @@ def show(id):
             try:
                 auslage.delete()
             except Exception as e:
-                debug(f"Fehler beim Löschen der Auslage: {e}")
-                flash("Fehler beim Löschen der Auslage", "danger")
+                flash(f"Fehler: {e}", "danger")
                 return redirect(url_for(".show", id=auslage.id))
             flash(f"Auslage {auslage.id} gelöscht", "success")
             return redirect(url_for(".deine"))
@@ -129,7 +128,7 @@ def export(id):
         return {"success": False, "msg": e.args[0]}
 
 
-@auslagen_site.route("/new", methods=["GET", "POST"])
+@auslagen_site.route("/neu", methods=["GET", "POST"])
 def new():
     usr: Benutzer = current_user
 
