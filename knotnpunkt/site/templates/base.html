@@ -136,27 +136,27 @@
   </div>
 
   <div class="container-fluid">
-    <div class="row">
-      <div class="col min-vh-100 py-3">
-        {%if not hide_menu%}
-        <!-- toggler -->
-        <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button"
-          style="padding: 0.3em">
-          <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-          <img src="{{url_for('static', filename='menu.svg')}}">
-        </button>
+    <div class="min-vh-100">
+      <div class="row">
+        <div class="col">
+          <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button"
+            style="padding: 0.3em">
+            <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
+            <img src="{{url_for('static', filename='menu.svg')}}">
+          </button>
 
-        <a class="btn float-start" href="/home" role="button" style="padding:0.3">
-          <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-          <img src="{{url_for('static', filename='house.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
-        </a>
+          <a class="btn float-start" href="/home" role="button" style="padding:0.3">
+            <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
+            <img src="{{url_for('static', filename='house.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+          </a>
 
-        <a class="btn float-start" onclick="window.history.back()" role="button" style="padding:0.3">
-          <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-          <img src="{{url_for('static', filename='arrow_left.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
-        </a>
-        {%endif%}
-
+          <a class="btn float-start" onclick="window.history.back()" role="button" style="padding:0.3">
+            <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
+            <img src="{{url_for('static', filename='arrow_left.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+          </a>
+        </div>
+      </div>
+      <div>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="px-3">
@@ -169,15 +169,18 @@
         </div>
         {% endif %}
         {% endwith %}
-
-        <div class="mx-1" id="contentBlock" style="margin-top:2.7em">
-          {%block content%}{%endblock%}
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="mx-1" id="contentBlock">
+            {%block content%}{%endblock%}
+          </div>
         </div>
       </div>
     </div>
-
-
   </div>
+
+
   <div id="footerBlock">
     {%block footer%}{%endblock%}
   </div>
