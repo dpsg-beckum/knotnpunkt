@@ -102,13 +102,7 @@ def show(id):
 
     form.update_form()
 
-    iim = auslage.bilder[0].img
-
-    iim = bytes(iim).decode("utf-8")
-
-    print(iim)
-
-    return render_template("auslagen/show.html", auslage=auslage.to_dict(), user=usr.to_dict(), form=form, iim=iim)
+    return render_template("auslagen/show.html", auslage=auslage.to_dict(), user=usr.to_dict(), form=form)
 
 
 @auslagen_site.get("/<int:id>/export")
