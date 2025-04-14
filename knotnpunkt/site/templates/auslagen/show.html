@@ -1,5 +1,11 @@
 {%extends "auslagen/base.html"%}
 
+
+{% block subnav %}
+<a class="nav-link active" href="{{ url_for('.show', id=auslage.id) }}">Auslage {{ auslage.id }}</a>
+{% endblock %}
+
+
 {% block tab %}
 
 <form action="" method="post">

@@ -10,6 +10,8 @@
 
             <a class="nav-link {% if 'neu' in request.path %} active {% endif %}"
                 href="{{ url_for('.new') }}">Hinzufügen...</a>
+            {% block subnav %}
+            {% endblock %}
         </div>
     </nav>
 
