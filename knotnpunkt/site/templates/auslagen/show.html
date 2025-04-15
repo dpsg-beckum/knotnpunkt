@@ -1,0 +1,188 @@
+{%extends "auslagen/base.html"%}
+
+
+{% block subnav %}
+<a class="nav-link active" href="{{ url_for('.show', id=auslage.id) }}">Auslage #{{ auslage.id }}</a>
+{% endblock %}
+
+
+{% block tab %}
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <div id="carouselExample" class="carousel slide">
+                    <div class="carousel-inner">
+                        {% for image in auslage.bilder %}
+                        <div class="carousel-item active">
+                            <img src="{{ url_for('apiv1.auslagen.get_img', id=image.id)}}" class="d-block w-100"
+                                alt="...">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h1>Auslage #{{ auslage.id }}</h1>
+                    </div>
+                    <hr>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Titel</small>
+                                <div>{{ auslage.titel }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Kategorie</small>
+                                <div>{{ auslage.Kategorie.anzeigeName }}</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Grund</small>
+                                <div>{{ auslage.grund }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Betrag</small>
+                                <div>{{ auslage.betrag }} €</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Kontoinhaber</small>
+                                <div>{{ auslage.kontoinhaber }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">IBAN</small>
+                                <div>{{ auslage.iban }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">BIC</small>
+                                <div>{{ auslage.bic }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Eingereicht am</small>
+                                <div>{{ auslage.eingereicht_zeit.strftime('%d.%m.%Y %H:%M') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Erstellt von</small>
+                                <div>
+                                    {{ auslage.ersteller.name }} ({{ auslage.ersteller.Rolle.name }})<br>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FREIGABE -->
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Freigegeben</small>
+                                <div>
+                                    {% if auslage.freigabeDurch_benutzername %}
+                                    {{ auslage.Freigebende.name }} ({{ auslage.Freigebende.Rolle.name }})
+                                    <br>
+                                    {{ auslage.freigabe_zeit.strftime('%d.%m.%Y %H:%M') }}
+                                    {% else %}
+                                    <span class="text-danger">Noch nicht freigegeben</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ERLEDIGT -->
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">Erledigt</small>
+                                <div>
+                                    {% if auslage.erledigtDurch_benutzername %}
+                                    {{ auslage.ErledigtDurch.name }} ({{ auslage.ErledigtDurch.Rolle.name }})
+                                    <br>
+                                    {{ auslage.erledigtZeit.strftime('%d.%m.%Y %H:%M') }}
+                                    {% else %}
+                                    <span class="text-danger">Nicht erledigt</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column mt-3">
+                        <!-- Default Hidden Submit -->
+                        <input type="submit" value="" class="d-none">
+
+                        <div class="btn-group">
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+
+                            <a href="{{ url_for('.export', id=auslage.id)}}" target="_blank" rel="noopener noreferrer"
+                                class="btn btn-outline-dark">
+                                <i class="bi bi-printer-fill"></i>
+                            </a>
+                            <button type="submit" id="{{ form.approve.id }}" name="{{ form.approve.name }}"
+                                title="{{ form.approve.label.text }}" class="btn btn-outline-dark"
+                                value="{{ form.approve.label.text }}">
+                                <i class="bi bi-bookmark-check"></i>
+                            </button>
+                            <button type="submit" id="{{ form.done.id }}" name="{{ form.done.name }}"
+                                title="{{ form.done.label.text }}" class="btn btn-outline-dark"
+                                value="{{ form.done.label.text }}">
+                                <i class="bi bi-envelope-check-fill"></i>
+                            </button>
+                            <a href="{{ url_for('.edit', id=auslage.id)}}" class="btn btn-outline-warning">
+                                <i class="bi bi-pen-fill"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel">Auslage Löschen?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" id="{{ form.delete.id }}" name="{{ form.delete.name }}"
+                        title="{{ form.delete.label.text }}" class="btn btn-danger"
+                        value="{{ form.delete.label.text }}">
+                        Löschen <i class="bi bi-trash-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

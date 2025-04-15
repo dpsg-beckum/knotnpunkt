@@ -21,7 +21,7 @@ from ...database.db import Benutzer, Rolle
 from ...database.exceptions import ElementNotEditable
 from ...export.file_generators import (AuslagenPDFGenerator,
                                        AuslagenSVGGenerator, ExportError)
-from .forms import EditAuslagenForm, NewAuslagenForm
+from .forms import EditAuslagenForm, NewAuslagenForm, ShowAuslagenForm
 
 auslagen_site = Blueprint("auslagen", __name__, url_prefix="/auslagen")
 
@@ -49,6 +49,41 @@ def deine():
     return render_template("auslagen/deine.html", auslagen=[a.to_dict() for a in auslagen])
 
 
+@auslagen_site.route("/<int:id>",  methods=["GET", "POST"])
+def show(id):
+    usr: Benutzer = current_user
+    auslage = Auslage.get_via_id(int(id))
+
+    form = ShowAuslagenForm()
+
+    if form.validate_on_submit():
+        if form.delete.data:
+            try:
+                auslage.delete()
+            except Exception as e:
+                flash(f"Fehler: {e}", "danger")
+                return redirect(url_for(".show", id=auslage.id))
+            flash(f"Auslage {auslage.id} gelöscht", "success")
+            return redirect(url_for(".deine"))
+
+        if form.approve.data:
+            try:
+                auslage.freigeben(usr)
+            except ValueError as e:
+                flash(
+                    f"Fehler: {e}", "danger")
+                return redirect(url_for(".deine"))
+
+        if form.done.data:
+            try:
+                auslage.erledigen(usr)
+            except ValueError as e:
+                flash(f"Fehler: {e}", "danger")
+                return redirect(url_for(".deine"))
+
+    return render_template("auslagen/show.html", auslage=auslage.to_dict(), user=usr.to_dict(), form=form)
+
+
 @auslagen_site.route("/<int:id>/edit",  methods=["GET", "POST"])
 def edit(id):
     usr: Benutzer = current_user
@@ -61,28 +96,6 @@ def edit(id):
                              for k in AuslagenKategorie.get_all()]
 
     if form.validate_on_submit():
-        if form.delete.data:
-            try:
-                auslage.delete()
-            except Exception as e:
-                flash(f"Fehler: {e}", "danger")
-                return redirect(url_for(".edit", id=auslage.id))
-            flash(f"Auslage {auslage.id} gelöscht", "success")
-            return redirect(url_for(".deine"))
-
-        if form.approve.data:
-            try:
-                auslage.freigeben(usr)
-            except ValueError as e:
-                flash(
-                    f"Fehler: {e}", "danger")
-
-        if form.done.data:
-            try:
-                auslage.erledigen(usr)
-            except ValueError as e:
-                flash(f"Fehler: {e}", "danger")
-
         if form.submit.data:
             try:
                 auslage.update(

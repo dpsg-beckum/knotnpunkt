@@ -9,16 +9,18 @@ from wtforms.validators import DataRequired, EqualTo, Length, Optional, length
 from ..forms import KPForm
 
 
+class ShowAuslagenForm(KPForm):
+    approve = SubmitField("Genehmigen", name="approve")
+    done = SubmitField("Erledigt", name="done")
+    delete = SubmitField("Löschen", name="delete")
+
+
 class EditAuslagenForm(KPForm):
     title = StringField("Titel *", validators=[DataRequired()])
     category = SelectField("Kategorie *", coerce=int,
                            validators=[DataRequired()])
     comment = TextAreaField("Begründung / Anmerkungen (200 Zeichen)", validators=[
         Optional(), Length(max=200)])
-
-    approve = SubmitField("Genehmigen", name="approve")
-    done = SubmitField("Erledigt", name="done")
-    delete = SubmitField("Löschen", name="delete")
     submit = SubmitField("Änderungen speichern")
 
 

@@ -2,7 +2,7 @@
 
 
 {% block subnav %}
-<a class="nav-link active" href="{{ url_for('.show', id=auslage.id) }}">Auslage {{ auslage.id }}</a>
+<a class="nav-link active" href="{{ url_for('.show', id=auslage.id) }}">Auslage #{{ auslage.id }} Bearbeiten</a>
 {% endblock %}
 
 
@@ -53,7 +53,7 @@
                             {{ form.comment(class="form-control") }}
                             <label for="title">{{form.comment.label}}</label>
                         </div>
-                        <div>
+                        <!-- <div>
                             <p>
                                 {{ auslage.betrag }} €
                                 <br>
@@ -69,9 +69,8 @@
                                 <br>
                                 {{ auslage.bic }}
                             </p>
-                        </div>
-
-                        <div>
+                        </div> -->
+                        <!-- <div>
                             <p>Freigegeben:
                                 <br>
                                 {% if auslage.freigabeDurch_benutzername %}
@@ -95,32 +94,16 @@
                                 Nein
                                 {% endif %}
                             </p>
-                        </div>
+                        </div> -->
 
                         <!-- Default Hidden Submit -->
                         <input type="submit" value="" class="d-none">
 
                         <div class="btn-group">
                             <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal">
-                                <i class="bi bi-trash-fill"></i>
-                            </button>
-
-                            <a href="{{ url_for('.export', id=auslage.id)}}" target="_blank" rel="noopener noreferrer"
-                                class="btn btn-outline-dark">
-                                <i class="bi bi-printer-fill"></i>
+                            <a href="{{ url_for('.show', id=auslage.id)}}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg"></i>
                             </a>
-                            <button type="submit" id="{{ form.approve.id }}" name="{{ form.approve.name }}"
-                                title="{{ form.approve.label.text }}" class="btn btn-outline-dark"
-                                value="{{ form.approve.label.text }}">
-                                <i class="bi bi-bookmark-check"></i>
-                            </button>
-                            <button type="submit" id="{{ form.done.id }}" name="{{ form.done.name }}"
-                                title="{{ form.done.label.text }}" class="btn btn-outline-dark"
-                                value="{{ form.done.label.text }}">
-                                <i class="bi bi-envelope-check-fill"></i>
-                            </button>
                             <button type="submit" id="{{ form.submit.id }}" name="{{ form.submit.name }}"
                                 title="{{ form.submit.label.text }}" class="btn btn-success"
                                 value="{{ form.submit.label.text }}">
@@ -128,25 +111,6 @@
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="deleteModalLabel">Auslage Löschen?</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" id="{{ form.delete.id }}" name="{{ form.delete.name }}"
-                        title="{{ form.delete.label.text }}" class="btn btn-danger"
-                        value="{{ form.delete.label.text }}">
-                        Löschen <i class="bi bi-trash-fill"></i>
-                    </button>
                 </div>
             </div>
         </div>
