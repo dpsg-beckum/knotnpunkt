@@ -79,9 +79,12 @@
                 {{a.grund}}
             </p>
             <div class="col col-md-3 offset-3 offset-md-4 btn-group" role="group">
+                <a class="btn btn-outline-dark btn-sm" href="{{ url_for('.show', id=a.id)}}">
+                    <i class="bi bi-eye"></i>
+                </a>
                 <a class="btn btn-outline-dark btn-sm" href="{{ url_for('.export', id=a.id) }}" target="_blank"><i
                         class="bi bi-printer-fill"></i></a>
-                <button type="button" class="btn btn-outline-danger btn-sm">
+                {# <button type="button" class="btn btn-outline-danger btn-sm">
                     <i class="bi bi-trash-fill"></i>
                 </button>
                 <button type="button" class="btn btn-outline-dark btn-sm">
@@ -89,7 +92,7 @@
                 </button>
                 <button type="button" class="btn btn-outline-dark btn-sm">
                     <i class="bi bi-envelope-check"></i>
-                </button>
+                </button> #}
             </div>
         </div>
     </div>
