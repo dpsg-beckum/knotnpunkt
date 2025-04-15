@@ -49,8 +49,8 @@ def deine():
     return render_template("auslagen/deine.html", auslagen=[a.to_dict() for a in auslagen])
 
 
-@auslagen_site.route("/<int:id>",  methods=["GET", "POST"])
-def show(id):
+@auslagen_site.route("/<int:id>/edit",  methods=["GET", "POST"])
+def edit(id):
     usr: Benutzer = current_user
     auslage = Auslage.get_via_id(int(id))
 
@@ -66,7 +66,7 @@ def show(id):
                 auslage.delete()
             except Exception as e:
                 flash(f"Fehler: {e}", "danger")
-                return redirect(url_for(".show", id=auslage.id))
+                return redirect(url_for(".edit", id=auslage.id))
             flash(f"Auslage {auslage.id} gelöscht", "success")
             return redirect(url_for(".deine"))
 
@@ -94,7 +94,7 @@ def show(id):
             except ElementNotEditable as e:
                 flash(f"Fehler: {e}", "danger")
 
-        return redirect(url_for(".show", id=auslage.id))
+        return redirect(url_for(".edit", id=auslage.id))
 
     form.category.data = auslage.Kategorie.id
     form.title.data = auslage.titel
@@ -102,7 +102,7 @@ def show(id):
 
     form.update_form()
 
-    return render_template("auslagen/show.html", auslage=auslage.to_dict(), user=usr.to_dict(), form=form)
+    return render_template("auslagen/edit.html", auslage=auslage.to_dict(), user=usr.to_dict(), form=form)
 
 
 @auslagen_site.get("/<int:id>/export")
