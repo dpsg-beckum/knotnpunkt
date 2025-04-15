@@ -29,7 +29,7 @@ auslagen_site = Blueprint("auslagen", __name__, url_prefix="/auslagen")
 @auslagen_site.before_request
 @login_required
 def auth():
-    if not environ.get("KP_AUSLAGEN_AKTIV", False):
+    if not environ.get("KP_AUSLAGEN_AKTIV", True):
         abort(404)
 
 

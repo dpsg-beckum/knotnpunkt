@@ -26,7 +26,7 @@ auslagen_routes = Blueprint("auslagen", __name__, template_folder="templates",
 @auslagen_routes.before_request
 @login_required
 def auth():
-    if not environ.get("KP_AUSLAGEN_AKTIV", False):
+    if not environ.get("KP_AUSLAGEN_AKTIV", True):
         abort(404)
 
 
