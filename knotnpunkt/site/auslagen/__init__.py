@@ -54,27 +54,34 @@ def show(id):
     usr: Benutzer = current_user
     auslage = Auslage.get_via_id(int(id))
 
+    if not (usr.Rolle.lesenAlleAuslagen or usr.benutzername == auslage.ersteller_id):
+        abort(403)
+
     form = ShowAuslagenForm()
 
     if form.validate_on_submit():
         if form.delete.data:
             try:
                 auslage.delete()
-            except Exception as e:
-                flash(f"Fehler: {e}", "danger")
+            except ValueError as e:
+                flash(
+                    f"Auslage kann nicht mehr gelöscht werden, da sie bereits freigegeben wurde", "danger")
                 return redirect(url_for(".show", id=auslage.id))
             flash(f"Auslage {auslage.id} gelöscht", "success")
             return redirect(url_for(".deine"))
 
         if form.approve.data:
+            if not usr.Rolle.freigebenAuslagen:
+                abort(403)
             try:
                 auslage.freigeben(usr)
             except ValueError as e:
-                flash(
-                    f"Fehler: {e}", "danger")
+                flash(f"Fehler: {e}", "danger")
                 return redirect(url_for(".deine"))
 
         if form.done.data:
+            if not usr.Rolle.freigebenAuslagen:
+                abort(403)
             try:
                 auslage.erledigen(usr)
             except ValueError as e:
@@ -89,6 +96,13 @@ def edit(id):
     usr: Benutzer = current_user
     auslage = Auslage.get_via_id(int(id))
 
+    if not (usr.Rolle.lesenAlleAuslagen or usr.benutzername == auslage.ersteller_id):
+        abort(403)
+
+    if not auslage.is_editable():
+        flash("Auslage kann nicht mehr bearbeitet werden, da sie bereits freigegeben wurde", "danger")
+        return redirect(url_for(".show", id=auslage.id))
+
     form = EditAuslagenForm()
 
     form.category.choices = [(k.id,
@@ -102,12 +116,11 @@ def edit(id):
                     titel=form.title.data,
                     kategorie_id=AuslagenKategorie.get_via_id(
                         form.category.data).id,
-                    comment=form.comment.data
+                    grund=form.comment.data
                 )
+                return redirect(url_for(".show", id=auslage.id))
             except ElementNotEditable as e:
                 flash(f"Fehler: {e}", "danger")
-
-        return redirect(url_for(".edit", id=auslage.id))
 
     form.category.data = auslage.Kategorie.id
     form.title.data = auslage.titel
@@ -120,9 +133,15 @@ def edit(id):
 
 @auslagen_site.get("/<int:id>/export")
 def export(id):
+    usr: Benutzer = current_user
     auslage: Auslage = Auslage.get_via_id(id)
+
     if not auslage:
         abort(404)
+
+    if not (usr.Rolle.lesenAlleAuslagen or usr.benutzername == auslage.ersteller_id):
+        abort(403)
+
     try:
         if request.args.get("type") == "svg":
             generator = AuslagenSVGGenerator()

@@ -146,16 +146,20 @@
                                 class="btn btn-outline-dark">
                                 <i class="bi bi-printer-fill"></i>
                             </a>
+                            {% if cuser.Rolle.freigebenAuslagen %}
                             <button type="submit" id="{{ form.approve.id }}" name="{{ form.approve.name }}"
                                 title="{{ form.approve.label.text }}" class="btn btn-outline-dark"
-                                value="{{ form.approve.label.text }}">
+                                value="{{ form.approve.label.text }}" {% if auslage.freigabeDurch_benutzername %}
+                                disabled {% endif %}>
                                 <i class="bi bi-bookmark-check"></i>
                             </button>
                             <button type="submit" id="{{ form.done.id }}" name="{{ form.done.name }}"
                                 title="{{ form.done.label.text }}" class="btn btn-outline-dark"
-                                value="{{ form.done.label.text }}">
+                                value="{{ form.done.label.text }}" {% if (not auslage.freigabeDurch_benutzername) or
+                                auslage.erledigtDurch_benutzername %} disabled {% endif %}>
                                 <i class="bi bi-envelope-check-fill"></i>
                             </button>
+                            {% endif %}
                             <a href="{{ url_for('.edit', id=auslage.id)}}" class="btn btn-outline-warning">
                                 <i class="bi bi-pen-fill"></i>
                             </a>
