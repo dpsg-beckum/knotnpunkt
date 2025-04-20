@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from logging import debug
 from typing import List, Optional, Type, TypeVar
 
 from flask_login import UserMixin
@@ -33,7 +34,8 @@ class BaseTable(Base):
             f"{self.__class__.__name__} must implement is_editable()")
 
     def update(self, **kwargs):
-        # First, check if the model instance is editable.
+        debug(f"Updating {self.__class__.__name__} with {kwargs}")
+
         try:
             if not self.is_editable():
                 raise ElementNotEditable(
@@ -42,30 +44,21 @@ class BaseTable(Base):
             raise ElementNotEditable(
                 f"{self.__class__.__name__} is not editable (is_editable not implemented)")
 
-        # Get the SQLAlchemy mapper to inspect columns
         mapper = self.__mapper__
+        relationships = mapper.relationships.keys()
 
-        for key, value in kwargs.items():
+        for key in kwargs:
             if not hasattr(self, key):
                 raise AttributeError(
                     f"{self.__class__.__name__} has no attribute '{key}'")
 
-        # Iterate over provided key/value pairs
+            # Prevent updating relationship attributes (like `Kategorie`)
+            if key in relationships:
+                raise ElementNotEditable(
+                    f"Relationship attribute '{key}' is not editable directly. Use the foreign key column instead.")
+
         for key, value in kwargs.items():
-            # If the key is a column attribute, check if it's a foreign key
-            if key in mapper.c:
-                column = mapper.c[key]
-                if column.foreign_keys:  # if this column has one or more foreign keys
-                    raise ElementNotEditable(
-                        f"Foreign key column '{key}' is not editable")
-            # Optionally, you can also check for non-column properties if needed.
-            # Only update attributes that actually exist on the instance.
-            if hasattr(self, key):
-                setattr(self, key, value)
-            else:
-                # Either ignore or raise an error if updating an unknown property
-                raise AttributeError(
-                    f"{self.__class__.__name__} has no attribute '{key}'")
+            setattr(self, key, value)
 
         db.session.commit()
         return self
