@@ -231,6 +231,18 @@ class Benutzer(UserMixin, BaseTable):
         self.passwort = generate_password_hash(neues_passwort)
         db.session.commit()
 
+    def update(self, name: str = None, emailAdresse: str = None, passwort: str = None, rolle: Rolle = None):
+        if name:
+            self.name = name
+        if emailAdresse:
+            self.emailAdresse = emailAdresse
+        if passwort:
+            self.set_passwort(passwort)
+        if rolle:
+            self.rolle_id = rolle.id
+        db.session.commit()
+        return self
+
     def is_active(self) -> bool:
         return True
 
