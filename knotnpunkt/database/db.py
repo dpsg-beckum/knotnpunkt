@@ -215,7 +215,7 @@ class Benutzer(UserMixin, BaseTable):
     emailAdresse: Mapped[str] = mapped_column(String(255), nullable=True)
     passwort: Mapped[str] = mapped_column(String(45), nullable=False)
     iban: Mapped[Optional[str]] = mapped_column(String(25))
-    straße: Mapped[Optional[str]] = mapped_column(String(45))
+    strasse: Mapped[Optional[str]] = mapped_column(String(45))
     hausnummer: Mapped[Optional[str]] = mapped_column(String(45))
     postleitzahl: Mapped[Optional[str]] = mapped_column(String(45))
     ort: Mapped[Optional[str]] = mapped_column(String(45))
