@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import secrets
 from logging import debug
 from typing import List, Optional, Type, TypeVar
 
@@ -229,6 +230,12 @@ class Benutzer(UserMixin, BaseTable):
     def set_passwort(self, neues_passwort: str) -> None:
         self.passwort = generate_password_hash(neues_passwort)
         db.session.commit()
+
+    def reset_passwort(self) -> str:
+        passwort = secrets.token_urlsafe(8)
+        self.passwort = passwort
+        db.session.commit()
+        return passwort
 
     def update(self, name: str = None, emailAdresse: str = None, passwort: str = None, rolle: Rolle = None):
         if name:
