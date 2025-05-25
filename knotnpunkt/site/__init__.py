@@ -13,11 +13,13 @@ from ..database.auslagen import AuslagenKategorie
 from ..database.db import Benutzer
 from ..database.exceptions import ElementAlreadyExists, ElementDoesNotExsist
 from ..database.material import Ausleihe, Material
+from .admin import admin_site
 from .auslagen import auslagen_site
 from .material import material_site
 from .user import user_site
 
 site = Blueprint("site", __name__, template_folder="templates")
+site.register_blueprint(admin_site)
 site.register_blueprint(material_site)
 site.register_blueprint(user_site)
 site.register_blueprint(auslagen_site)

@@ -1,0 +1,48 @@
+{% extends 'admin/base.html' %}
+
+
+{% block tab %}
+
+<ul class="row list-group">
+    {% for user in users %}
+    <li class="list-group-item bg-light">
+        <div class="row">
+            <div class="col">
+                <h5 class="card-title">
+                    {{ user.benutzername }}
+                </h5>
+                <p class="card-text">
+                    {{ user.emailAdresse }}
+                </p>
+            </div>
+            <div class="col">
+
+                <p class="card-text">
+                    {{ user.strasse }} {{ user.hausnummer }} {{ user.postleitzahl }} {{ user.ort }}
+                </p>
+                <p class="card-text">
+                    Rolle: {{ user.Rolle.name }}
+                </p>
+            </div>
+
+            <!-- <p class="card-text">
+                    {{ user }}
+                </p> -->
+            <div class="col">
+
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="{{ url_for('.edit', benutzername=user.benutzername) }}"
+                            class="btn btn-primary">Edit</a>
+                    </div>
+                    <div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

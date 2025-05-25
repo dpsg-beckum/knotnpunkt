@@ -1,0 +1,62 @@
+{% extends 'admin/base.html' %}
+
+{% block tab %}
+
+<form method="post">
+    {{ form.hidden_tag() }}
+    <div class="d-flex flex-column gap-1">
+
+        <div class="row">
+            <div class="col-sm-3">
+                {{ form.benutzername.label(class="form-label") }}
+            </div>
+            <div class="col-sm-9 text-secondary">
+                {{ form.benutzername(class="form-control") }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3">
+                {{ form.name.label(class="form-label") }}
+            </div>
+            <div class="col-sm-9 text-secondary">
+                {{ form.name(class="form-control") }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3">
+                {{ form.email.label(class="form-label") }}
+            </div>
+            <div class="col-sm-9 text-secondary">
+                {{ form.email(class="form-control") }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3">
+                {{ form.passwort.label(class="form-label") }}
+            </div>
+            <div class="col-sm-9 text-secondary">
+                {{ form.passwort(class="form-control") }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3">
+                {{ form.rolle_id.label(class="form-label") }}
+            </div>
+            <div class="col-sm-9 text-secondary">
+                {{ form.rolle_id(class="form-control") }}
+            </div>
+        </div>
+
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4">
+            <input class="btn btn-primary" type="submit" value="Erstellen">
+        </div>
+    </div>
+</form>
+
+{% endblock %}

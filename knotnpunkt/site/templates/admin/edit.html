@@ -1,0 +1,105 @@
+{% extends 'admin/base.html' %}
+
+
+{% block tab %}
+
+<h1>
+    Editing: {{ user.benutzername }}
+</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group my-3">
+        {{ form.name.label(class="form-control-label") }}
+        {{ form.name(class="form-control" + (' is-invalid' if form.name.errors else '')) }}
+        {% if form.name.errors %}
+        <div class="invalid-feedback">
+            {{ form.name.errors[0] }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group my-3">
+        {{ form.email.label(class="form-control-label") }}
+        {{ form.email(class="form-control" + (' is-invalid' if form.email.errors else '')) }}
+        {% if form.email.errors %}
+        <div class="invalid-feedback">
+            {{ form.email.errors[0] }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group my-3">
+        {{ form.rolle.label(class="form-control-label") }}
+        {{ form.rolle(class="form-control" + (' is-invalid' if form.rolle.errors else '')) }}
+        {% if form.rolle.errors %}
+        <div class="invalid-feedback">
+            {{ form.rolle.errors[0] }}
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div>
+        <h3>Adresse:</h3>
+        <p> {{ user.strasse }} {{ user.hausnummer }} {{ user.postleitzahl }} {{ user.ort }} </p>
+    </div>
+
+
+
+    <div>
+        <input type="submit" class="d-none">
+        <a href="{{ url_for('.index')}}" class="btn btn-secondary my-3"> Back </a>
+
+        {{ form.submit(class="btn btn-primary my-3") }}
+
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#resetModal">
+            Passwort Zurücksetzen
+        </button>
+
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            Löschen
+        </button>
+    </div>
+
+
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel">Löschen</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bist du Sicher das du diesen Benutzer löschen möchtest?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="resetModalLabel">Löschen</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bist du Sicher das du das Passwort Zurücksetzen möchtest?
+                </div>
+                <div class="modal-footer">
+                    {{ form.reset(class="btn btn-danger my-3") }}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
