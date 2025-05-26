@@ -14,6 +14,12 @@ from ..database.db import Benutzer, Rolle
 user_site = Blueprint("user_site", __name__, url_prefix="/benutzer")
 
 
+@user_site.before_request
+@login_required
+def auth():
+    pass
+
+
 @user_site.route("/", methods=['GET', 'POST'])
 @login_required
 def benutzer():
@@ -85,3 +91,23 @@ def profil(benutzername):
         elif request.args.get('missingPwdConfirm'):
             error_msg = "Bitte bestätige das neues Passwort."
         return render_template('user/profil.html', user=user, roles=rollen, edit=edit_permission, hide_menu=hide_menu, error=error_msg)
+
+
+@user_site.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    usr: Benutzer = current_user
+    if request.method == 'POST':
+        if request.form.get('passwort') == request.form.get('passwortBestaetigung'):
+            usr.set_passwort(request.form.get('passwort'))
+            db.session.add(usr)
+            db.session.commit()
+            logout_user()
+            return redirect(url_for("site.login", newPassword=True))
+        else:
+            return redirect(url_for(".change_password", missingPwdConfirm=True))
+    elif request.method == 'GET':
+        if request.args.get('missingPwdConfirm'):
+            error_msg = "Bitte bestätige das neues Passwort."
+        else:
+            error_msg = ""
+        return render_template('user/change_password.html', error=error_msg)

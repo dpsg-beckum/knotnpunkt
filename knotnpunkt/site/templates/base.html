@@ -46,6 +46,7 @@
 
 <body>
   <!-- Sidebar -->
+  {%block sidebar%}
   <div class="offcanvas offcanvas-start w-75" style="max-width: 17em;" id="offcanvas" data-bs-keyboard="false"
     data-bs-backdrop="false">
     <div class="offcanvas-header">
@@ -55,8 +56,8 @@
             class="nav-link dropdown-toggle p-0" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
             {{current_user.name}}</a>
           <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown">
-            <li><a class="dropdown-item"
-                href="{{ url_for('site.user_site.profil', benutzername=current_user.benutzername) }}">Profil</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('site.user_site.profil') }}">Profil</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('site.user_site.change_password') }}">Passwort Ändern</a></li>
 
             <li>
               <hr class="dropdown-divider">
@@ -134,9 +135,12 @@
       </ul>
     </div>
   </div>
+  {% endblock %}
+
 
   <div class="container-fluid">
     <div class="min-vh-100">
+      {%block nav%}
       <div class="row">
         <div class="col">
           <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button"
@@ -156,6 +160,7 @@
           </a>
         </div>
       </div>
+      {%endblock%}
       <div>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

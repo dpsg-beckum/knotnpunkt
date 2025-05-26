@@ -36,8 +36,8 @@ def inject_user():
 
 
 @site.route('/')
-def redirectToLogin():
-    return redirect(url_for('site.login'))
+def index():
+    return redirect(url_for('site.home'))
 
 
 @site.route("/login", methods=['GET', 'POST'])
@@ -53,7 +53,7 @@ def login():
             user = Benutzer.get_via_id(request.form['benutzername'])
             if user.passwort == request.form.get('passwort'):
                 login_user(user, remember=True)
-                return redirect(url_for("site.user_site.profil", benutzername=user.benutzername, initialLogin=True))
+                return redirect(url_for("site.user_site.inital_login"))
             elif user.checkPassword(request.form['passwort']):
                 login_user(user, remember=True)
                 return redirect(url_for('site.home'))
