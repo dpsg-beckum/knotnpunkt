@@ -278,8 +278,6 @@ class Benutzer(UserMixin, BaseTable):
         for r in rechte:
             if "kalender" in r:
                 ansichten.append(('Kalender'))
-            if "benutzer" in r:
-                ansichten.append('Benutzer')
             if "material" in r:
                 ansichten.append("Material")
             if "einstellungen" in r:
