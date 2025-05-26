@@ -237,15 +237,32 @@ class Benutzer(UserMixin, BaseTable):
         db.session.commit()
         return passwort
 
-    def update(self, name: str = None, emailAdresse: str = None, passwort: str = None, rolle: Rolle = None):
-        if name:
-            self.name = name
-        if emailAdresse:
-            self.emailAdresse = emailAdresse
-        if passwort:
-            self.set_passwort(passwort)
-        if rolle:
-            self.rolle_id = rolle.id
+    def set_rolle(self, rolle: Rolle) -> None:
+        Rolle.get_via_id(rolle.id)  # Ensure the Rolle exists
+        self.rolle_id = rolle.id
+        db.session.commit()
+
+    def update(
+            self,
+            name: str = None,
+            emailAdresse: str = None,
+            iban: str = None,
+            strasse: str = None,
+            hausnummer: str = None,
+            postleitzahl: str = None,
+            ort: str = None):
+        updates = {
+            'name': name,
+            'emailAdresse': emailAdresse,
+            'iban': iban,
+            'strasse': strasse,
+            'hausnummer': hausnummer,
+            'postleitzahl': postleitzahl,
+            'ort': ort,
+        }
+        for attr, value in updates.items():
+            if value is not None:
+                setattr(self, attr, value)
         db.session.commit()
         return self
 

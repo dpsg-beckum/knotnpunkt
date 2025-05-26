@@ -67,9 +67,9 @@ def edit(benutzername):
 
                 user.update(
                     name=name,
-                    emailAdresse=email,
-                    rolle=rolle,
+                    emailAdresse=email
                 )
+                user.set_rolle(rolle)
                 flash(
                     f"Benutzer {user.benutzername} erfolgreich bearbeitet.", "success")
                 return redirect(url_for(".index"))
