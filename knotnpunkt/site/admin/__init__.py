@@ -104,7 +104,7 @@ def new():
                 form.benutzername.data,
                 form.name.data,
                 form.email.data,
-                form.passwort.data,
+                passwort,
                 Rolle.get_via_id(form.rolle_id.data),
             )
             flash(
