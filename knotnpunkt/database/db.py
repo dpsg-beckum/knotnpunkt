@@ -169,6 +169,19 @@ class Rolle(BaseTable):
     def __str__(self):
         return f"<Rolle {self.name}>"
 
+    def to_dict(self, depth: int = 2, _visited: set[int] | None = None) -> dict:
+
+        data = super().to_dict(depth, _visited)
+
+        recht: Rechte
+        for recht in Rechte.get_all():
+            if self.hat_recht(recht):
+                data[recht.name] = True
+            else:
+                data[recht.name] = False
+
+        return data
+
     @staticmethod
     def get_via_name(name: str) -> Rolle:
         item = db.session.query(Rolle).get({"name": name})
