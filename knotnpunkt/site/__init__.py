@@ -84,7 +84,6 @@ def index():
 
 @site.route("/login", methods=['GET', 'POST'])
 def login():
-    print(f"Login: {request.method}")
     error_msg = ""
     if current_user.is_authenticated:
         return redirect(url_for('site.home'))

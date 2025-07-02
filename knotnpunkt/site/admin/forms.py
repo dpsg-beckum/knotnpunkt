@@ -13,7 +13,7 @@ class CreateUserForm(KPForm):
     benutzername = StringField("Benutzername *", validators=[DataRequired()])
     name = StringField("Name *", validators=[DataRequired()])
     email = StringField(
-        "E-Mail *", validators=[Optional(), Length(max=255)])
+        "E-Mail", validators=[Optional(), Length(max=255)])
     passwort = StringField(
         "Passwort (Leer: Automatisch Generiert)", validators=[Optional(), Length(min=8)])
     rolle_id = SelectField("Rolle *", coerce=int, validators=[DataRequired()])
@@ -22,7 +22,7 @@ class CreateUserForm(KPForm):
 class EditUserForm(KPForm):
     name = StringField("Name *", validators=[DataRequired()])
     email = StringField(
-        "E-Mail *", validators=[Optional(), Length(max=255)])
+        "E-Mail", validators=[Optional(), Length(max=255)])
     rolle = SelectField("Rolle *", coerce=int, validators=[DataRequired()])
     submit = SubmitField("Benutzer Aktualisieren")
     reset = SubmitField("Passwort Zurücksetzen")
