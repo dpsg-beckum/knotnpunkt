@@ -36,7 +36,7 @@ def auth():
 @auslagen_site.get("/")
 def index():
     usr: Benutzer = current_user
-    if not (usr.Rolle.hat_recht("lesenAlleAuslagen") or usr.Rolle.freigebenAuslagen):
+    if not (usr.Rolle.hat_recht("lesenAlleAuslagen") or usr.Rolle.hat_recht("freigebenAuslagen")):
         return redirect(url_for(".deine"))
     return redirect(url_for(".deine"))
     return render_template("auslagen/index.html")
@@ -71,7 +71,7 @@ def show(id):
             return redirect(url_for(".deine"))
 
         if form.approve.data:
-            if not usr.Rolle.freigebenAuslagen:
+            if not usr.Rolle.hat_recht("freigebenAuslagen"):
                 abort(403)
             try:
                 auslage.freigeben(usr)
@@ -80,7 +80,7 @@ def show(id):
                 return redirect(url_for(".deine"))
 
         if form.done.data:
-            if not usr.Rolle.freigebenAuslagen:
+            if not usr.Rolle.hat_recht("freigebenAuslagen"):
                 abort(403)
             try:
                 auslage.erledigen(usr)

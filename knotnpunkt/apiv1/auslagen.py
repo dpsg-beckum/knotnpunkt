@@ -127,7 +127,7 @@ def patch_auslagen(id):
         abort(404)
     elif action == "freigabe":
         # User needs respective permission and mustn't accept his own Auslagen
-        if not usr.Rolle.freigebenAuslagen or usr == auslage.ersteller:
+        if not usr.Rolle.hat_recht("freigebenAuslagen") or usr == auslage.ersteller:
             abort(403)
         # In the end a PATCH-call toggles from unaccepted to accepted and vice versa
         if auslage.Freigebende is None:
