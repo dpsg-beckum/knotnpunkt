@@ -6,7 +6,7 @@ from typing import List, Optional, Type, TypeVar
 
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Boolean, ForeignKey, String
+from sqlalchemy import Boolean, Column, ForeignKey, String, Table
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -133,27 +133,38 @@ class BaseTable(Base):
 Tabellen für Nutzerverwaltung
 """
 
+# 1) Define the association table
+rolle_rechte_association = Table(
+    "rolle_rechte",
+    BaseTable.metadata,
+    Column("rolle_id", ForeignKey("rolle.id"), primary_key=True),
+    Column("rechte_id", ForeignKey("rechte.id"), primary_key=True),
+)
+
 
 class Rolle(BaseTable):
     """
-    1:n to Benutzer
+    Rolle Tabelle
     """
 
     __tablename__ = 'rolle'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(45), nullable=False, unique=True)
-    schreibenKalender: Mapped[bool] = mapped_column(Boolean, default=False)
-    lesenKalender: Mapped[bool] = mapped_column(Boolean, default=False)
-    schreibenBenutzer: Mapped[bool] = mapped_column(Boolean, default=False)
-    lesenBenutzer: Mapped[bool] = mapped_column(Boolean, default=False)
-    schreibenMaterial: Mapped[bool] = mapped_column(Boolean, default=False)
-    lesenMaterial: Mapped[bool] = mapped_column(Boolean, default=False)
-    schreibenEinstellungen: Mapped[bool] = mapped_column(
-        Boolean, default=False)
-    lesenEinstellungen: Mapped[bool] = mapped_column(Boolean, default=False)
-    lesenAlleAuslagen: Mapped[bool] = mapped_column(Boolean, default=False)
-    freigebenAuslagen: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # 2) Declare the relationship, pointing at Rechte, via the association table
+    rechte: Mapped[List[Rechte]] = relationship(
+        "Rechte",
+        secondary=rolle_rechte_association,
+        back_populates="rollen",
+        collection_class=list,
+    )
+
+    benutzer: Mapped[List[Benutzer]] = relationship(
+        "Benutzer",
+        back_populates="Rolle",
+        collection_class=list,
+    )
 
     def __str__(self):
         return f"<Rolle {self.name}>"
@@ -167,41 +178,91 @@ class Rolle(BaseTable):
         return item
 
     @staticmethod
-    def create_new(
-        id: int,
-        name: str,
-        schreibenKalender: bool,
-        lesenKalender: bool,
-        schreibenBenutzer: bool,
-        lesenBenutzer: bool,
-        schreibenMaterial: bool,
-        lesenMaterial: bool,
-        schreibenEinstellungen: bool,
-        lesenEinstellungen: bool,
-        lesenAlleAuslagen: bool,
-        freigebenAuslagen: bool
-    ) -> Rolle:
+    def create_new(id: int, name: str) -> Rolle:
         if db.session.query(Rolle).filter_by(name=name).first():
             raise ElementAlreadyExists(
-                f"Rolle mit dem Namen \"{name}\" existiert bereits")
-
-        new_rolle = Rolle(
-            id=id,
-            name=name,
-            schreibenKalender=schreibenKalender,
-            lesenKalender=lesenKalender,
-            schreibenBenutzer=schreibenBenutzer,
-            lesenBenutzer=lesenBenutzer,
-            schreibenMaterial=schreibenMaterial,
-            lesenMaterial=lesenMaterial,
-            schreibenEinstellungen=schreibenEinstellungen,
-            lesenEinstellungen=lesenEinstellungen,
-            lesenAlleAuslagen=lesenAlleAuslagen,
-            freigebenAuslagen=freigebenAuslagen
-        )
-        db.session.add(new_rolle)
+                f"Rolle mit dem Namen \"{name}\" existiert bereits"
+            )
+        new = Rolle(id=id, name=name)
+        db.session.add(new)
         db.session.commit()
-        return new_rolle
+        return new
+
+    def hat_recht(self, recht: Rechte | str) -> bool:
+        """
+        Überprüft, ob die Rolle ein bestimmtes Recht hat.
+        :param recht: Das Recht, das überprüft werden soll (entweder als Rechte-Objekt oder Name).
+        :return: True, wenn die Rolle das Recht hat, sonst False.
+        """
+        if isinstance(recht, str):
+            try:
+                recht = Rechte.get_via_name(recht)
+            except ElementDoesNotExsist:
+                debug(
+                    f"Recht {recht} nicht gefunden, kann nicht überprüft werden.")
+                return False
+        return recht in self.rechte
+
+    def add_recht(self, recht: Rechte) -> None:
+        """Fügt ein Recht zur Rolle hinzu."""
+        if recht in self.rechte:
+            raise ElementAlreadyExists(
+                f"Recht \"{recht.name}\" ist schon in Rolle \"{self.name}\"."
+            )
+        self.rechte.append(recht)
+        db.session.commit()
+
+    def remove_recht(self, recht: Rechte) -> None:
+        """Entfernt ein Recht aus der Rolle."""
+        if recht not in self.rechte:
+            raise ElementDoesNotExsist(
+                f"Recht \"{recht.name}\" ist nicht in Rolle \"{self.name}\"."
+            )
+        self.rechte.remove(recht)
+        db.session.commit()
+
+
+class Rechte(BaseTable):
+    """
+    Rechte Tabelle
+    """
+
+    __tablename__ = 'rechte'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(45), nullable=False, unique=True)
+    beschreibung: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    # 3) Mirror the relationship on the other side
+    rollen: Mapped[List[Rolle]] = relationship(
+        "Rolle",
+        secondary=rolle_rechte_association,
+        back_populates="rechte",
+        collection_class=list,
+    )
+
+    def __str__(self):
+        return f"<Recht {self.name}>"
+
+    @staticmethod
+    def get_via_name(name: str) -> "Rechte":
+        item = db.session.query(Rechte).filter_by(name=name).first()
+        if not item:
+            raise ElementDoesNotExsist(
+                f"Rechte mit dem Namen \"{name}\" existiert nicht"
+            )
+        return item
+
+    @staticmethod
+    def create_new(id: int, name: str, beschreibung: str = None) -> "Rechte":
+        if db.session.query(Rechte).filter_by(name=name).first():
+            raise ElementAlreadyExists(
+                f"Rechte mit dem Namen \"{name}\" existiert bereits"
+            )
+        new = Rechte(id=id, name=name, beschreibung=beschreibung)
+        db.session.add(new)
+        db.session.commit()
+        return new
 
 
 class Benutzer(UserMixin, BaseTable):
@@ -221,8 +282,11 @@ class Benutzer(UserMixin, BaseTable):
     postleitzahl: Mapped[Optional[str]] = mapped_column(String(45))
     ort: Mapped[Optional[str]] = mapped_column(String(45))
 
-    rolle_id: Mapped[Optional[int]] = mapped_column(ForeignKey('rolle.id'))
-    Rolle: Mapped[Optional[Rolle]] = relationship('Rolle')
+    rolle_id: Mapped[Optional[int]] = mapped_column(ForeignKey("rolle.id"))
+    Rolle: Mapped[Optional[Rolle]] = relationship(
+        "Rolle",
+        back_populates="benutzer",
+    )
 
     def checkPassword(self, password: str) -> bool:
         return check_password_hash(self.passwort, password)
@@ -272,29 +336,6 @@ class Benutzer(UserMixin, BaseTable):
     def get_id(self) -> str | None:
         return self.benutzername
 
-    def views(self) -> list[str]:
-        rechte = [key for key, value in self.rechte().items() if value == True]
-        ansichten = []
-        for r in rechte:
-            if "kalender" in r:
-                ansichten.append(('Kalender'))
-            if "material" in r:
-                ansichten.append("Material")
-            if "einstellungen" in r:
-                ansichten.append("Einstellungen")
-        return list(dict.fromkeys(ansichten))
-
-    def rechte(self) -> dict[str, bool]:
-        return {
-            'benutzerSchreiben': self.Rolle.schreibenBenutzer,
-            'benutzerLesen': self.Rolle.lesenBenutzer,
-            'materialSchreiben': self.Rolle.schreibenMaterial,
-            'materialLesen': self.Rolle.lesenMaterial,
-            'kalenderSchreiben': self.Rolle.schreibenKalender,
-            'kalenderLesen': self.Rolle.lesenKalender,
-            'einstellungenSchreiben': self.Rolle.schreibenEinstellungen,
-            'einstellungenLesen': self.Rolle.lesenEinstellungen}
-
     @classmethod
     def get_via_id(self, benutzername: int) -> Benutzer:
         item = db.session.query(self).get({"benutzername": benutzername})
@@ -328,4 +369,4 @@ class Benutzer(UserMixin, BaseTable):
         return new_user
 
     def __repr__(self):
-        return f"<User {self.benutzername} {self.Rolle.schreibenEinstellungen}>"
+        return f"<User {self.benutzername} {self.Rolle.name}>"

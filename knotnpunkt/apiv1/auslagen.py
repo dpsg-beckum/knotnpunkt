@@ -36,9 +36,11 @@ def get_zahlungen():
     """Get all Auslagen a user has read access for. On the home page this is
     called with the onlyAuthored parameter.
     """
+
+    usr: Benutzer = current_user
     data = {"request": request.args, "response": []}
-    data['user'] = json.dumps(current_user, cls=DatabaseEncoder)
-    if current_user.Rolle.lesenAlleAuslagen is True and not request.args.get("onlyAuthored", False):
+    data['user'] = json.dumps(usr, cls=DatabaseEncoder)
+    if usr.Rolle.hat_recht("lesenAlleAuslagen") is True and not request.args.get("onlyAuthored", False):
         filtered_auslagen = []
         filtered_auslagen.append([ausl.to_dict() for ausl in reversed(
             Auslage.get_all()) if ausl.freigabe_zeit is None])
@@ -50,7 +52,7 @@ def get_zahlungen():
             [ausl_liste for ausl_liste in filtered_auslagen if ausl_liste is not []], [])
     else:
         data['response'] = [ausl.to_dict()
-                            for ausl in reversed(current_user.Auslagen)]
+                            for ausl in reversed(usr.Auslagen)]
     return data
 
 
@@ -138,7 +140,7 @@ def patch_auslagen(id):
         db.session.commit()
         return auslage.to_dict()
     elif action == "done":
-        if not usr.Rolle.lesenAlleAuslagen:
+        if not usr.Rolle.hat_recht("lesenAlleAuslagen"):
             abort(403)
         if auslage.ErledigtDurch is None:
             auslage.erledigtZeit = dt.now()

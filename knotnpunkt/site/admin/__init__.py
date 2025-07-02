@@ -30,7 +30,7 @@ admin_site = Blueprint("admin", __name__, url_prefix="/admin")
 @login_required
 def auth():
     usr: Benutzer = current_user
-    if not usr.Rolle.lesenBenutzer:
+    if not usr.Rolle.hat_recht("lesenBenutzer"):
         abort(403)
 
 

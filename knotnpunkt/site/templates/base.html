@@ -76,45 +76,14 @@
             <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
           </a>
         </li>
-        {%for a in current_user.views()%}
+        {%for a in views %}
         <li class="nav-item">
-          <a href="/{{a.lower()}}" class="nav-link text-truncate">
-            <i class="fs-5">{{a}}</i>
+          <a href="{{a.url}}" class="nav-link text-truncate">
+            <i class="fs-5">{{a.name}}</i>
             <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
           </a>
         </li>
         {%endfor%}
-        <li class="nav-item">
-          <a href="/auslagen" class="nav-link text-truncate">
-            <i class="fs-5">Auslagen</i>
-            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{ url_for('site.material.scanner')}}" class="nav-link text-truncate">
-            <i class="fs-5">Scanner</i>
-            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-          </a>
-        </li>
-        <li class="nav-item">
-          <!-- TODO -->
-          <a href="{{ url_for('site.material.material') }}" class="nav-link text-truncate">
-            <i class="fs-5">QR code generator</i>
-            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{{ url_for('site.user_site.profil') }}" class="nav-link text-truncate">
-            <i class="fs-5">Mein Konto</i>
-            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="/logout" class="nav-link text-truncate">
-            <i class="fs-5 text-danger">Abmelden</i>
-            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
-          </a>
-        </li>
         <!-- Dropdown Prototyp -->
         <!-- <li class="dropdown">
               <a href="#" class="nav-link dropdown-toggle  text-truncate" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">

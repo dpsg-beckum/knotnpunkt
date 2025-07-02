@@ -31,7 +31,7 @@ def benutzer():
         db.session.commit()
         return redirect(url_for(".benutzer"))
     else:
-        if usr.Rolle.schreibenBenutzer:
+        if usr.Rolle.hat_recht("schreibenBenutzer"):
             erlaubeBearbeiten = True
         else:
             erlaubeBearbeiten = False
@@ -76,11 +76,11 @@ def profil(benutzername):
                 db.session.commit()
                 return redirect(url_for(".benutzer"))
     elif request.method == 'GET':
-        if usr.Rolle.lesenBenutzer is False and usr.benutzername is not benutzername:
+        if usr.Rolle.hat_recht("lesenBenutzer") is False and usr.benutzername is not benutzername:
             return Response(f'Du hast keinen Zugriff auf das Profil von {benutzername}.', 401)
         user = Benutzer.get_via_id(benutzername)
         rollen = Rolle.get_all()
-        if usr.Rolle.schreibenBenutzer:
+        if usr.Rolle.hat_recht("schreibeBenutzer"):
             edit_permission = True
         else:
             edit_permission = False

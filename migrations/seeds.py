@@ -12,90 +12,129 @@
 
 # from knotnpunkt import app
 from knotnpunkt.database.auslagen import AuslagenKategorie
-from knotnpunkt.database.db import Benutzer, Rolle
+from knotnpunkt.database.db import Benutzer, Rechte, Rolle
 from knotnpunkt.database.material import (KategorieSpezifisch, KategorieTypen,
                                           Set, SetTypes)
 
-a = Rolle.create_new(
-    id=1,
-    lesenBenutzer=1,
-    lesenEinstellungen=1,
-    lesenKalender=1,
-    lesenMaterial=1,
-    name="admin",
-    schreibenBenutzer=1,
-    schreibenEinstellungen=1,
-    schreibenKalender=1,
-    schreibenMaterial=1,
-    lesenAlleAuslagen=1,
-    freigebenAuslagen=0
-)
+r_benutzer_lesen = Rechte.create_new(
+    id=1, name="lesenBenutzer", beschreibung="Benutzer lesen")
+
+r_benutzer_schreiben = Rechte.create_new(
+    id=2, name="schreibenBenutzer", beschreibung="Benutzer schreiben")
+
+r_einstellungen_lesen = Rechte.create_new(
+    id=3, name="lesenEinstellungen", beschreibung="Einstellungen lesen")
+
+r_einstellungen_schreiben = Rechte.create_new(
+    id=4, name="schreibenEinstellungen", beschreibung="Einstellungen schreiben")
+
+r_kalender_lesen = Rechte.create_new(
+    id=5, name="lesenKalender", beschreibung="Kalender lesen")
+
+r_kalender_schreiben = Rechte.create_new(
+    id=6, name="schreibenKalender", beschreibung="Kalender schreiben")
+
+r_material_lesen = Rechte.create_new(
+    id=7, name="lesenMaterial", beschreibung="Material lesen")
+
+r_material_schreiben = Rechte.create_new(
+    id=8, name="schreibenMaterial", beschreibung="Material schreiben")
+
+r_auslagen_erstellen = Rechte.create_new(
+    id=9, name="erstelleAuslagen", beschreibung="Eigene Auslagen erstellen")
+
+r_auslagen_lesen = Rechte.create_new(
+    id=10, name="lesenAlleAuslagen", beschreibung="Alle Auslagen lesen")
+
+r_auslagen_freigeben = Rechte.create_new(
+    id=11, name="freigebenAuslagen", beschreibung="Auslagen freigeben")
+
+r_auslagen_schreiben = Rechte.create_new(
+    id=12, name="SchreibenAlleAuslagen", beschreibung="Alle Auslagen bearbeiten")
+
+
+admin = Rolle.create_new(id=1, name="admin")
+admin.add_recht(r_benutzer_lesen)
+admin.add_recht(r_benutzer_schreiben)
+admin.add_recht(r_einstellungen_lesen)
+admin.add_recht(r_einstellungen_schreiben)
+admin.add_recht(r_kalender_lesen)
+admin.add_recht(r_kalender_schreiben)
+admin.add_recht(r_material_lesen)
+admin.add_recht(r_material_schreiben)
+admin.add_recht(r_auslagen_erstellen)
+# admin.add_recht(r_auslagen_lesen)
+# admin.add_recht(r_auslagen_freigeben)
+# admin.add_recht(r_auslagen_schreiben)
 
 Benutzer.create_new(
     benutzername="admin",
     name="Robert Baden-Powell",
     email="test@dpsg.de",
     passwort="admin",
-    rolle=a,
+    rolle=admin,
 )
 
-Rolle.create_new(
-    id=2,
-    lesenBenutzer=1,
-    lesenEinstellungen=1,
-    lesenKalender=1,
-    lesenMaterial=1,
-    name="stavo",
-    schreibenBenutzer=1,
-    schreibenEinstellungen=0,
-    schreibenKalender=1,
-    schreibenMaterial=1,
-    lesenAlleAuslagen=1,
-    freigebenAuslagen=1)
+
+stavo = Rolle.create_new(id=2, name="stavo")
+stavo.add_recht(r_benutzer_lesen)
+stavo.add_recht(r_benutzer_schreiben)
+stavo.add_recht(r_einstellungen_lesen)
+# stavo.add_recht(r_einstellungen_schreiben)
+stavo.add_recht(r_kalender_lesen)
+stavo.add_recht(r_kalender_schreiben)
+stavo.add_recht(r_material_lesen)
+stavo.add_recht(r_material_schreiben)
+stavo.add_recht(r_auslagen_erstellen)
+stavo.add_recht(r_auslagen_lesen)
+stavo.add_recht(r_auslagen_freigeben)
+# stavo.add_recht(r_auslagen_schreiben)
 
 
-Rolle.create_new(
-    id=3,
-    lesenBenutzer=1,
-    lesenEinstellungen=0,
-    lesenKalender=1,
-    lesenMaterial=1,
-    name="leiter",
-    schreibenBenutzer=0,
-    schreibenEinstellungen=0,
-    schreibenKalender=1,
-    schreibenMaterial=1,
-    lesenAlleAuslagen=0,
-    freigebenAuslagen=0
-)
-Rolle.create_new(
-    id=4,
-    lesenBenutzer=0,
-    lesenEinstellungen=0,
-    lesenKalender=0,
-    lesenMaterial=1,
-    name="api",
-    schreibenBenutzer=0,
-    schreibenEinstellungen=0,
-    schreibenKalender=0,
-    schreibenMaterial=1,
-    lesenAlleAuslagen=0,
-    freigebenAuslagen=0
-)
-Rolle.create_new(
-    id=5,
-    lesenBenutzer=1,
-    lesenEinstellungen=0,
-    lesenKalender=1,
-    lesenMaterial=1,
-    name="kassenwart",
-    schreibenBenutzer=0,
-    schreibenEinstellungen=0,
-    schreibenKalender=1,
-    schreibenMaterial=1,
-    lesenAlleAuslagen=1,
-    freigebenAuslagen=0
-)
+leiter = Rolle.create_new(id=3, name="leiter")
+leiter.add_recht(r_benutzer_lesen)
+# leiter.add_recht(r_benutzer_schreiben)
+# leiter.add_recht(r_einstellungen_lesen)
+# leiter.add_recht(r_einstellungen_schreiben)
+leiter.add_recht(r_kalender_lesen)
+leiter.add_recht(r_kalender_schreiben)
+leiter.add_recht(r_material_lesen)
+leiter.add_recht(r_material_schreiben)
+leiter.add_recht(r_auslagen_erstellen)
+# leiter.add_recht(r_auslagen_lesen)
+# leiter.add_recht(r_auslagen_freigeben)
+# leiter.add_recht(r_auslagen_schreiben)
+
+
+api = Rolle.create_new(id=4, name="api")
+api.add_recht(r_benutzer_lesen)
+api.add_recht(r_benutzer_schreiben)
+api.add_recht(r_einstellungen_lesen)
+api.add_recht(r_einstellungen_schreiben)
+api.add_recht(r_kalender_lesen)
+api.add_recht(r_kalender_schreiben)
+api.add_recht(r_material_lesen)
+api.add_recht(r_material_schreiben)
+api.add_recht(r_auslagen_erstellen)
+api.add_recht(r_auslagen_lesen)
+api.add_recht(r_auslagen_freigeben)
+api.add_recht(r_auslagen_schreiben)
+
+
+kassenwart = Rolle.create_new(id=5, name="kassenwart")
+# kassenwart.add_recht(r_benutzer_lesen)
+# kassenwart.add_recht(r_benutzer_schreiben)
+# kassenwart.add_recht(r_einstellungen_lesen)
+# kassenwart.add_recht(r_einstellungen_schreiben)
+kassenwart.add_recht(r_kalender_lesen)
+kassenwart.add_recht(r_kalender_schreiben)
+kassenwart.add_recht(r_material_lesen)
+kassenwart.add_recht(r_material_schreiben)
+kassenwart.add_recht(r_auslagen_erstellen)
+kassenwart.add_recht(r_auslagen_lesen)
+# kassenwart.add_recht(r_auslagen_freigeben)
+kassenwart.add_recht(r_auslagen_schreiben)
+
 
 AuslagenKategorie.create_new(
     id=1,

@@ -36,7 +36,7 @@ def auth():
 @auslagen_site.get("/")
 def index():
     usr: Benutzer = current_user
-    if not (usr.Rolle.lesenAlleAuslagen or usr.Rolle.freigebenAuslagen):
+    if not (usr.Rolle.hat_recht("lesenAlleAuslagen") or usr.Rolle.freigebenAuslagen):
         return redirect(url_for(".deine"))
     return redirect(url_for(".deine"))
     return render_template("auslagen/index.html")
@@ -54,7 +54,7 @@ def show(id):
     usr: Benutzer = current_user
     auslage = Auslage.get_via_id(int(id))
 
-    if not (usr.Rolle.lesenAlleAuslagen or usr.benutzername == auslage.ersteller_id):
+    if not (usr.Rolle.hat_recht("lesenAlleAuslagen") or usr.benutzername == auslage.ersteller_id):
         abort(403)
 
     form = ShowAuslagenForm()
@@ -96,7 +96,7 @@ def edit(id):
     usr: Benutzer = current_user
     auslage = Auslage.get_via_id(int(id))
 
-    if not (usr.Rolle.lesenAlleAuslagen or usr.benutzername == auslage.ersteller_id):
+    if not (usr.Rolle.hat_recht("lesenAlleAuslagen") or usr.benutzername == auslage.ersteller_id):
         abort(403)
 
     if not auslage.is_editable():
@@ -139,7 +139,7 @@ def export(id):
     if not auslage:
         abort(404)
 
-    if not (usr.Rolle.lesenAlleAuslagen or usr.benutzername == auslage.ersteller_id):
+    if not (usr.Rolle.hat_recht("lesenAlleAuslagen") or usr.benutzername == auslage.ersteller_id):
         abort(403)
 
     try:
