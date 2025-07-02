@@ -13,7 +13,7 @@ from ..forms import KPForm
 class InitalLoginForm(KPForm):
     name = StringField("Name *", validators=[DataRequired()])
     email = StringField(
-        "E-Mail *", validators=[DataRequired(), Length(max=255)])
+        "E-Mail", validators=[Optional(), Length(max=255)])
     strasse = StringField("Straße", validators=[Optional()])
     hausnummer = StringField("Hausnummer", validators=[Optional()])
     plz = StringField(
@@ -39,12 +39,12 @@ class ChangePasswordForm(KPForm):
 class EditProfileForm(KPForm):
     name = StringField("Name *", validators=[DataRequired()])
     email = StringField(
-        "E-Mail *", validators=[Optional(), Length(max=255)])
-    strasse = StringField("Straße *", validators=[Optional()])
-    hausnummer = StringField("Hausnummer *", validators=[Optional()])
+        "E-Mail", validators=[Optional(), Length(max=255)])
+    strasse = StringField("Straße", validators=[Optional()])
+    hausnummer = StringField("Hausnummer", validators=[Optional()])
     plz = StringField(
-        "PLZ *", validators=[Optional(), length(min=5, max=5)])
-    ort = StringField("Ort *", validators=[Optional()])
+        "PLZ", validators=[Optional(), length(min=5, max=5)])
+    ort = StringField("Ort", validators=[Optional()])
     iban = StringField(
         "IBAN", validators=[Optional(), length(min=22, max=34)])
     submit = SubmitField("Profil Aktualisieren")
