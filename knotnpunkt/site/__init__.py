@@ -20,9 +20,9 @@ from .user import user_site
 
 site = Blueprint("site", __name__, template_folder="templates")
 site.register_blueprint(admin_site)
+site.register_blueprint(auslagen_site)
 site.register_blueprint(material_site)
 site.register_blueprint(user_site)
-site.register_blueprint(auslagen_site)
 
 
 # insert current user for all templates
@@ -95,7 +95,7 @@ def login():
             user = Benutzer.get_via_id(request.form['benutzername'])
             if user.passwort == request.form.get('passwort'):
                 login_user(user, remember=True)
-                return redirect(url_for("site.user_site.inital_login"))
+                return redirect(url_for("site.user.inital_login"))
             elif user.checkPassword(request.form['passwort']):
                 login_user(user, remember=True)
                 return redirect(url_for('site.home'))

@@ -11,7 +11,7 @@ from werkzeug.utils import redirect
 from ...database.db import Benutzer, Rolle
 from .forms import ChangePasswordForm, EditProfileForm, InitalLoginForm
 
-user_site = Blueprint("user_site", __name__, url_prefix="/benutzer")
+user_site = Blueprint("user", __name__, url_prefix="/benutzer")
 
 
 @user_site.before_request
