@@ -36,16 +36,10 @@ def inject_user():
     views = []
     usr_rechte = usr.Rolle.rechte
 
-    if Rechte.get_via_name("lesenBenutzer") in usr_rechte:
+    if Rechte.get_via_name("erstelleAuslagen") in usr_rechte:
         views.append({
-            "name": "Benutzer",
-            "url": url_for("site.admin.index")
-        })
-
-    if Rechte.get_via_name("lesenKalender") in usr_rechte:
-        views.append({
-            "name": "Kalender",
-            "url": url_for("site.kalender")
+            "name": "Auslagen",
+            "url": url_for("site.auslagen.deine")
         })
 
     if Rechte.get_via_name("lesenMaterial") in usr_rechte:
@@ -62,10 +56,16 @@ def inject_user():
             "url": url_for("site.material.material")
         })
 
-    if Rechte.get_via_name("erstelleAuslagen") in usr_rechte:
+    if Rechte.get_via_name("lesenKalender") in usr_rechte:
         views.append({
-            "name": "Auslagen",
-            "url": url_for("site.auslagen.deine")
+            "name": "Kalender",
+            "url": url_for("site.kalender")
+        })
+
+    if Rechte.get_via_name("lesenBenutzer") in usr_rechte:
+        views.append({
+            "name": "Benutzer",
+            "url": url_for("site.admin.index")
         })
 
     if Rechte.get_via_name("lesenEinstellungen") in usr_rechte:
