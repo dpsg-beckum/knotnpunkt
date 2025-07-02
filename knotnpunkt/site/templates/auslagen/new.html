@@ -37,12 +37,16 @@
             <div class="row">
                 <div class="col-4 mt-1 text-xl-end">Belegbild *</div>
                 <div class="col-xl">
-                    <div class="input-group">
-                        {{ form.image(class="form-control") }}
+                    <div class="input-group has-validation">
+                        {{ form.image(class="form-control" + " is-invalid" if form.image.errors else "") }}
 
+                        {% if form.image.errors %}
+                        {% for error in form.image.errors %}
                         <div class="invalid-feedback">
-                            Lade z. B. ein Bild deines Kassenbons hoch.
+                            {{ error }}
                         </div>
+                        {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
 
