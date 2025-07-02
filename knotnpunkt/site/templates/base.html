@@ -55,8 +55,8 @@
             class="nav-link dropdown-toggle p-0" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
             {{current_user.name}}</a>
           <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown">
-            <li><a class="dropdown-item" href="{{ url_for('site.user_site.profil') }}">Profil</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('site.user_site.change_password') }}">Passwort Ändern</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('site.user.profil') }}">Profil</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('site.user.change_password') }}">Passwort Ändern</a></li>
 
             <li>
               <hr class="dropdown-divider">
