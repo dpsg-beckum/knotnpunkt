@@ -91,7 +91,7 @@ def show(id):
                 return redirect(url_for(".deine"))
 
         if form.done.data:
-            if not usr.Rolle.hat_recht("freigebenAuslagen"):
+            if not usr.Rolle.hat_recht("SchreibenAlleAuslagen"):
                 abort(403)
             try:
                 auslage.erledigen(usr)
