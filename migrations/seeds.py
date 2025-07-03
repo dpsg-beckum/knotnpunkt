@@ -92,7 +92,7 @@ stavo.add_recht(r_auslagen_freigeben)
 
 
 leiter = Rolle.create_new(id=3, name="leiter")
-leiter.add_recht(r_benutzer_lesen)
+# leiter.add_recht(r_benutzer_lesen)
 # leiter.add_recht(r_benutzer_schreiben)
 # leiter.add_recht(r_einstellungen_lesen)
 # leiter.add_recht(r_einstellungen_schreiben)

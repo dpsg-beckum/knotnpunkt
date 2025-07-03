@@ -53,6 +53,10 @@ def show(benutzername):
 
 @admin_site.route("/<benutzername>/edit",  methods=["GET", "POST"])
 def edit(benutzername):
+    usr: Benutzer = current_user
+    if not usr.Rolle.hat_recht("schreibenBenutzer"):
+        abort(403)
+
     user = Benutzer.get_via_id(benutzername)
     form = EditUserForm()
     form.rolle.choices = [(r.id, r.name + (" (Aktuell)" if r.id ==
@@ -90,6 +94,10 @@ def edit(benutzername):
 
 @admin_site.route("/neu", methods=["GET", "POST"])
 def new():
+    usr: Benutzer = current_user
+    if not usr.Rolle.hat_recht("schreibenBenutzer"):
+        abort(403)
+
     form = CreateUserForm()
     form.rolle_id.choices = [(r.id, r.name) for r in Rolle.get_all()]
 
