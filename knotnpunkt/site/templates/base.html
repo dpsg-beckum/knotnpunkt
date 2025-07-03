@@ -41,6 +41,10 @@
     registerServiceWorker();
 
   </script>
+
+  <link rel="stylesheet" href="{{url_for('static', filename='knotnpunkt.css')}}">
+  <script src="{{url_for('static', filename='js/theme.js')}}"></script>
+
   {%block additionalHeader%}{%endblock%}
 </head>
 
@@ -51,8 +55,8 @@
     <div class="offcanvas-header">
       <div class="offcanvas-title d-sm-block" id="offcanvas">
         <h6>Herzlich Willkommen,</h6>
-        <h5 class="dropdown" style="font-weight: bold;"><a href="#" style="color:black"
-            class="nav-link dropdown-toggle p-0" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <h5 class="dropdown" style="font-weight: bold;"><a href="#" class="nav-link dropdown-toggle p-0" id="dropdown"
+            data-bs-toggle="dropdown" aria-expanded="false">
             {{current_user.name}}</a>
           <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown">
             <li><a class="dropdown-item" href="{{ url_for('site.user.profil') }}">Profil</a></li>
@@ -64,12 +68,12 @@
             <li><a class="dropdown-item" href="/logout">Abmelden</a></li>
           </ul>
         </h5>
-        <h6 style="color: grey;">{{current_user.Rolle.name}}</h6>
+        <h6 class="text-secondary">{{current_user.Rolle.name}}</h6>
       </div>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body px-0">
-      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+    <div class="offcanvas-body px-0 d-flex flex-column justify-content-between">
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0" id="menu">
         <li class="nav-item">
           <a href="/home" class="nav-link text-truncate">
             <i class="fs-5">Startseite</i>
@@ -100,6 +104,12 @@
               </ul>
           </li> -->
       </ul>
+
+      <div class="px-3 py-2 text-center">
+        <button onclick="toggleTheme()" class="btn">
+          <i class="bi bi-sun-fill"></i> | <i class="bi bi-moon-stars-fill"></i>
+        </button>
+      </div>
     </div>
   </div>
   {% endblock %}
@@ -112,18 +122,15 @@
         <div class="col">
           <button class="btn float-start" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button"
             style="padding: 0.3em">
-            <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-            <img src="{{url_for('static', filename='menu.svg')}}">
+            <i class="bi bi-list h4"></i>
           </button>
 
           <a class="btn float-start" href="/home" role="button" style="padding:0.3">
-            <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-            <img src="{{url_for('static', filename='house.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+            <i class="bi bi-house h5"></i>
           </a>
 
           <a class="btn float-start" onclick="window.history.back()" role="button" style="padding:0.3">
-            <!-- <i class="bi bi-arrow-right-square-fill fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i> -->
-            <img src="{{url_for('static', filename='arrow_left.svg')}}" style="height: 1.2em;margin-bottom:0.4em;">
+            <i class="bi bi-arrow-left-square h5"></i>
           </a>
         </div>
       </div>

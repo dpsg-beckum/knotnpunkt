@@ -1,0 +1,13 @@
+/* In dark-mode, force .btn-outline-dark to look like .btn-outline-light */
+[data-bs-theme="dark"] .btn-outline-dark {
+    /* text + border color */
+    --bs-btn-color: var(--bs-light);
+    --bs-btn-border-color: var(--bs-light);
+}
+
+/* Optional: swap hover styles, too */
+[data-bs-theme="dark"] .btn-outline-dark:hover {
+    --bs-btn-hover-bg: var(--bs-light);
+    --bs-btn-hover-color: var(--bs-dark);
+    --bs-btn-hover-border-color: var(--bs-dark);
+}
