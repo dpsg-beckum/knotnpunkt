@@ -97,6 +97,23 @@
         </div>
     </div>
     {% endfor %}
+
+    {% if auslagen|length == 0 %}
+    <a href="{{ url_for('.new') }}" class="list-group-item list-group-item-action border-secondary">
+        <div class="row">
+            <div class="col-8">
+                <h5 class="d-none d-md-block mb-1">Keine Auslagen vorhanden </h5>
+                <h6 class="d-md-none mb-1">Keine Auslagen vorhanden</h6>
+                <small class="text-secondary">
+                    Bitte reiche deine Auslagen ein, damit sie bearbeitet werden können.
+                </small>
+            </div>
+            <div class="col-4 d-flex align-items-center justify-content-end">
+                <i class="bi bi-plus-circle me-2"></i> Neue Auslage
+            </div>
+        </div>
+    </a>
+    {% endif %}
 </div>
 
 {% endblock%}
