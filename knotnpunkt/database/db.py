@@ -278,7 +278,7 @@ class Rechte(BaseTable):
         return new
 
 
-class Benutzer(UserMixin, BaseTable):
+class Benutzer(BaseTable, UserMixin):
     """
     Benutzer Tabelle
     """
@@ -300,6 +300,11 @@ class Benutzer(UserMixin, BaseTable):
         "Rolle",
         back_populates="benutzer",
     )
+
+    def to_dict(self, depth: int = 2, _visited: set[int] | None = None) -> dict:
+        data = super().to_dict(depth, _visited)
+        data['passwort'] = ""  # Do not expose password in dict
+        return data
 
     def checkPassword(self, password: str) -> bool:
         return check_password_hash(self.passwort, password)
