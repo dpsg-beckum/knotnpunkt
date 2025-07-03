@@ -86,6 +86,7 @@ def show(id):
                 abort(403)
             try:
                 auslage.freigeben(usr)
+                return redirect(url_for(".show", id=auslage.id))
             except ValueError as e:
                 flash(f"Fehler: {e}", "danger")
                 return redirect(url_for(".deine"))
@@ -95,6 +96,7 @@ def show(id):
                 abort(403)
             try:
                 auslage.erledigen(usr)
+                return redirect(url_for(".show", id=auslage.id))
             except ValueError as e:
                 flash(f"Fehler: {e}", "danger")
                 return redirect(url_for(".deine"))
