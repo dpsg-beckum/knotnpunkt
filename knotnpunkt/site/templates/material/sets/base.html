@@ -1,4 +1,4 @@
-{%extends "material/base.html"%}
+{%extends "base.html"%}
 
 {% block content%}
 
@@ -9,9 +9,6 @@
 
         <button class="nav-link {% if 'new' in request.path %} active {% endif %}" type="button"
             onclick="location.href = 'new'">Hinzufügen...</button>
-
-        <button class="nav-link {% if 'scanner' in request.path %} active {% endif %}" type="button"
-            onclick="location.href = 'scanner'">Scanner</button>
     </div>
 </nav>
 
