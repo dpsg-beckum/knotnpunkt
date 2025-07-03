@@ -146,6 +146,7 @@
                                 class="btn btn-outline-dark">
                                 <i class="bi bi-printer-fill"></i>
                             </a>
+
                             {% if cuser.Rolle.freigebenAuslagen %}
                             <button type="submit" id="{{ form.approve.id }}" name="{{ form.approve.name }}"
                                 title="{{ form.approve.label.text }}" class="btn btn-outline-dark"
@@ -153,6 +154,9 @@
                                 disabled {% endif %}>
                                 <i class="bi bi-bookmark-check"></i>
                             </button>
+                            {% endif %}
+
+                            {% if cuser.Rolle.SchreibenAlleAuslagen %}
                             <button type="submit" id="{{ form.done.id }}" name="{{ form.done.name }}"
                                 title="{{ form.done.label.text }}" class="btn btn-outline-dark"
                                 value="{{ form.done.label.text }}" {% if (not auslage.freigabeDurch_benutzername) or
@@ -160,9 +164,13 @@
                                 <i class="bi bi-envelope-check-fill"></i>
                             </button>
                             {% endif %}
+
+                            {% if auslage.ersteller.benutzername == cuser.benutzername or
+                            cuser.Rolle.SchreibenAlleAuslagen %}
                             <a href="{{ url_for('.edit', id=auslage.id)}}" class="btn btn-outline-warning">
                                 <i class="bi bi-pen-fill"></i>
                             </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

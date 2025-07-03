@@ -49,6 +49,17 @@ def deine():
     return render_template("auslagen/deine.html", auslagen=[a.to_dict() for a in auslagen])
 
 
+@auslagen_site.route("/alle", methods=["GET", "POST"])
+def alle():
+    usr: Benutzer = current_user
+    if not usr.Rolle.hat_recht("lesenAlleAuslagen"):
+        flash("Du hast keine Berechtigung, alle Auslagen zu sehen", "danger")
+        return redirect(url_for(".deine"))
+
+    auslagen = Auslage.get_all()
+    return render_template("auslagen/alle.html", auslagen=[a.to_dict() for a in auslagen])
+
+
 @auslagen_site.route("/<int:id>",  methods=["GET", "POST"])
 def show(id):
     usr: Benutzer = current_user

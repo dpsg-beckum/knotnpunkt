@@ -3,11 +3,20 @@
 {% block content%}
 <nav>
     <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-        <a class="nav-link {% if 'deine' in request.path %} active {% endif %}"
-            href="{{ url_for('.deine') }}">Übersicht</a>
+        {% if cuser.Rolle.lesenAlleAuslagen %}
+        <a class="nav-link {% if 'alle' in request.path %} active {% endif %}" href="{{ url_for('.alle') }}">
+            Alle Auslagen
+        </a>
+        {% endif %}
+
+        <a class="nav-link {% if 'deine' in request.path %} active {% endif %}" href="{{ url_for('.deine') }}">
+            Deine Auslagen
+        </a>
 
         <a class="nav-link {% if 'neu' in request.path %} active {% endif %}"
             href="{{ url_for('.new') }}">Hinzufügen...</a>
+
+
         {% block subnav %}
         {% endblock %}
     </div>
