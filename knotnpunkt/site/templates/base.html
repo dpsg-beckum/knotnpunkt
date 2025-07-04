@@ -161,7 +161,7 @@
       <div>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div class="px-3">
+        <div>
           {% for category, message in messages %}
           <div class="alert alert-{{ category.lower() }} alert-dismissible fade show mt-1" role="alert">
             {{ message }}
