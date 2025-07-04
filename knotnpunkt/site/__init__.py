@@ -33,48 +33,7 @@ def inject_user():
 
     usr: Benutzer = current_user
 
-    views = []
-    usr_rechte = usr.Rolle.rechte
-
-    if Rechte.get_via_name("erstelleAuslagen") in usr_rechte:
-        views.append({
-            "name": "Auslagen",
-            "url": url_for("site.auslagen.deine")
-        })
-
-    if Rechte.get_via_name("lesenMaterial") in usr_rechte:
-        views.append({
-            "name": "Material",
-            "url": url_for("site.material.material")
-        })
-        views.append({
-            "name": "Scanner",
-            "url": url_for("site.material.scanner")
-        })
-        views.append({
-            "name": "QR code generator",
-            "url": url_for("site.material.material")
-        })
-
-    if Rechte.get_via_name("lesenKalender") in usr_rechte:
-        views.append({
-            "name": "Kalender",
-            "url": url_for("site.kalender")
-        })
-
-    if Rechte.get_via_name("lesenBenutzer") in usr_rechte:
-        views.append({
-            "name": "Benutzer",
-            "url": url_for("site.admin.index")
-        })
-
-    if Rechte.get_via_name("lesenEinstellungen") in usr_rechte:
-        views.append({
-            "name": "Einstellungen",
-            "url": url_for("site.einstellungen")
-        })
-
-    return dict(cuser=usr.to_dict(1), views=views)
+    return dict(cuser=usr.to_dict(1))
 
 
 @site.route('/')

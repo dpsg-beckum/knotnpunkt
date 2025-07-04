@@ -76,34 +76,56 @@
     <div class="offcanvas-body px-0 d-flex flex-column justify-content-between">
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0" id="menu">
         <li class="nav-item">
-          <a href="/home" class="nav-link text-truncate">
-            <i class="fs-5">Startseite</i>
+          <a href="/home" class="nav-link text-truncate fs-5">
+            <i class="bi bi-house"></i> Startseite
             <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
           </a>
         </li>
-        {%for a in views %}
+        {% if cuser.Rolle.erstelleAuslagen %}
         <li class="nav-item">
-          <a href="{{a.url}}" class="nav-link text-truncate">
-            <i class="fs-5">{{a.name}}</i>
-            <!-- <span class="ms-1 d-none d-sm-inline">{{a}}</span> -->
+          <a href="{{url_for('site.auslagen.index')}}" class="nav-link text-truncate fs-5">
+            <i class="bi bi-currency-euro"></i> Auslagen
           </a>
         </li>
-        {%endfor%}
-        <!-- Dropdown Prototyp -->
-        <!-- <li class="dropdown">
-              <a href="#" class="nav-link dropdown-toggle  text-truncate" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">Bootstrap</span>
-              </a>
-              <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown">
-                  <li><a class="dropdown-item" href="#">New project...</a></li>
-                  <li><a class="dropdown-item" href="#">Settings</a></li>
-                  <li><a class="dropdown-item" href="#">Profile</a></li>
-                  <li>
-                      <hr class="dropdown-divider">
-                  </li>
-                  <li><a class="dropdown-item" href="#">Sign out</a></li>
-              </ul>
-          </li> -->
+        {% endif %}
+        {% if cuser.Rolle.lesenMaterial %}
+        <li class="nav-item">
+          <a href="{{url_for('site.material.material')}}" class="nav-link text-truncate fs-5">
+            <i class="bi bi-box"></i> Material
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{url_for('site.material.scanner')}}" class="nav-link text-truncate fs-5">
+            <i class="bi bi-qr-code-scan"></i> Scanner
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{url_for('site.material.material')}}" class="nav-link text-truncate fs-5">
+            <i class="bi bi-qr-code"></i> QR code generator
+          </a>
+        </li>
+        {% endif %}
+        {% if cuser.Rolle.lesenKalender %}
+        <li class="nav-item">
+          <a href="{{url_for('site.kalender')}}" class="nav-link text-truncate fs-5">
+            <i class="bi bi-calendar"></i> Kalender
+          </a>
+        </li>
+        {% endif %}
+        {% if cuser.Rolle.lesenBenutzer %}
+        <li class="nav-item">
+          <a href="{{url_for('site.admin.index')}}" class="nav-link text-truncate fs-5">
+            <i class="bi bi-people"></i> Benutzerverwaltung
+          </a>
+        </li>
+        {% endif %}
+        {% if cuser.Rolle.lesenEinstellungen %}
+        <li class="nav-item">
+          <a href="{{url_for('site.einstellungen')}}" class="nav-link text-truncate fs-5">
+            <i class="bi bi-gear"></i> Einstellungen
+          </a>
+        </li>
+        {% endif %}
       </ul>
 
       <div class="px-3 py-2 text-center">
