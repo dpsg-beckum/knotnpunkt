@@ -59,7 +59,7 @@ def alle():
 
     auslagen = Auslage.get_all()
     auslagen.sort(key=lambda a: a.id, reverse=True)
-    return render_template("auslagen/alle.html", auslagen=[a.to_dict() for a in auslagen])
+    return render_template("auslagen/deine.html", auslagen=[a.to_dict() for a in auslagen])
 
 
 @auslagen_site.route("/<int:id>",  methods=["GET", "POST"])

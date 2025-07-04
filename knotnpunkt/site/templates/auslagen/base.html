@@ -4,7 +4,7 @@
 <nav>
     <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
         {% if cuser.Rolle.lesenAlleAuslagen %}
-        <a class="nav-link {% if 'alle' in request.path %} active {% endif %}" href="{{ url_for('.alle') }}">
+        <a class="nav-link {% if 'alle' in request.path %} active {% endif %} fw-bold" href="{{ url_for('.alle') }}">
             Alle Auslagen
         </a>
         {% endif %}
@@ -13,12 +13,13 @@
             Deine Auslagen
         </a>
 
-        <a class="nav-link {% if 'neu' in request.path %} active {% endif %}"
-            href="{{ url_for('.new') }}">Hinzufügen...</a>
-
-
         {% block subnav %}
         {% endblock %}
+
+        <a class="nav-link {% if 'neu' in request.path %} active {% endif %}" href="{{ url_for('.new') }}">
+            <i class="bi bi-plus-square"></i>
+        </a>
+
     </div>
 </nav>
 
