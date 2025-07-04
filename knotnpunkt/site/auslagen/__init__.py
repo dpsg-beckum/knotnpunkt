@@ -38,7 +38,7 @@ def index():
     usr: Benutzer = current_user
     if not (usr.Rolle.hat_recht("lesenAlleAuslagen") or usr.Rolle.hat_recht("freigebenAuslagen")):
         return redirect(url_for(".deine"))
-    return redirect(url_for(".deine"))
+    return redirect(url_for(".alle"))
     return render_template("auslagen/index.html")
 
 

@@ -40,7 +40,6 @@ def inital_login():
     form.hausnummer.data = usr.hausnummer if usr.hausnummer else ""
     form.plz.data = usr.postleitzahl if usr.postleitzahl else ""
     form.ort.data = usr.ort if usr.ort else ""
-    form.iban.data = usr.iban if usr.iban else ""
 
     return render_template('user/intital_login.html', form=form, user=usr.to_dict())
 
@@ -75,8 +74,7 @@ def edit_profile():
             strasse=form.strasse.data,
             hausnummer=form.hausnummer.data,
             postleitzahl=form.plz.data,
-            ort=form.ort.data,
-            iban=form.iban.data
+            ort=form.ort.data
         )
         return redirect(url_for(".profil"))
 
@@ -86,6 +84,5 @@ def edit_profile():
     form.hausnummer.data = usr.hausnummer if usr.hausnummer else ""
     form.plz.data = usr.postleitzahl if usr.postleitzahl else ""
     form.ort.data = usr.ort if usr.ort else ""
-    form.iban.data = usr.iban if usr.iban else ""
 
     return render_template('user/edit.html', form=form, user=usr.to_dict())

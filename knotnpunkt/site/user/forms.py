@@ -19,8 +19,6 @@ class InitalLoginForm(KPForm):
     plz = StringField(
         "PLZ", validators=[Optional(), length(min=5, max=5)])
     ort = StringField("Ort", validators=[Optional()])
-    iban = StringField(
-        "IBAN", validators=[Optional(), length(min=22, max=34)])
     passwort = PasswordField(
         "Passwort *", validators=[DataRequired(), Length(min=8)])
     passwortBestaetigung = PasswordField(
@@ -45,6 +43,4 @@ class EditProfileForm(KPForm):
     plz = StringField(
         "PLZ", validators=[Optional(), length(min=5, max=5)])
     ort = StringField("Ort", validators=[Optional()])
-    iban = StringField(
-        "IBAN", validators=[Optional(), length(min=22, max=34)])
     submit = SubmitField("Profil Aktualisieren")

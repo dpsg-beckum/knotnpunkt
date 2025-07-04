@@ -82,7 +82,6 @@ def post_zahlungen():
         erstellerBenutzername=current_user.benutzername
     )
     # Update users iban
-    current_user.iban = request.form.get("iban")
     db.session.add(current_user)
     db.session.add(new_auslage)
     db.session.commit()
