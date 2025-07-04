@@ -46,6 +46,7 @@ def index():
 def deine():
     usr: Benutzer = current_user
     auslagen = Auslage.filter_by(ersteller_id=usr.benutzername)
+    auslagen.sort(key=lambda a: a.id, reverse=True)
     return render_template("auslagen/deine.html", auslagen=[a.to_dict() for a in auslagen])
 
 
@@ -57,6 +58,7 @@ def alle():
         return redirect(url_for(".deine"))
 
     auslagen = Auslage.get_all()
+    auslagen.sort(key=lambda a: a.id, reverse=True)
     return render_template("auslagen/alle.html", auslagen=[a.to_dict() for a in auslagen])
 
 
@@ -201,7 +203,7 @@ def new():
             mimetype=bild.mimetype,
         )
 
-        flash("Auslage erfolgreich eingereicht", "success")
+        flash(f"Auslage #{auslage.id} erfolgreich eingereicht", "success")
         return redirect(url_for(".deine"))
 
     auslagen = Auslage.filter_by(ersteller_id=usr.benutzername)
