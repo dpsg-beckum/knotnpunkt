@@ -1,7 +1,6 @@
-{%extends "auslagen/base.html"%}
+{% extends "auslagen/base.html" %}
 
 {% block tab %}
-
 <form method="post" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <div class="row mb-3">
@@ -26,38 +25,55 @@
                     </ol>
                 </div>
             </div>
-
         </div>
-
     </div>
 
     <div class="row">
         <div class="col-xl-8 border mx-xl-2 py-2">
 
-            <div class="row">
-                <div class="col-4 mt-1 text-xl-end">Belegbild *</div>
+            <!-- FILE INPUT ROW -->
+            <div class="row mb-3">
+                <div class="col-12 col-xl-4 mt-1 text-xl-end">Belegbild / Datei *</div>
                 <div class="col-xl">
-                    <div class="input-group has-validation">
+                    <div class="input-group has-validation align-items-center">
+                        <div class="btn-group w-100 has-validation" role="group">
+                            <button id="cameraBtn" type="button" class="btn btn-outline-secondary flex-fill"
+                                title="Foto aufnehmen">
+                                <i class="bi bi-camera-fill"></i>
+                            </button>
+                            <button id="fileBtn" type="button" class="btn btn-outline-secondary flex-fill"
+                                title="Datei auswählen">
+                                <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                            </button>
+                        </div>
+                        <!-- Hidden WTForms file field -->
                         {{ form.image(
-                        class_='form-control' ~ ( ' is-invalid' if form.image.errors else '' )
+                        id="fileInput",
+                        style="display:none;",
+                        class_="form-control" ~ (' is-invalid' if form.image.errors else '')
                         ) }}
-
 
                         {% if form.image.errors %}
                         {% for error in form.image.errors %}
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback d-block">
                             {{ error }}
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
-                </div>
 
-            </div>
-            <div class="row mb-3">
-                <div class="col-4 d-none d-xl-block"></div>
-                <div class="col align-text-top font-text fst-italic" style="font-size: 0.8em;">Erlaubte Formate: jpg,
-                    png, gif</div>
+                    <!-- HELP TEXT -->
+                    <div class="font-text fst-italic" style="font-size:0.8em; margin-top:.25rem;">
+                        Erlaubte Formate: jpg, png, gif
+                    </div>
+
+                    <!-- PREVIEW AREA -->
+                    <div class="mt-2 text-center" id="previewContainer" style="display:none;">
+                        <img id="previewImage" class="img-fluid rounded shadow-sm mx-auto d-block"
+                            style="max-height:200px; display:none;" alt="Bildvorschau">
+                        <div id="previewFilename" class="fst-italic"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="mb-3 row">
@@ -122,12 +138,51 @@
             </div>
 
         </div>
-
     </div>
+
     <div class="text-danger">* Pflichtfeld</div>
-
-
-
 </form>
 
+<!-- SCRIPT FOR CAMERA / FILE BUTTONS & PREVIEW -->
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const fileBtn = document.getElementById('fileBtn');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const previewFilename = document.getElementById('previewFilename');
+
+    // Launch camera
+    cameraBtn.addEventListener('click', () => {
+        fileInput.accept = 'image/*';
+        fileInput.capture = 'environment';
+        fileInput.click();
+    });
+
+    // Launch generic file picker
+    fileBtn.addEventListener('click', () => {
+        fileInput.accept = '';
+        fileInput.removeAttribute('capture');
+        fileInput.click();
+    });
+
+    // Show preview or filename
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        previewContainer.style.display = 'block';
+        previewFilename.textContent = '';         // clear old text
+        previewImage.style.display = 'none';      // hide old image
+
+        if (file.type.startsWith('image/')) {
+            // show image preview
+            previewImage.src = URL.createObjectURL(file);
+            previewImage.style.display = 'block';
+        } else {
+            // show filename for non-images
+            previewFilename.textContent = file.name;
+        }
+    });
+</script>
 {% endblock %}
