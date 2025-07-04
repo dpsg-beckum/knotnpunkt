@@ -9,7 +9,7 @@ from sqlalchemy import desc
 from werkzeug.utils import redirect
 
 from ..database import db
-from ..database.auslagen import AuslagenKategorie
+from ..database.auslagen import Auslage, AuslagenKategorie
 from ..database.db import Benutzer, Rechte, Rolle
 from ..database.exceptions import ElementAlreadyExists, ElementDoesNotExsist
 from ..database.material import Ausleihe, Material
@@ -117,6 +117,9 @@ def logout():
 def home():
     usr: Benutzer = current_user
 
+    auslagen = Auslage.filter_by(ersteller_id=usr.benutzername)[:5]
+    auslagen.sort(key=lambda x: x.id, reverse=True)
+
     ausleihen = Ausleihe.filter_by(ersteller_benutzername=usr.benutzername)
     ausleihen = sorted(
         ausleihen, key=lambda x: x.ts_von, reverse=True)
@@ -145,7 +148,12 @@ def home():
             stats_dict1[m.name] = stats_dict.get(
                 str(m.id), 0) / len(stats_list)*100
         max_value = max(stats_dict1.values())
-    return render_template('home.html', ausleihen_zukunft=ausleihen_filtered_future[:3], ausleihen_alt=ausleihen_filtered_past[:3], stats=stats_dict1, max=max_value)
+    return render_template('home.html',
+                           auslagen=[a.to_dict() for a in auslagen],
+                           ausleihen_zukunft=ausleihen_filtered_future[:3],
+                           ausleihen_alt=ausleihen_filtered_past[:3],
+                           stats=stats_dict1,
+                           max=max_value)
 
 
 @site.route("/kalender")

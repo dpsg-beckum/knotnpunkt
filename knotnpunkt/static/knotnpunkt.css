@@ -11,3 +11,7 @@
     --bs-btn-hover-color: var(--bs-dark);
     --bs-btn-hover-border-color: var(--bs-dark);
 }
+
+.accordion-button:focus {
+    box-shadow: none !important;
+}
