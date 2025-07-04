@@ -8,49 +8,51 @@
         </h1>
     </div>
 
-
-    <div class="accordion mt-3">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed persist focus-ring-success" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#collapseAuslagen">
-                    Auslagen:
-                </button>
-            </h2>
-            <div id="collapseAuslagen" class="accordion-collapse collapse">
-                <div class="accordion-body">
-                    <a href="{{ url_for('site.auslagen.new')}}" class="btn btn-success w-100"> Neue Auslage</a>
-                    <hr>
-                    {% for auslage in auslagen %}
-                    <a class="card mt-1 text-decoration-none" href="{{ url_for('site.auslagen.show', id=auslage.id) }}">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">
-                                #{{ auslage.id }}: {{ auslage.titel }}
-                            </h5>
-                            {% if auslage.freigabe_zeit is not none %}
-                            <span class="badge text-bg-success ">Freigegeben</span>
-                            {% else %}
-                            <span class="badge text-bg-secondary ">Eingereicht</span>
+    <div class="row mt-3 justify-content-center">
+        <div class="col-sm-4">
+            <div class="accordion ">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed persist focus-ring-success" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapseAuslagen">
+                            Auslagen:
+                        </button>
+                    </h2>
+                    <div id="collapseAuslagen" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <a href="{{ url_for('site.auslagen.new')}}" class="btn btn-success w-100"> Neue Auslage</a>
+                            <hr>
+                            {% for auslage in auslagen %}
+                            <a class="card mt-1 text-decoration-none"
+                                href="{{ url_for('site.auslagen.show', id=auslage.id) }}">
+                                <div class="card-body d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0 text-truncate">
+                                        #{{ auslage.id }} | {{ auslage.titel }}
+                                    </h5>
+                                    {% if auslage.freigabe_zeit is not none %}
+                                    <span class="badge text-bg-success ">Freigegeben</span>
+                                    {% else %}
+                                    <span class="badge text-bg-secondary ">Eingereicht</span>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% endfor %}
+                            <a class="card mt-1 text-decoration-none" href="{{ url_for('site.auslagen.deine') }}">
+                                <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                    <i class="mx-auto my-0 bi bi-three-dots"></i>
+                                </div>
+                            </a>
+                            {% if auslagen|length == 0 %}
+                            <div class="alert alert-info mt-3" role="alert">
+                                Du hast aktuell keine Auslagen eingereicht.
+                            </div>
                             {% endif %}
                         </div>
-                    </a>
-                    {% endfor %}
-                    <a class="card mt-1 text-decoration-none" href="{{ url_for('site.auslagen.deine') }}">
-                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
-                            <i class="mx-auto my-0 bi bi-three-dots"></i>
-                        </div>
-                    </a>
-                    {% if auslagen|length == 0 %}
-                    <div class="alert alert-info mt-3" role="alert">
-                        Du hast aktuell keine Auslagen eingereicht.
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-
-
 
     <div class="row mt-4 justify-content-center">
         <div class="col-sm-4">
