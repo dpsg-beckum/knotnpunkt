@@ -117,7 +117,7 @@ def logout():
 def home():
     usr: Benutzer = current_user
 
-    auslagen = Auslage.filter_by(ersteller_id=usr.benutzername)[:5]
+    auslagen = Auslage.filter_by(ersteller_id=usr.benutzername)[-5:]
     auslagen.sort(key=lambda x: x.id, reverse=True)
 
     ausleihen = Ausleihe.filter_by(ersteller_benutzername=usr.benutzername)
