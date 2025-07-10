@@ -42,10 +42,11 @@ def new_material():
 
     ks: list[dict[str, str | dict]] = []
     for i in [k.to_dict() for k in all_kategorien]:
-        kuerzel = f"{i["kategorie_typen"]["kuerzel"]}{i.get('kuerzel')}"
+        print(i)
+        kuerzel = f"{i['kategorie_typen']['kuerzel']}{i.get('kuerzel')}"
         data = {
             "id": i.get("id"),
-            "name": f"{kuerzel} {i["kategorie_typen"]["name"]}-{i.get('name')}"
+            "name": f"{kuerzel} {i['kategorie_typen']['name']}-{i.get('name')}"
         }
         ks.append(data)
 
@@ -79,8 +80,8 @@ def new_material():
 
 
 @material_site.route("/", methods=['GET', 'POST'])
-def _redirect():
-    return redirect(url_for(".material"))
+def index():
+    return render_template('material/index.html')
 
 
 @material_site.get("/overview")
@@ -147,10 +148,10 @@ def edit(id):
 
     ks: list[dict[str, str | dict]] = []
     for i in [k.to_dict() for k in KategorieSpezifisch.get_all()]:
-        kuerzel = f"{i["kategorie_typen"]["kuerzel"]}{i.get('kuerzel')}"
+        kuerzel = f"{i['kategorie_typen']['kuerzel']}{i.get('kuerzel')}"
         data = {
             "id": i.get("id"),
-            "name": f"{kuerzel} {i["kategorie_typen"]["name"]}-{i.get('name')}"
+            "name": f"{kuerzel} {i['kategorie_typen']['name']}-{i.get('name')}"
         }
         ks.append(data)
     form.category.choices = [(k.get("id"), k.get("name")) for k in ks]
