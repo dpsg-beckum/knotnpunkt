@@ -14,7 +14,7 @@
 from knotnpunkt.database.auslagen import AuslagenKategorie
 from knotnpunkt.database.db import Benutzer, Rechte, Rolle
 from knotnpunkt.database.material import (KategorieSpezifisch, KategorieTypen,
-                                          Set, SetTypes)
+                                          Material, Set, SetTypes)
 
 r_benutzer_lesen = Rechte.create_new(
     id=1, name="lesenBenutzer", beschreibung="Benutzer lesen")
@@ -157,7 +157,70 @@ AuslagenKategorie.create_new(
     anzeigeName="Sonstiges"
 )
 
+# TODO Demo
+if True:
+    t8 = SetTypes.create_new("8", "Achter")
+    t6 = SetTypes.create_new("6", "Sechser")
+    tG6 = SetTypes.create_new("G6", "Geknüpfter Sechser")
+    tK = SetTypes.create_new("K", "Khote")
+    tS = SetTypes.create_new("S", "Sudan")
+    tI = SetTypes.create_new("I", "Igel")
+    tC = SetTypes.create_new("C", "Küche")
 
-Set.create_new(0, SetTypes.create_new("0", "Kein Set"))
-KategorieSpezifisch.create_new(
-    "0", "Keine Kategorie", KategorieTypen.create_new("0", "Keine Kategorie"))
+    Set.create_new(1, t8)
+    Set.create_new(2, t8)
+    Set.create_new(1, t6)
+    Set.create_new(2, t6)
+    Set.create_new(1, tG6)
+    Set.create_new(1, tK)
+    Set.create_new(1, tS)
+    Set.create_new(1, tI)
+    Set.create_new(1, tC)
+
+    k = KategorieTypen.create_new("S", "Seitenbahn")
+    KategorieSpezifisch.create_new("E", "Einzel", k)
+    KategorieSpezifisch.create_new("D", "Doppel", k)
+    k = KategorieTypen.create_new("F", "Fensterbahn")
+    KategorieSpezifisch.create_new("E", "Einzel", k)
+    KategorieSpezifisch.create_new("D", "Doppel", k)
+    k = KategorieTypen.create_new("E", "Erdbahn")
+    KategorieSpezifisch.create_new("E", "Einzel", k)
+    KategorieSpezifisch.create_new("D", "Doppel", k)
+    k = KategorieTypen.create_new("D", "Dreiecksbahn")
+    KategorieSpezifisch.create_new("O", "Ohne", k)
+    KategorieSpezifisch.create_new("K", "Kurz", k)
+    KategorieSpezifisch.create_new("M", "Mittel", k)
+    KategorieSpezifisch.create_new("L", "Lang", k)
+    k = KategorieTypen.create_new("B", "Bodenplane")
+    KategorieSpezifisch.create_new("I", "Igel", k)
+    KategorieSpezifisch.create_new("S", "Sudan", k)
+    KategorieSpezifisch.create_new("J", "Jurte", k)
+    KategorieSpezifisch.create_new("K", "Khote", k)
+    KategorieSpezifisch.create_new("P", "Pfusch", k)
+    k = KategorieTypen.create_new("P", "Stange")
+    KategorieSpezifisch.create_new("M", "Mittelstange", k)
+    KategorieSpezifisch.create_new("S", "Seitenstange", k)
+    KategorieSpezifisch.create_new("E", "Eingangsstange", k)
+    KategorieSpezifisch.create_new("V", "Igel-Eingang", k)
+    k = KategorieTypen.create_new("K", "Komplettdach")
+    KategorieSpezifisch.create_new("6", "6er Dach", k)
+    KategorieSpezifisch.create_new("8", "8er Dach", k)
+    k = KategorieTypen.create_new("T", "Teaterbahn")
+    KategorieSpezifisch.create_new("-", "-", k)
+
+    s = Set.get_via_code("1-8")
+    ks = KategorieSpezifisch.get_via_code("S-D")
+    for i in range(2):
+        Material.create_new("", ks, None, "Testmaterial", s)
+
+    ks = KategorieSpezifisch.get_via_code("P-S")
+    for i in range(1):
+        Material.create_new("", ks, None, "Testmaterial", s)
+
+    ks = KategorieSpezifisch.get_via_code("P-M")
+    for i in range(1):
+        Material.create_new("", ks, None, "Testmaterial", s)
+
+    ks = KategorieSpezifisch.get_via_code("K-8")
+    for i in range(1):
+        Material.create_new("", ks, None, "Testmaterial", s)
