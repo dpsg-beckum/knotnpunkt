@@ -97,36 +97,41 @@ class BaseTable(Base):
         if _visited is None:
             _visited = set()
 
-        # Only check for cycles in the current recursion path.
         if id(self) in _visited:
-            # Instead of returning an empty dict, you might return a minimal representation.
             return {"id": getattr(self, "id", None)}
 
         _visited.add(id(self))
-        data = {}
+        try:
+            data = {}
 
-        # Serialize columns
-        mapper = self.__mapper__
-        for column in mapper.columns:
-            data[column.key] = getattr(self, column.key)
+            # Serialize columns
+            mapper = self.__mapper__
+            for column in mapper.columns:
+                data[column.key] = getattr(self, column.key)
 
-        # Serialize relationships if depth allows
-        if depth > 0:
-            for rel in mapper.relationships:
-                rel_val = getattr(self, rel.key)
-                if rel_val is None:
-                    data[rel.key] = None
-                elif isinstance(rel_val, list):
-                    data[rel.key] = [
-                        item.to_dict(depth=depth - 1, _visited=_visited.copy())
-                        for item in rel_val
-                    ]
-                else:
-                    data[rel.key] = rel_val.to_dict(
-                        depth=depth - 1, _visited=_visited.copy())
+            # Serialize relationships if depth allows
+            if depth > 0:
+                for rel in mapper.relationships:
+                    rel_val = getattr(self, rel.key)
+                    if rel_val is None:
+                        data[rel.key] = None
+                    elif isinstance(rel_val, (list, tuple)):
+                        data[rel.key] = [
+                            item.to_dict(depth=depth - 1, _visited=_visited)
+                            for item in rel_val
+                        ]
+                    else:
+                        data[rel.key] = rel_val.to_dict(
+                            depth=depth - 1, _visited=_visited)
 
-        _visited.remove(id(self))
-        return data
+            # Include dynamic and extra attributes
+            for k, v in vars(self).items():
+                if not k.startswith('_') and k not in data:
+                    data[k] = v
+
+            return data
+        finally:
+            _visited.remove(id(self))
 
 
 """
