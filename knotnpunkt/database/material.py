@@ -115,6 +115,18 @@ class SetTypes(BaseTable):
         db.session.commit()
         return new_set_types
 
+    @staticmethod
+    def get_via_kuerzel(kuerzel: str) -> SetTypes:
+        """
+        Get a SetTypes instance by its kuerzel.
+        """
+        set_type = db.session.query(
+            SetTypes).filter_by(kuerzel=kuerzel).first()
+        if not set_type:
+            raise ElementDoesNotExsist(
+                f"SetType mit kuerzel \"{kuerzel}\" existiert nicht")
+        return set_type
+
 
 class Set(BaseTable):
     """
@@ -159,6 +171,36 @@ class Set(BaseTable):
     def name(self) -> str:
         return f"{self.number}.{self.setType.kuerzel}"
 
+    @staticmethod
+    def get_via_number(number: int, setType: SetTypes) -> Set:
+        """
+        Get a Set instance by its number and type.
+        """
+        if not isinstance(setType, SetTypes):
+            raise TypeError("setType muss ein SetTypes Objekt sein")
+
+        set_instance = db.session.query(Set).filter_by(
+            number=number, setType_id=setType.id).first()
+        if not set_instance:
+            raise ElementDoesNotExsist(
+                f"Set mit Nummer \"{number}\" und Typ \"{setType.kuerzel}\" existiert nicht")
+
+        return set_instance
+
+    @staticmethod
+    def get_via_code(code: str) -> Set:
+        """
+        Get a Set instance by its code.
+        eg. "1-8" for Set with number 1 and type 8.
+        """
+        code = code.split("-")
+        if len(code) != 2:
+            raise ValueError("Code must be in the format 'Number-Type'")
+
+        number, typ = code
+        set_type = SetTypes.get_via_kuerzel(typ)
+        return Set.get_via_number(int(number), set_type)
+
 
 class KategorieTypen(BaseTable):
     """
@@ -190,6 +232,18 @@ class KategorieTypen(BaseTable):
         db.session.add(new_kategorie_typen)
         db.session.commit()
         return new_kategorie_typen
+
+    @staticmethod
+    def get_via_kuerzel(kuerzel: str) -> KategorieTypen:
+        """
+        Get a KategorieTypen instance by its kuerzel.
+        """
+        kategorie_typen = db.session.query(
+            KategorieTypen).filter_by(kuerzel=kuerzel).first()
+        if not kategorie_typen:
+            raise ElementDoesNotExsist(
+                f"KategorieTypen mit kuerzel \"{kuerzel}\" existiert nicht")
+        return kategorie_typen
 
 
 class KategorieSpezifisch(BaseTable):
@@ -250,6 +304,41 @@ class KategorieSpezifisch(BaseTable):
             m.to_dict(depth=max(depth, 1), _visited=_visited) for m in self.material]
         return data
 
+    @staticmethod
+    def get_via_kuerzel(kuerzel: str, typ: KategorieTypen) -> KategorieSpezifisch:
+        """
+        Get a KategorieSpezifisch instance by its kuerzel.
+        """
+        if not isinstance(typ, KategorieTypen):
+            raise TypeError("typ muss ein KategorieTypen Objekt sein")
+
+        print(
+            f"Searching for KategorieSpezifisch with kuerzel: {kuerzel} and typ: {typ.kuerzel}")
+
+        kategorie_spezifisch = db.session.query(KategorieSpezifisch).filter_by(
+            kuerzel=kuerzel, kategorie_typen_id=typ.id).first()
+        print(kategorie_spezifisch)
+        if not kategorie_spezifisch:
+            raise ElementDoesNotExsist(
+                f"KategorieSpezifisch mit kuerzel \"{kuerzel}\" existiert nicht")
+        return kategorie_spezifisch
+
+    @staticmethod
+    def get_via_code(code: str) -> KategorieSpezifisch:
+        """
+        Get a KategorieSpezifisch instance by its code.
+        eg. "S-E" for Seitenbahn-Einzel.
+        """
+        code = code.split("-")
+        if len(code) != 2:
+            raise ValueError(
+                "Code must be in the format 'Kuerzel-Spezifizierer'")
+        typ, spezifizierer = code
+
+        kategorie_typen = KategorieTypen.get_via_kuerzel(typ)
+        return KategorieSpezifisch.get_via_kuerzel(
+            spezifizierer, kategorie_typen)
+
 
 class Material(BaseTable):
     """
@@ -278,7 +367,7 @@ class Material(BaseTable):
 
     @staticmethod
     def create_new(name: str,
-                   kategorie: KategorieSpezifisch | None = None,
+                   kategorie: KategorieSpezifisch,
                    eigenschaften: dict | None = None,
                    description: str | None = None,
                    set: Set | None = None
@@ -287,9 +376,14 @@ class Material(BaseTable):
         if len(name) < 1 and kategorie:
             name = kategorie.name + " " + kategorie.kategorie_typen.name
 
+        if eigenschaften is None:
+            eigenschaften = {}
+        if not isinstance(eigenschaften, dict):
+            raise TypeError("eigenschaften must be a dictionary")
+
         new_material = Material(
             name=name,
-            eigenschaften=eigenschaften,
+            eigenschaften=dict(eigenschaften),
             description=description,
             spezifisch_id=kategorie.id if kategorie else None,
             set_id=set.id if set else Set.get_via_id(1).id
