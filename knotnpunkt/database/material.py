@@ -135,6 +135,7 @@ class Set(BaseTable):
 
     @staticmethod
     def create_new(number: int, setType: SetTypes) -> Set:
+        number = int(number)
 
         if not isinstance(setType, SetTypes):
             raise TypeError("setType muss ein SetTypes Objekt sein")
@@ -267,7 +268,7 @@ class Material(BaseTable):
         'KategorieSpezifisch', back_populates="material")
 
     set_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey('set.id'), nullable=False)
+        ForeignKey('set.id'), nullable=True)
     set: Mapped[Optional[Set]] = relationship(
         'Set', back_populates="materials")
 
@@ -282,6 +283,9 @@ class Material(BaseTable):
                    description: str | None = None,
                    set: Set | None = None
                    ) -> Material:
+
+        if len(name) < 1 and kategorie:
+            name = kategorie.name + " " + kategorie.kategorie_typen.name
 
         new_material = Material(
             name=name,
