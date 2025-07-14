@@ -52,13 +52,6 @@ def new_material():
 
     form = NewMaterialForm()
 
-    form.category.choices = [(k.get("id"), k.get("name")) for k in ks]
-    form.set.choices = [(s.id, s.name) for s in Set.get_all()]
-
-    form.update_form()
-
-    print(form.category.choices)
-
     if form.validate_on_submit():
         kategorie = KategorieSpezifisch.get_via_id(form.category.data)
         title = form.title.data if form.title.data else kategorie.kategorie_typen.name
