@@ -1,0 +1,63 @@
+{% extends "material/sets/base.html" %}
+
+{% block tab %}
+<div>
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-md-5">
+            <img src="https://placehold.co/400x2000" alt="My Collection" class="img-fluid rounded shadow-sm"
+                style="object-fit: cover; object-position: center; width: 100%; height: 300px;">
+        </div>
+        <div class="col-12 col-md-7 d-flex flex-column">
+            <h1 class="mb-3">{{ set.number }}.{{ set.setType.name }}</h1>
+            <div>
+                <div class="input-group mb-3 ">
+                    <span class="input-group-text">Material Überprüfen:</span>
+                    <a href="#" class="btn btn-secondary flex-grow-0">
+                        <!-- <i class="bi bi-plus-circle"></i> -->
+                        <i class="bi bi-qr-code-scan"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items by Type as Accordion (multi-open enabled) -->
+    <div class="accordion mb-3" id="accordionSet">
+        {% for group in set.groups %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-{{ loop.index }}">
+                <button class="accordion-button persist collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse-{{ loop.index }}-sets" aria-expanded="false"
+                    aria-controls="collapse-{{ loop.index }}-sets">
+                    <span class="badge bg-secondary me-2">{{ group.materials|length }}</span>
+                    <span class="text-decoration-underline text-truncate">
+                        {{ group.kategorie.name }} {{ group.kategorie.kategorie_typen.name }}
+                    </span>
+                </button>
+            </h2>
+            <div id="collapse-{{ loop.index }}-sets" class="accordion-collapse collapse"
+                aria-labelledby="heading-{{ loop.index }}">
+                <div class="accordion-body p-0 mx-3">
+                    <ul class="list-group list-group-flush">
+                        {% for material in group.materials %}
+                        <a class="list-group-item list-group-item-action"
+                            href="{{ url_for('site.material.show', id=material.id) }}">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ material.name }}</strong><br>
+                                    <small class="text-muted">{{ material.description }}</small>
+                                </div>
+                                <span class="text-end">
+                                    Nr. {{ material.numberinset or '-' }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
