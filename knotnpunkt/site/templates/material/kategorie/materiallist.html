@@ -1,0 +1,52 @@
+{% macro materiallist(title, material) %}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>{{title}}</strong>
+        <span class="badge text-bg-secondary"> {{material|length}} </span>
+    </div>
+
+    <ul class="list-group">
+        {% if not material %}
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col">
+                    <h5>Keine Materialien vorhanden</h5>
+                </div>
+            </div>
+        </li>
+        {% endif %}
+
+        {% for m in material %}
+
+        <a href="{{url_for('site.material.show', id=m.id)}}"
+            class="list-group-item list-group-item-action text-decoration-none text-reset">
+            <div class="row">
+                <div class="col-auto">
+                    {% if m != None %}
+                    <img src="data:image/jpg;base64,{{ m }}" class="img-fluid" alt="" style="height: 4em;">
+                    {% else %}
+                    <img style="height: 4em;" src="" alt="">
+                    {% endif %}
+                </div>
+                <div class="col">
+                    <h5>{{m.name}}</h5>
+                    <div>{{m.spezifisch.name}}</div>
+                </div>
+                <div class="col">
+
+                    <div class="text-danger">Nicht verfügbar</div>
+
+                </div>
+                <div class="col d-none d-sm-block">
+                    <div style="font-size: 0.8em;">Zuletzt Geändert</div>
+                </div>
+            </div>
+        </a>
+
+        {% endfor %}
+    </ul>
+
+    <div class="card-footer small text-muted"></div>
+</div>
+{% endmacro %}

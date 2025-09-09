@@ -1,39 +1,6 @@
 {%extends "base.html"%}
 
-{% block content%}
-
-<nav>
-    <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-        <a class="nav-link {% if 'overview' in request.path %} active {% endif %}"
-            href="{{ url_for('site.material.material') }}">
-            Material
-        </a>
-
-        <a class="nav-link {% if 'overview' in request.path %} active {% endif %}"
-            href="{{ url_for('site.material.kategorie.show') }}">
-            Typen
-        </a>
-
-        <a class="nav-link {% if 'overview' in request.path %} active {% endif %}"
-            href="{{ url_for('site.material.sets.index') }}">
-            Sets
-        </a>
-
-        <a class="nav-link {% if 'new' in request.path %} active {% endif %}"
-            href="{{ url_for('site.material.new_material') }}">
-            Hinzufügen...
-        </a>
-
-        <a class="nav-link {% if 'scanner' in request.path %} active {% endif %}"
-            href="{{ url_for('site.material.scanner') }}">
-            Scanner
-        </a>
-    </div>
-</nav>
-
-{% block tab %}
-{% endblock %}
-
-
-
-{% endblock %}
+{%block breadcrumbs%}
+{{ super() }}
+<a class="breadcrumb-item" href="{{url_for('site.material.material')}}">Material</a>
+{%endblock%}

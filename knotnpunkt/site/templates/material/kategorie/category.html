@@ -1,0 +1,129 @@
+{%extends "material/kategorie/index.html"%}
+
+{% block breadcrumbs%}
+{{ super() }}
+<a class="breadcrumb-item" href="{{url_for('site.material.kategorie.category', id=kategorie.id)}}">
+    {{ kategorie.name }}
+</a>
+{%endblock%}
+
+{% block content%}
+
+
+
+<div class="row g-4">
+    <!-- Subkategorien -->
+    <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header"><strong>Subkategorien</strong></div>
+            <div class="list-group list-group-flush">
+                {% for s in subkategorien %}
+                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                    href="{{ url_for('site.material.kategorie.subcategory', id=s.id) }}">
+                    <span>{{ s.kuerzel }}</span> {{ s.name }}
+                    <span class="badge text-bg-secondary">{{ s.material|length }}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Expand/collapse trigger -->
+            <div class="card-footer border-top">
+                <button class="btn btn-sm btn-outline-secondary w-100" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#newSubcatForm" aria-expanded="false" aria-controls="newSubcatForm">
+                    Neue Subkategorie anlegen
+                </button>
+
+                <!-- Collapsible form -->
+                <div class="collapse mt-3" id="newSubcatForm">
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Name</span>
+                            {{ form.name(class="form-control", aria_label="Name") }}
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Kürzel</span>
+                            {{ form.kuerzel(class="form-control", aria_label="Kürzel") }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter + Liste -->
+    <div class="col-12 col-lg-8">
+        <div class="accordion mb-3" id="accordionExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed persist fw-bold" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        Filter
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+
+                    <div class="m-3">
+                        <form method="get" action="#">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="search">Suchbegriff</label>
+                                    <input type="search" id="search" class="form-control"
+                                        placeholder="z. B. 2-Personen, 4-Jahreszeiten …">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="subfilter">Subkategorie</label>
+                                    <select id="subfilter" class="form-select">
+                                        <option value="">Alle</option>
+                                        <option>Leichtzelte</option>
+                                        <option>Familienzelte</option>
+                                        <option>Expeditionszelte</option>
+                                        <option>Tipis</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label" for="kapazitaet">Kapazität</label>
+                                    <select id="kapazitaet" class="form-select">
+                                        <option value="">Alle</option>
+                                        <option>1-2 Personen</option>
+                                        <option>3-4 Personen</option>
+                                        <option>5+ Personen</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label" for="saisons">Saison</label>
+                                    <select id="saisons" class="form-select">
+                                        <option value="">Alle</option>
+                                        <option>3-Jahreszeiten</option>
+                                        <option>4-Jahreszeiten</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label" for="gewicht">Max. Gewicht (kg)</label>
+                                    <input type="number" step="0.1" min="0" id="gewicht" class="form-control"
+                                        placeholder="z. B. 2.5">
+                                </div>
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Anwenden</button>
+                                <button type="reset" class="btn btn-outline-secondary">Zurücksetzen</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {{ materiallist(kategorie.name, material) }}
+    </div>
+</div>
+
+<footer class="py-4 border-top">
+    <div class="container small text-muted">Demo ohne Funktionalität – nur HTML &amp; Bootstrap.</div>
+</footer>
+
+{% endblock %}

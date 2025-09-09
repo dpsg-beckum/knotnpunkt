@@ -6,7 +6,7 @@ from wtforms.fields import (SelectField, SelectMultipleField, StringField,
                             SubmitField, TextAreaField)
 from wtforms.validators import DataRequired, EqualTo, Length, Optional, length
 
-from ..forms import KPForm
+from ...forms import KPForm
 
 
 class NewKategorieStep1Form(KPForm):
@@ -14,7 +14,7 @@ class NewKategorieStep1Form(KPForm):
                        DataRequired()])
     kuerzel = StringField('Kürzel', validators=[
                           DataRequired()])
-    submit = SubmitField('Speichern')
+    submit = SubmitField('Kategorien erstellen')
 
 
 class NewKategorieStep2Form(KPForm):
@@ -22,4 +22,4 @@ class NewKategorieStep2Form(KPForm):
                        DataRequired()])
     kuerzel = StringField('Kürzel', validators=[
                           DataRequired()])
-    submit = SubmitField('Speichern')
+    submit = SubmitField('Subkategorie erstellen')
