@@ -7,31 +7,38 @@ from wtforms.fields import (SelectField, SelectMultipleField, StringField,
 from wtforms.validators import DataRequired, EqualTo, Length, Optional, length
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from ...database.material import KategorieSpezifisch, Set
+from ...database.material import (KategorieSpezifisch, KategorieTypen, Set,
+                                  SetTypes)
 from ..forms import KPForm
 
 
 class NewMaterialForm(KPForm):
     title = StringField('Name', validators=[
                         Optional()], render_kw={"placeholder": "Automatisch"})
-    category = QuerySelectField(
+    category = SelectField(
         "Kategorie",
-        query_factory=KategorieSpezifisch.get_all,
-        get_label=lambda k: f"{k.kategorie_typen.kuerzel}{k.kuerzel} ({k.kategorie_typen.name} {k.name})",
-        allow_blank=False,
+        coerce=int,
+        validators=[DataRequired()]
     )
     description = TextAreaField('Beschreibung', validators=[Optional()])
     artNr = StringField('Artikelnummer', validators=[Optional()])
-    set = QuerySelectField(
+    set = SelectField(
         "Set",
-        query_factory=Set.get_all,
-        get_label=lambda s: f"{s.number}.{s.setType.kuerzel} ({s.setType.name})",
-        allow_blank=True,
-        blank_text="Kein Set"
+        coerce=int,
+        validators=[DataRequired()]
     )
     images = MultipleFileField('Bilder', validators=[
                                FileAllowed(['jpg', 'png'], 'Nur Bilder erlaubt')])
     submit = SubmitField('Speichern')
+
+    def populate_obj(self, obj=None):
+        self.category.choices = {"Kein": [(-1, "Kein")]} | {
+            k.name: [(s.id, s.name) for s in KategorieSpezifisch.filter_by(kategorie_typen_id=k.id)] for k in KategorieTypen.get_all()}
+
+        self.set.choices = {"Kein": [(-1, "Kein")]} | {
+            k.name: [(s.id, s.name) for s in Set.filter_by(setType_id=k.id)] for k in SetTypes.get_all()}
+
+        super().populate_obj(obj)
 
 
 class MultiCheckboxField(SelectMultipleField):

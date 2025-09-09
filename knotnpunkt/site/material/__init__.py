@@ -18,12 +18,12 @@ from werkzeug.utils import redirect
 from ...database.material import (Ausleihe, Img, KategorieSpezifisch, Material,
                                   Set)
 from ...utils import checkverfuegbarkeit
-from .kategorien import kategorie_site
+from .kategorie import kategorie_material_site
 from .materialforms import EditMaterialForm, NewMaterialForm
 from .sets import sets_site
 
 material_site = Blueprint("material", __name__, url_prefix="/material")
-material_site.register_blueprint(kategorie_site)
+material_site.register_blueprint(kategorie_material_site)
 material_site.register_blueprint(sets_site)
 
 
@@ -42,7 +42,6 @@ def new_material():
 
     ks: list[dict[str, str | dict]] = []
     for i in [k.to_dict() for k in all_kategorien]:
-        print(i)
         kuerzel = f"{i['kategorie_typen']['kuerzel']}{i.get('kuerzel')}"
         data = {
             "id": i.get("id"),
@@ -51,9 +50,15 @@ def new_material():
         ks.append(data)
 
     form = NewMaterialForm()
+    form.populate_obj(request.form)
 
     if form.validate_on_submit():
-        kategorie = KategorieSpezifisch.get_via_id(form.category.data)
+        kategorie = None
+        if form.category.data is not -1:
+            kategorie = KategorieSpezifisch.get_via_id(form.category.data)
+        if not kategorie and not form.title.data:
+            flash("Bitte eine Kategorie auswählen oder einen Namen vergeben", "danger")
+            return render_template('material/new.html', form=form)
         title = form.title.data if form.title.data else kategorie.kategorie_typen.name
         Material.create_new(
             name=title,
