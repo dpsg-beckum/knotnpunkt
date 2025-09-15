@@ -17,10 +17,10 @@ from sqlalchemy import desc
 from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.utils import redirect
 
-from ...database.exceptions import ElementAlreadyExists, ElementDoesNotExsist
-from ...database.material import (Ausleihe, Img, KategorieSpezifisch,
-                                  KategorieTypen, Material, Set, SetTypes)
-from ...utils import checkverfuegbarkeit
+from ....database.exceptions import ElementAlreadyExists, ElementDoesNotExsist
+from ....database.material import (Ausleihe, Img, KategorieSpezifisch,
+                                   KategorieTypen, Material, Set, SetTypes)
+from ....utils import checkverfuegbarkeit
 from .setforms import NewSetForm, NewSetTypeForm
 
 sets_site = Blueprint("sets", __name__, url_prefix="/sets")
@@ -34,7 +34,26 @@ def auth():
 
 @sets_site.get("/")
 def index():
-    return redirect(url_for('.overview'))
+    form = NewSetTypeForm()
+
+    return render_template("material/sets/index.html",
+                           form=form,
+                           setstypes=[s.to_dict(1)
+                                      for s in SetTypes.get_all()],
+                           sets=[s.to_dict(1) for s in Set.get_all()]
+                           )
+
+
+@sets_site.route("/category/<int:id>", methods=['GET', 'POST'])
+def category(id):
+    set_type = SetTypes.get_via_id(id)
+    sets = Set.filter_by(setType_id=set_type.id)
+
+    form = NewSetForm()
+    return render_template("material/sets/category.html",
+                           form=form,
+                           set_type=set_type.to_dict(),
+                           sets=[s.to_dict(1) for s in sets])
 
 
 @sets_site.route("/overview", methods=['GET', 'POST'])
