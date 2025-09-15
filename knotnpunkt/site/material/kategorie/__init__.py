@@ -1,26 +1,10 @@
-import base64
-import json
-from datetime import date
-from datetime import datetime as dt
-from logging import debug
-from pprint import pprint
-
-import humanize as hu
-from flask import Blueprint, abort, flash, jsonify, request
+from flask import Blueprint, flash
 from flask.helpers import url_for
 from flask.templating import render_template
-from flask_login import current_user
-from flask_login.utils import login_required
-from sqlalchemy import desc
-from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.utils import redirect
 
-from ....database.exceptions import ElementAlreadyExists, ElementDoesNotExsist
-from ....database.material import (Ausleihe, Img, KategorieSpezifisch,
-                                   KategorieTypen, Material, Set)
-from ....utils import checkverfuegbarkeit
-from ..materialforms import EditMaterialForm, NewMaterialForm
-from ..sets import sets_site
+from ....database.exceptions import ElementAlreadyExists
+from ....database.material import KategorieSpezifisch, KategorieTypen, Material
 from .kategorienforms import NewKategorieStep1Form, NewKategorieStep2Form
 
 kategorie_material_site = Blueprint(
