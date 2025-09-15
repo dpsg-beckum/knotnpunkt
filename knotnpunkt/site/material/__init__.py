@@ -95,7 +95,7 @@ def material():
                            jsonRef=json, huRef=hu, dtRef=dt)
 
 
-@material_site.route('/<int:id>/show', methods=['GET'])
+@material_site.route('/<int:id>', methods=['GET'])
 def show(id):
     print(f"Getting Material with ID {id}")
     mat = Material.get_via_id(id)
