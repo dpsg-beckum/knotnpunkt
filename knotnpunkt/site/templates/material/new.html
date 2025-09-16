@@ -1,54 +1,88 @@
-{%extends "material/base.html"%}
+{% extends "material/base.html" %}
 
-{% block tab%}
-<form method="post">
-    {{ form.hidden_tag() }}
+{%block breadcrumbs%}
+{{ super() }}
+<p class="breadcrumb-item">Neu</p>
+{%endblock%}
 
+{% block content %}
+<div class="container py-3">
+    <form method="post">
+        {{ form.hidden_tag() }}
 
-    <div class="row mb-3">
-        <div class="col-2">
-            {{ form.submit(class="btn btn-success") }}
+        <!-- Form card -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <!-- Title -->
+                    <div class="col-12">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.title.id }}" class="col-12 col-md-2 col-form-label text-md-end">
+                                {{ form.title.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-10">
+                                {{ form.title(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.category.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.category.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.category(class="form-select") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Set -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.set.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.set.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.set(class="form-select") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        <div class="row g-0 g-md-2 align-items-start">
+                            <label for="{{ form.description.id }}" class="col-12 col-md-2 col-form-label text-md-end">
+                                {{ form.description.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-10">
+                                {{ form.description(class="form-control", rows="3") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ArtNr -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.artNr.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.artNr.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.artNr(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Submit again at the bottom for convenience -->
+            <div class="card-footer bg-body d-flex justify-content-end">
+                {{ form.submit(class="btn btn-success") }}
+            </div>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xl-4 border mx-xl-2 py-2">
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ form.title.label.text }}</div>
-                <div class="col-8">
-                    {{ form.title(class="form-control") }}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ form.category.label.text }}</div>
-                <div class="col-8">
-                    {{ form.category(class="form-select") }}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ form.description.label.text }}</div>
-                <div class="col-8">
-                    {{ form.description(class="form-control") }}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ form.set.label.text }}</div>
-                <div class="col-8">
-                    {{ form.set(class="form-select") }}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ form.artNr.label.text }}</div>
-                <div class="col-8">
-                    {{ form.artNr(class="form-control") }}
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-{% endblock%}
+    </form>
+</div>
+{% endblock %}

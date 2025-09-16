@@ -34,20 +34,7 @@ def auth():
 
 
 @material_site.route("/new", methods=['GET', 'POST'])
-def new_material():
-
-    all_kategorien = KategorieSpezifisch.get_all()
-
-    # return str([k.to_dict() for k in all_kategorien])
-
-    ks: list[dict[str, str | dict]] = []
-    for i in [k.to_dict() for k in all_kategorien]:
-        kuerzel = f"{i['kategorie_typen']['kuerzel']}{i.get('kuerzel')}"
-        data = {
-            "id": i.get("id"),
-            "name": f"{kuerzel} {i['kategorie_typen']['name']}-{i.get('name')}"
-        }
-        ks.append(data)
+def new():
 
     form = NewMaterialForm()
     form.populate_obj(request.form)
@@ -56,18 +43,26 @@ def new_material():
         kategorie = None
         if form.category.data is not -1:
             kategorie = KategorieSpezifisch.get_via_id(form.category.data)
+            print(f"Selected Kategorie: {kategorie}")
         if not kategorie and not form.title.data:
             flash("Bitte eine Kategorie auswählen oder einen Namen vergeben", "danger")
             return render_template('material/new.html', form=form)
         title = form.title.data if form.title.data else kategorie.kategorie_typen.name
+        set = None
+        if form.set.data and form.set.data is not -1:
+            set = Set.get_via_id(form.set.data)
+            print(f"Selected Set: {set}")
+
         Material.create_new(
             name=title,
             kategorie=kategorie,
             description=form.description.data,
             eigenschaften={
                 "artNr": form.artNr.data,
-            }
-        )
+            },
+            set=set)
+
+        flash(f"Material angelegt!", "success")
         return redirect(url_for(".material"))
 
     if form.errors:
