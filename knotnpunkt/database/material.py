@@ -386,7 +386,7 @@ class Material(BaseTable):
             eigenschaften=dict(eigenschaften),
             description=description,
             spezifisch_id=kategorie.id if kategorie else None,
-            set_id=set.id if set else Set.get_via_id(1).id
+            set_id=set.id if set else None
         )
         db.session.add(new_material)
         db.session.commit()

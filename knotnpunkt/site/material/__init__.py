@@ -53,7 +53,7 @@ def new():
             set = Set.get_via_id(form.set.data)
             print(f"Selected Set: {set}")
 
-        Material.create_new(
+        m = Material.create_new(
             name=title,
             kategorie=kategorie,
             description=form.description.data,
@@ -63,7 +63,7 @@ def new():
             set=set)
 
         flash(f"Material angelegt!", "success")
-        return redirect(url_for(".material"))
+        return redirect(url_for(".show", id=m.id))
 
     if form.errors:
         flash(f"Fehler beim Speichern des Materials {form.errors}", "danger")
