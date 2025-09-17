@@ -2,20 +2,100 @@
 
 {% block content %}
 <div>
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-md-5">
-            <img src="https://placehold.co/400x2000" alt="My Collection" class="img-fluid rounded shadow-sm"
-                style="object-fit: cover; object-position: center; width: 100%; height: 300px;">
-        </div>
-        <div class="col-12 col-md-7 d-flex flex-column">
-            <h1 class="mb-3">{{ set.number }}.{{ set.setType.name }}</h1>
-            <div>
-                <div class="input-group mb-3 ">
-                    <span class="input-group-text">Material Überprüfen:</span>
-                    <a href="#" class="btn btn-secondary flex-grow-0">
-                        <!-- <i class="bi bi-plus-circle"></i> -->
-                        <i class="bi bi-qr-code-scan"></i>
-                    </a>
+    <div class="card mb-3">
+        <div class="row g-0">
+            <!-- Images -->
+            <div class="col-md-6 d-flex">
+                <div id="imgcarousel" class="carousel slide flex-grow-1 h-100" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        {% for image in images %}
+                        <button type="button" data-bs-target="#imgcarousel" data-bs-slide-to="{{ loop.index0 }}"
+                            class="{% if loop.first %} active{% endif %}" aria-current="true"
+                            aria-label="Slide {{ loop.index }}"></button>
+                        {% endfor %}
+                    </div>
+                    <div class="carousel-inner h-100">
+                        {% if images and images|length > 0 %}
+                        {% for image in images %}
+                        <div class="carousel-item{% if loop.first %} active {% endif %} h-100">
+                            <img src="{{ url_for('apiv1.img.get_img', id=image.id) }}" class="d-block w-100 h-100"
+                                style="object-fit: contain;" alt="">
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="carousel-item active h-100">
+                            <img src="{{ url_for('static', filename='Zelte_icon.svg') }}" class="d-block w-100 h-100"
+                                style="object-fit: contain;">
+                        </div>
+                        {% endif %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#imgcarousel"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#imgcarousel"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Material Info -->
+            <div class="col-md-6">
+                <div class="card-body" id="materialInfoCardBody">
+                    {% if set.name %}
+                    <h3 class="card-title">{{ set.name }}</h3>
+                    <p class="fw-medium">{{ set.number }}.{{ set.setType.name }}</p>
+                    {% else %}
+                    <h3 class="card-title">{{ set.number }}.{{ set.setType.name }}</h3>
+                    {% endif %}
+                    <!-- <h5 class="card-title"><b>{{ set.number }}.{{ set.setType.name }}</b></h5> -->
+                    <p class="card-text">{{ set.description }}</p>
+                    <p class="card-text">
+                        <!-- {{set}}-{{set}} -->
+                    </p>
+                    <br>
+                    <b>Rüsthaus-Artikelnummer:</b>
+                    <p class="card-text"> {{ set.eigenschaften }} </p>
+                    <br>
+
+                    <div class="input-group mb-3">
+                        {% if set %}
+                        <a href="{{ url_for('site.material.sets.show', id=1) }}" class="btn btn-success flex-grow-1">
+                            Enthalten im Set
+                            <!-- {{set.number}}.{{set}} -->
+                            <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                        {% else %}
+
+                        <div class="input-group-text col-12 justify-content-center d-flex">
+                            In keinem Set Enthalten
+                        </div>
+                        {% endif %}
+                    </div>
+
+
+                    <br>
+
+
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ url_for('site.material.sets.edit', id=set.id) }}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+
+                        <button type="button" class="btn btn-primary">QR</button>
+
+                        <div class="input-group ">
+                            <span class="input-group-text">Material Überprüfen:</span>
+                            <a href="#" class="btn btn-secondary flex-grow-0">
+                                <!-- <i class="bi bi-plus-circle"></i> -->
+                                <i class="bi bi-qr-code-scan"></i>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
