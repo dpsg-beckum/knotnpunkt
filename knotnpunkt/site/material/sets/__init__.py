@@ -139,7 +139,7 @@ def show(id):
             kategorien[key] = []
         kategorien[key].append(m)
     for k, mats in kategorien.items():
-        mats.sort(key=lambda x: x.numberinset if x.numberinset else x.name)
+        mats.sort(key=lambda x: (x.numberinset if x.numberinset else 0, x.id))
         data = {
             "kategorie": k.to_dict(0),
             "materials": [m.to_dict(0) for m in mats],
@@ -170,3 +170,23 @@ def set_new(id):
             flash(e, "danger")
 
     return render_template("material/sets/set_new.html", form=form, set=step1.to_dict())
+
+
+@sets_site.route("/<int:id>/edit", methods=['GET', 'POST'])
+def edit(id):
+    set = Set.get_via_id(id)
+
+    form = NewSetForm(obj=set)
+
+    if form.validate_on_submit():
+        try:
+            set.update(
+                number=form.number.data,
+                setType=form.set_type.data
+            )
+            flash("Set erfolgreich bearbeitet", "success")
+            return redirect(url_for(".show", id=set.id))
+        except ElementAlreadyExists as e:
+            flash(e, "danger")
+
+    return render_template("material/sets/edit.html", form=form, set=set.to_dict())
