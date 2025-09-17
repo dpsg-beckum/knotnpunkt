@@ -27,18 +27,6 @@
                         </div>
                     </div>
 
-                    <!-- Category -->
-                    <div class="col-12 col-lg-6">
-                        <div class="row g-0 g-md-2 align-items-center">
-                            <label for="{{ form.category.id }}" class="col-12 col-md-4 col-form-label text-md-end">
-                                {{ form.category.label.text }}:
-                            </label>
-                            <div class="col-12 col-md-8">
-                                {{ form.category(class="form-select") }}
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Set -->
                     <div class="col-12 col-lg-6">
                         <div class="row g-0 g-md-2 align-items-center">
@@ -47,6 +35,30 @@
                             </label>
                             <div class="col-12 col-md-8">
                                 {{ form.set(class="form-select") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- nrset -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.set.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.nrset.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.nrset(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.category.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.category.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.category(class="form-select") }}
                             </div>
                         </div>
                     </div>

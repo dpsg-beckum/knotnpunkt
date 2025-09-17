@@ -2,9 +2,11 @@ import wtforms.widgets as widgets
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, MultipleFileField
 from werkzeug.datastructures.structures import ImmutableMultiDict
-from wtforms.fields import (SelectField, SelectMultipleField, StringField,
-                            SubmitField, TextAreaField)
-from wtforms.validators import DataRequired, EqualTo, Length, Optional, length
+from wtforms.fields import (DecimalField, IntegerField, SelectField,
+                            SelectMultipleField, StringField, SubmitField,
+                            TextAreaField)
+from wtforms.validators import (DataRequired, EqualTo, Length, NumberRange,
+                                Optional, length)
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from ...database.material import (Img, KategorieSpezifisch, KategorieTypen,
@@ -27,6 +29,8 @@ class NewMaterialForm(KPForm):
         coerce=int,
         validators=[DataRequired()]
     )
+    nrset = IntegerField('Nummer im Set', validators=[
+                         Optional(), NumberRange(min=0)], default=0)
     images = MultipleFileField('Bilder', validators=[
                                FileAllowed(['jpg', 'png'], 'Nur Bilder erlaubt')])
     submit = SubmitField('Speichern')

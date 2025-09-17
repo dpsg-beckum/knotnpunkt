@@ -53,6 +53,10 @@ def new():
             set = Set.get_via_id(form.set.data)
             print(f"Selected Set: {set}")
 
+        nrset = None
+        if form.nrset.data and form.nrset.data > 0:
+            nrset = form.nrset.data
+
         m = Material.create_new(
             name=title,
             kategorie=kategorie,
@@ -60,7 +64,8 @@ def new():
             eigenschaften={
                 "artNr": form.artNr.data,
             },
-            set=set)
+            set=set,
+            nrset=nrset)
 
         flash(f"Material angelegt!", "success")
         return redirect(url_for(".show", id=m.id))
@@ -142,9 +147,14 @@ def edit(id):
 
         kategorie = KategorieSpezifisch.get_via_id(form.category.data)
         set = Set.get_via_id(form.set.data)
+        nrset = None
+        if form.nrset.data and form.nrset.data > 0:
+            nrset = form.nrset.data
+
         material.update(
             name=form.title.data,
             description=form.description.data,
+            numberinset=nrset,
             eigenschaften=dict(material.eigenschaften) | {
                 "artNr": form.artNr.data}
         )
@@ -175,11 +185,11 @@ def edit(id):
             f"Fehler beim Speichern des Materials {form.errors}", "danger")
 
     form.title.data = material.name
-    # materialForm.category.data = "SE Seitenbahn-Einzel"
     form.category.data = material.spezifisch_id
     form.description.data = material.description
     form.artNr.data = material.eigenschaften.get("artNr", "")
     form.set.data = material.set_id
+    form.nrset.data = material.numberinset
     form.update_form()
 
     return render_template('material/edit.html',
