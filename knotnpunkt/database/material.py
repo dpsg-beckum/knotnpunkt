@@ -92,6 +92,30 @@ class Ausleihe(BaseTable):
         return f"<Ausleihe {props}>"
 
 
+class SetImg(BaseTable):
+    __tablename__ = 'set_img'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    set_id: Mapped[int] = mapped_column(
+        ForeignKey('set.id'), nullable=False)
+    img: Mapped[str] = mapped_column(String, nullable=False)
+    mimetype: Mapped[str] = mapped_column(String, nullable=False)
+
+    @staticmethod
+    def create_new(set: Set, img: str, mimetype: str) -> Img:
+        new_img = Img(
+            material_id=set.id,
+            img=img,
+            mimetype=mimetype
+        )
+        db.session.add(new_img)
+        db.session.commit()
+        return new_img
+
+    def delete(self) -> None:
+        db.session.delete(self)
+        db.session.commit()
+
+
 class SetTypes(BaseTable):
     """
     Speichert die Typen von Sets
@@ -137,6 +161,8 @@ class Set(BaseTable):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     number: Mapped[int] = mapped_column(Integer, nullable=False)
+    name: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(Text)
 
     setType_id: Mapped[int] = mapped_column(
         ForeignKey('settypes.id'), nullable=False)
@@ -145,8 +171,10 @@ class Set(BaseTable):
     materials: Mapped[List[Material]] = relationship(
         'Material', back_populates="set")
 
+    imgs: Mapped[List[SetImg]] = relationship('SetImg')
+
     @staticmethod
-    def create_new(number: int, setType: SetTypes) -> Set:
+    def create_new(number: int, setType: SetTypes, name: str | None = None, description: str | None = None) -> Set:
         number = int(number)
 
         if not isinstance(setType, SetTypes):
@@ -161,15 +189,13 @@ class Set(BaseTable):
 
         new_set = Set(
             number=number,
-            setType_id=setType.id
+            name=name,
+            description=description,
+            setType_id=setType.id,
         )
         db.session.add(new_set)
         db.session.commit()
         return new_set
-
-    @property
-    def name(self) -> str:
-        return f"{self.number}.{self.setType.kuerzel}"
 
     @staticmethod
     def get_via_number(number: int, setType: SetTypes) -> Set:

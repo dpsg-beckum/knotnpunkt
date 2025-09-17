@@ -167,15 +167,18 @@ if True:
     tI = SetTypes.create_new("I", "Igel")
     tC = SetTypes.create_new("C", "Küche")
 
-    Set.create_new(1, t8)
-    Set.create_new(2, t8)
-    Set.create_new(1, t6)
-    Set.create_new(2, t6)
-    Set.create_new(1, tG6)
-    Set.create_new(1, tK)
-    Set.create_new(1, tS)
-    Set.create_new(1, tI)
-    Set.create_new(1, tC)
+    Set.create_new(number=1,
+                   name="Neue Jurte",
+                   description="Eine nagelneue Jurte",
+                   setType=t8)
+    Set.create_new(number=2, setType=t8)
+    Set.create_new(number=1, setType=t6)
+    Set.create_new(number=2, setType=t6)
+    Set.create_new(number=1, setType=tG6)
+    Set.create_new(number=1, setType=tK)
+    Set.create_new(number=1, setType=tS)
+    Set.create_new(number=1, setType=tI)
+    Set.create_new(number=1, setType=tC)
 
     k = KategorieTypen.create_new("S", "Seitenbahn")
     KategorieSpezifisch.create_new("E", "Einzel", k)
