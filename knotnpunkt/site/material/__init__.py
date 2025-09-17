@@ -77,12 +77,7 @@ def new():
     return render_template('material/new.html', form=form)
 
 
-@material_site.route("/", methods=['GET', 'POST'])
-def index():
-    return render_template('material/index.html')
-
-
-@material_site.get("/overview")
+@material_site.get("/")
 def material():
     materialien = Material.get_all()
     verfuegbarkeit = checkverfuegbarkeit(materialien)
