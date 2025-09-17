@@ -424,3 +424,7 @@ class Img(BaseTable):
         db.session.add(new_img)
         db.session.commit()
         return new_img
+
+    def delete(self) -> None:
+        db.session.delete(self)
+        db.session.commit()
