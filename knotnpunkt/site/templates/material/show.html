@@ -7,7 +7,14 @@
             <div class="row g-0">
                 <!-- Images -->
                 <div class="col-md-4">
-                    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                    <div id="imgcarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            {% for image in images %}
+                            <button type="button" data-bs-target="#imgcarousel" data-bs-slide-to="{{ loop.index0 }}"
+                                class="{% if loop.first %} active{% endif %}" aria-current="true"
+                                aria-label="Slide {{ loop.index }}"></button>
+                            {% endfor %}
+                        </div>
                         <div class="carousel-inner" style="width:100%; height: 200px !important;">
                             {% if images and images|length > 0 %}
                             {% for image in images %}
@@ -26,12 +33,12 @@
                             </div>
                             {% endif %}
                         </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                        <button class="carousel-control-prev" type="button" data-bs-target="#imgcarousel"
                             data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                             <span class="visually-hidden">Previous</span>
                         </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                        <button class="carousel-control-next" type="button" data-bs-target="#imgcarousel"
                             data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                             <span class="visually-hidden">Next</span>
