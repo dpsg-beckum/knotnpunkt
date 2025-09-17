@@ -1,100 +1,206 @@
-{%extends "base.html"%}
+{% extends "material/base.html" %}
 
-{% block content %}
+{%block breadcrumbs%}
+{{ super() }}
+<p class="breadcrumb-item">
+    {{material.name}}
+    {% if material.eigenschaften.artNr %}
+    ({{material.eigenschaften.artNr}})
+    {% endif %}
+    Bearbeiten</p>
+{%endblock%}
 
+{% block additionalHeader %}
+{{ super() }}
 <style>
-    /* CSS */
-    .img-label {
-        cursor: pointer;
-        display: inline-block;
+    .img-wrapper {
         position: relative;
+        overflow: hidden;
+        display: block;
     }
 
-    .img-label img {
+    /* Base image */
+    label img {
+        cursor: pointer;
         transition: filter 0.3s ease;
-        width: 150px;
-        /* Adjust the size as needed */
-        height: auto;
+        display: block;
+        width: 100%;
     }
 
-    /* When the checkbox is checked, apply a darkening filter to the image */
-    input[type="checkbox"]:checked+.img-label img {
-        filter: brightness(50%);
+    label img:hover {
+        filter: brightness(0.85);
+    }
+
+    /* Red overlay when checked */
+    .img-check-input:checked+label::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(220, 53, 69, 0.5);
+        /* Bootstrap red w/ transparency */
+        z-index: 1;
+        /* sits above image, below trash */
+    }
+
+    /* Trash overlay */
+    .trash-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3rem;
+        color: #fff;
+        /* stays white */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 2;
+        /* above red overlay */
+        pointer-events: none;
+    }
+
+    /* Show trash icon when checked */
+    .img-check-input:checked+label .trash-overlay {
+        opacity: 1;
     }
 </style>
-
-<form method="post" enctype="multipart/form-data">
-    {{ materialForm.hidden_tag() }}
+{% endblock %}
 
 
-    <div class="row mb-3">
-        <div class="col-2">
-            {{ materialForm.submit(class="btn btn-success") }}
+{% block content %}
+<div class="py-3">
+    <form method="post" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <!-- Form card -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Featured
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <!-- Title -->
+                    <div class="col-12">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.title.id }}" class="col-12 col-md-2 col-form-label text-md-end">
+                                {{ form.title.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-10">
+                                {{ form.title(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.category.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.category.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.category(class="form-select") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Set -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.set.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.set.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.set(class="form-select") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        <div class="row g-0 g-md-2 align-items-start">
+                            <label for="{{ form.description.id }}" class="col-12 col-md-2 col-form-label text-md-end">
+                                {{ form.description.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-10">
+                                {{ form.description(class="form-control", rows="3") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ArtNr -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.artNr.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.artNr.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.artNr(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Img Upload -->
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-0 g-md-2 align-items-center">
+                            <label for="{{ form.artNr.id }}" class="col-12 col-md-4 col-form-label text-md-end">
+                                {{ form.images.label.text }}:
+                            </label>
+                            <div class="col-12 col-md-8">
+                                {{ form.images(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- Submit again at the bottom for convenience -->
+            <div class="card-footer bg-body d-flex justify-content-end">
+                {{ form.submit(class="btn btn-success") }}
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-xl-4 border mx-xl-2 py-2">
+        <hr>
 
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ materialForm.title.label.text }}</div>
-                <div class="col-8">
-                    {{ materialForm.title(class="form-control") }}
+
+        <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
+
+            {% for image in form.delete_images %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+
+                    <!-- Hidden checkbox -->
+                    {{ image(class="img-check-input d-none", id=image.id) }}
+
+                    <!-- Label wraps image + overlay -->
+                    <label for="{{ image.id }}" class="m-0 img-wrapper">
+                        <img src="{{ url_for('apiv1.img.get_img', id=image.label.text) }}"
+                            class="card-img-top img-fluid" alt="{{ image.label.text }}" loading="lazy"
+                            style="object-fit: cover; height: 220px;">
+                        <div class="trash-overlay">
+                            <i class="bi bi-trash-fill"></i>
+                        </div>
+                    </label>
+
+                    <!-- Optional caption -->
+                    <!-- <div class="card-body p-2">
+                        <h6 class="card-title text-truncate mb-0">
+                            {{ image.label.text }}
+                        </h6>
+                    </div> -->
+
                 </div>
             </div>
+            {% endfor %}
 
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ materialForm.category.label.text }}</div>
-                <div class="col-8">
-                    {{ materialForm.category(class="form-select") }}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ materialForm.description.label.text }}</div>
-                <div class="col-8">
-                    {{ materialForm.description(class="form-control") }}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ materialForm.artNr.label.text }}</div>
-                <div class="col-8">
-                    {{ materialForm.artNr(class="form-control") }}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ materialForm.images.label.text }}</div>
-                <div class="col-8">
-                    {{ materialForm.images(class="form-control") }}
-                </div>
-            </div>
-
-
-
-            <div class="row mb-3">
-                <div class="col-4 text-end align-middle">{{ materialForm.set.label.text }}</div>
-                <div class="col-8">
-                    {{ materialForm.set(class="form-select") }}
-                </div>
-            </div>
         </div>
-    </div>
 
-    <div>
-        {% for image in materialForm.delete_images %}
-        <div class="row mb-3">
-            <div class="col-8">
-                {{ image(class="d-none") }}
-            </div>
-            <p> {{ image.label }} </p>
-            <label for="delete_images-0" class="img-label">
-                <img src="{{ url_for('apiv1.img.get_img', id=image.label.text) }}" class="img-fluid" alt=""
-                    style='height: 100%; width: 100%; object-fit: contain'>
-            </label>
-        </div>
-        {% endfor %}
-    </div>
-</form>
-{% endblock%}
+
+
+    </form>
+</div>
+{% endblock %}

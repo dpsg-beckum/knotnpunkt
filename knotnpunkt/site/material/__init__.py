@@ -135,20 +135,7 @@ def edit(id):
     material = Material.get_via_id(id)
 
     form = EditMaterialForm()
-
-    form.delete_images.choices = [(i.id, i.id)
-                                  for i in Img.filter_by(material_id=id)]
-
-    ks: list[dict[str, str | dict]] = []
-    for i in [k.to_dict() for k in KategorieSpezifisch.get_all()]:
-        kuerzel = f"{i['kategorie_typen']['kuerzel']}{i.get('kuerzel')}"
-        data = {
-            "id": i.get("id"),
-            "name": f"{kuerzel} {i['kategorie_typen']['name']}-{i.get('name')}"
-        }
-        ks.append(data)
-    form.category.choices = [(k.get("id"), k.get("name")) for k in ks]
-    form.set.choices = [(s.id, s.name) for s in Set.get_all()]
+    form.populate_obj(request.form, material=material)
 
     if form.validate_on_submit():
         print(form.images.data)
@@ -165,7 +152,6 @@ def edit(id):
         material.add_to_set(set)
 
         if form.images.data:
-
             image: FileStorage
             for image in form.images.data:
                 print(image)
@@ -175,7 +161,14 @@ def edit(id):
                     img=image.stream.read(),
                     mimetype=image.mimetype
                 )
-        return redirect(url_for(".material"))
+
+        if form.delete_images.data:
+            for img_id in form.delete_images.data:
+                img = Img.get_via_id(img_id)
+                if img and img.material_id == material.id:
+                    img.delete()
+
+        return redirect(url_for(".show", id=material.id))
 
     if form.errors:
         flash(
@@ -191,7 +184,7 @@ def edit(id):
 
     return render_template('material/edit.html',
                            material=material.to_dict(),
-                           materialForm=form)
+                           form=form)
 
 
 @material_site.route('/reservieren/<idMaterial>', methods=['POST'])

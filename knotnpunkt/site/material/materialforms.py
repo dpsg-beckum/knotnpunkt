@@ -7,8 +7,8 @@ from wtforms.fields import (SelectField, SelectMultipleField, StringField,
 from wtforms.validators import DataRequired, EqualTo, Length, Optional, length
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from ...database.material import (KategorieSpezifisch, KategorieTypen, Set,
-                                  SetTypes)
+from ...database.material import (Img, KategorieSpezifisch, KategorieTypen,
+                                  Material, Set, SetTypes)
 from ..forms import KPForm
 
 
@@ -33,7 +33,7 @@ class NewMaterialForm(KPForm):
 
     def populate_obj(self, obj=None):
         self.category.choices = {"Kein": [(-1, "Kein")]} | {
-            k.name: [(s.id, s.name) for s in KategorieSpezifisch.filter_by(kategorie_typen_id=k.id)] for k in KategorieTypen.get_all()}
+            k.name: [(s.id, f"{s.name} - {k.name}") for s in KategorieSpezifisch.filter_by(kategorie_typen_id=k.id)] for k in KategorieTypen.get_all()}
 
         self.set.choices = {"Kein": [(-1, "Kein")]} | {
             k.name: [(s.id, s.name) for s in Set.filter_by(setType_id=k.id)] for k in SetTypes.get_all()}
@@ -48,3 +48,11 @@ class MultiCheckboxField(SelectMultipleField):
 
 class EditMaterialForm(NewMaterialForm):
     delete_images = MultiCheckboxField('Bilder', coerce=int)
+
+    def populate_obj(self, obj=None, material: Material = None):
+        if not material:
+            raise ValueError("material must be provided")
+
+        self.delete_images.choices = [(i.id, i.id)
+                                      for i in Img.filter_by(material_id=material.id)]
+        super().populate_obj(obj)
