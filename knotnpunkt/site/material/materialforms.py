@@ -40,7 +40,7 @@ class NewMaterialForm(KPForm):
             k.name: [(s.id, f"{s.name} - {k.name}") for s in KategorieSpezifisch.filter_by(kategorie_typen_id=k.id)] for k in KategorieTypen.get_all()}
 
         self.set.choices = {"Kein": [(-1, "Kein")]} | {
-            k.name: [(s.id, s.name) for s in Set.filter_by(setType_id=k.id)] for k in SetTypes.get_all()}
+            f"{k.kuerzel} {k.name}": [(s.id, f"{k.kuerzel}.{s.number} {s.name or ''}") for s in Set.filter_by(setType_id=k.id)] for k in SetTypes.get_all()}
 
         super().populate_obj(obj)
 
