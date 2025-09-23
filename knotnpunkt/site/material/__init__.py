@@ -65,7 +65,7 @@ def new():
                 "artNr": form.artNr.data,
             },
             set=set,
-            nrset=nrset)
+            numberinset=nrset)
 
         flash(f"Material angelegt!", "success")
         return redirect(url_for(".show", id=m.id))

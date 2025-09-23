@@ -396,7 +396,8 @@ class Material(BaseTable):
                    kategorie: KategorieSpezifisch,
                    eigenschaften: dict | None = None,
                    description: str | None = None,
-                   set: Set | None = None
+                   set: Set | None = None,
+                   numberinset: int | None = None
                    ) -> Material:
 
         if len(name) < 1 and kategorie:
@@ -412,7 +413,8 @@ class Material(BaseTable):
             eigenschaften=dict(eigenschaften),
             description=description,
             spezifisch_id=kategorie.id if kategorie else None,
-            set_id=set.id if set else None
+            set_id=set.id if set else None,
+            numberinset=numberinset
         )
         db.session.add(new_material)
         db.session.commit()
