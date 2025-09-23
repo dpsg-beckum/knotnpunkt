@@ -122,10 +122,17 @@
                 <div class="col-4 mt-1 text-xl-end">IBAN *</div>
                 <div class="col-xl">
                     <div class="input-group">
-                        {{ form.iban(class="form-control") }}
-                        <div class="invalid-feedback">
+                        {{ form.iban(class="form-control" + (" is-invalid" if form.iban.errors else "") ) }}
+                        <!-- <div class="invalid-feedback">
                             z. B. "DE91100000000123456789" oder "DE91 1000 0000 0123 4567 89"
+                        </div> -->
+                        {% if form.iban.errors %}
+                        {% for error in form.iban.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ error }}
                         </div>
+                        {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
